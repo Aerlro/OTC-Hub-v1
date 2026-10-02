@@ -106,7 +106,6 @@ function Window.Create(Settings, OTC)
     Logo.ImageTransparency = 0
     Logo.ImageColor3 = Color3.fromRGB(255, 255, 255)
     Logo.ScaleType = Enum.ScaleType.Fit
-    Logo.ResampleMode = Enum.ResamplerMode.Default
     Logo.Parent = TopBar
 
     local Title = Instance.new("TextLabel")
@@ -712,7 +711,6 @@ function Window.Create(Settings, OTC)
 
     function Object:AddTab(TabObject)
         table.insert(self.Tabs, TabObject)
-
         TabObject.Button.Parent = TabsContainer
 
         if not self.SelectedTab then
