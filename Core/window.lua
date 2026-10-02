@@ -2,7 +2,6 @@ local Window = {}
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -11,6 +10,7 @@ local LOGO_URL = "rbxassetid://82435776198191"
 local WINDOW_WIDTH = 560
 local WINDOW_HEIGHT = 380
 local MINI_SIZE = 58
+local USER_AREA_HEIGHT = 72
 
 local function create(Class, Properties)
     local Object = Instance.new(Class)
@@ -20,26 +20,6 @@ local function create(Class, Properties)
     end
 
     return Object
-end
-
-local function tween(Object, Time, Properties)
-    if not Object then
-        return
-    end
-
-    local Animation = TweenService:Create(
-        Object,
-        TweenInfo.new(
-            Time or 0.25,
-            Enum.EasingStyle.Quint,
-            Enum.EasingDirection.Out
-        ),
-        Properties
-    )
-
-    Animation:Play()
-
-    return Animation
 end
 
 local function getAvatar()
@@ -59,17 +39,16 @@ local function getAvatar()
 end
 
 function Window.Create(Settings, OTC)
-
     Settings = Settings or {}
 
     local Theme = OTC:GetTheme()
+    local Animation = OTC._AnimationModule
 
     local Object = {}
 
     Object.OTC = OTC
     Object.Settings = Settings
     Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
-
     Object.Tabs = {}
     Object.SelectedTab = nil
 
@@ -93,10 +72,7 @@ function Window.Create(Settings, OTC)
             0.5,
             -WINDOW_HEIGHT / 2
         ),
-        Size = UDim2.fromOffset(
-            WINDOW_WIDTH,
-            WINDOW_HEIGHT
-        ),
+        Size = UDim2.fromOffset(WINDOW_WIDTH, WINDOW_HEIGHT),
         ClipsDescendants = true,
         ZIndex = 1
     })
@@ -215,28 +191,56 @@ function Window.Create(Settings, OTC)
 
     Object.CloseButton = CloseButton
 
+    if Animation then
+        Animation:Press(MinimizeButton)
+    end
+
     MinimizeButton.MouseEnter:Connect(function()
-        tween(MinimizeButton, 0.15, {
-            BackgroundColor3 = Theme.Hover
-        })
+        if Animation then
+            Animation:Tween(
+                MinimizeButton,
+                {
+                    BackgroundColor3 = Theme.Hover
+                },
+                0.15
+            )
+        end
     end)
 
     MinimizeButton.MouseLeave:Connect(function()
-        tween(MinimizeButton, 0.15, {
-            BackgroundColor3 = Theme.Element
-        })
+        if Animation then
+            Animation:Tween(
+                MinimizeButton,
+                {
+                    BackgroundColor3 = Theme.Element
+                },
+                0.15
+            )
+        end
     end)
 
     CloseButton.MouseEnter:Connect(function()
-        tween(CloseButton, 0.15, {
-            TextColor3 = Theme.Text
-        })
+        if Animation then
+            Animation:Tween(
+                CloseButton,
+                {
+                    TextColor3 = Theme.Text
+                },
+                0.15
+            )
+        end
     end)
 
     CloseButton.MouseLeave:Connect(function()
-        tween(CloseButton, 0.15, {
-            TextColor3 = Theme.SubText
-        })
+        if Animation then
+            Animation:Tween(
+                CloseButton,
+                {
+                    TextColor3 = Theme.SubText
+                },
+                0.15
+            )
+        end
     end)
 
     local Sidebar = create("Frame", {
@@ -251,8 +255,6 @@ function Window.Create(Settings, OTC)
     })
 
     Object.Sidebar = Sidebar
-
-    local USER_AREA_HEIGHT = 72
 
     local TabsArea = create("Frame", {
         Name = "TabsArea",
@@ -431,7 +433,9 @@ function Window.Create(Settings, OTC)
         end
 
         for _, CurrentTab in ipairs(self.Tabs) do
-            CurrentTab:SetSelected(CurrentTab == TabObject)
+            if CurrentTab.SetSelected then
+                CurrentTab:SetSelected(CurrentTab == TabObject)
+            end
         end
 
         self.SelectedTab = TabObject
@@ -466,7 +470,7 @@ function Window.Create(Settings, OTC)
         Size = UDim2.new(1, -90, 1, 0),
         Text = "",
         AutoButtonColor = false,
-        ZIndex = 4
+        ZIndex = 7
     })
 
     DragArea.MouseButton1Down:Connect(function()
@@ -520,6 +524,10 @@ function Window.Create(Settings, OTC)
 
     Object.MinimizedButton = MiniButton
 
+    if Animation then
+        Animation:Press(MiniButton)
+    end
+
     local MiniDragging = false
     local MiniDragStart
     local MiniStartPosition
@@ -568,29 +576,46 @@ function Window.Create(Settings, OTC)
 
     local Minimized = false
     local Closed = false
+    local Transitioning = false
 
-    MinimizeButton.MouseButton1Click:Connect(function()
-        if Minimized or Closed then
+    local function setMainScale(Value)
+        if not Animation then
+            local Scale = Main:FindFirstChildOfClass("UIScale")
+
+            if not Scale then
+                Scale = Instance.new("UIScale")
+                Scale.Parent = Main
+            end
+
+            Scale.Scale = Value
             return
         end
 
+        Animation:Scale(Main, Value, 0.01)
+    end
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        if Minimized or Closed or Transitioning then
+            return
+        end
+
+        Transitioning = true
         Minimized = true
 
+        local MainPosition = Main.Position
+
         MiniButton.Position = UDim2.new(
-            Main.Position.X.Scale,
-            Main.Position.X.Offset + (WINDOW_WIDTH - MINI_SIZE) / 2,
-            Main.Position.Y.Scale,
-            Main.Position.Y.Offset + (WINDOW_HEIGHT - MINI_SIZE) / 2
+            MainPosition.X.Scale,
+            MainPosition.X.Offset + (WINDOW_WIDTH - MINI_SIZE) / 2,
+            MainPosition.Y.Scale,
+            MainPosition.Y.Offset + (WINDOW_HEIGHT - MINI_SIZE) / 2
         )
 
-        Main.ClipsDescendants = true
+        setMainScale(1)
 
-        tween(Main, 0.3, {
-            Size = UDim2.fromOffset(
-                MINI_SIZE,
-                MINI_SIZE
-            )
-        })
+        if Animation then
+            Animation:Scale(Main, 0.01, 0.3)
+        end
 
         task.delay(0.3, function()
             if Closed or not Minimized then
@@ -599,18 +624,21 @@ function Window.Create(Settings, OTC)
 
             Main.Visible = false
             MiniButton.Visible = true
+            Transitioning = false
         end)
     end)
 
     MiniButton.MouseButton1Click:Connect(function()
         if MiniWasDragged then
+            MiniWasDragged = false
             return
         end
 
-        if not Minimized or Closed then
+        if not Minimized or Closed or Transitioning then
             return
         end
 
+        Transitioning = true
         Minimized = false
 
         Main.Position = UDim2.new(
@@ -621,42 +649,65 @@ function Window.Create(Settings, OTC)
         )
 
         MiniButton.Visible = false
-
         Main.Visible = true
+        setMainScale(0.01)
 
-        Main.Size = UDim2.fromOffset(
-            MINI_SIZE,
-            MINI_SIZE
-        )
+        if Animation then
+            local Tween = Animation:Scale(Main, 1, 0.3)
 
-        tween(Main, 0.3, {
-            Size = UDim2.fromOffset(
-                WINDOW_WIDTH,
-                WINDOW_HEIGHT
-            )
-        })
+            if Tween then
+                Tween.Completed:Connect(function()
+                    Transitioning = false
+                end)
+            else
+                Transitioning = false
+            end
+        else
+            Transitioning = false
+        end
     end)
 
     CloseButton.MouseButton1Click:Connect(function()
-        if Closed then
+        if Closed or Transitioning then
             return
         end
 
         Closed = true
+        Transitioning = true
 
-        tween(Main, 0.25, {
-            Size = UDim2.fromOffset(
-                0,
-                0
-            )
-        })
+        if Animation then
+            local Tween = Animation:Scale(Main, 0.01, 0.25)
 
-        task.delay(0.25, function()
-            if ScreenGui then
+            if Tween then
+                Tween.Completed:Connect(function()
+                    if ScreenGui then
+                        ScreenGui:Destroy()
+                    end
+                end)
+            else
                 ScreenGui:Destroy()
             end
-        end)
+        else
+            ScreenGui:Destroy()
+        end
     end)
+
+    function Object:Toggle()
+        if Closed or Transitioning then
+            return
+        end
+
+        if Minimized then
+            Minimized = false
+            MiniButton.Visible = false
+            Main.Visible = true
+            setMainScale(1)
+        else
+            Minimized = true
+            Main.Visible = false
+            MiniButton.Visible = true
+        end
+    end
 
     function Object:RefreshTheme()
         local NewTheme = OTC:GetTheme()
