@@ -98,12 +98,15 @@ function Window.Create(Settings, OTC)
 
     local Logo = Instance.new("ImageLabel")
     Logo.Name = "Logo"
-    Logo.Size = UDim2.new(0, 30, 0, 30)
-    Logo.Position = UDim2.new(0, 14, 0.5, -15)
+    Logo.Size = UDim2.new(0, 26, 0, 26)
+    Logo.Position = UDim2.new(0, 14, 0.5, -13)
     Logo.BackgroundTransparency = 1
     Logo.BorderSizePixel = 0
     Logo.Image = "rbxassetid://116094782851554"
+    Logo.ImageTransparency = 0
+    Logo.ImageColor3 = Color3.fromRGB(255, 255, 255)
     Logo.ScaleType = Enum.ScaleType.Fit
+    Logo.ResampleMode = Enum.ResamplerMode.Default
     Logo.Parent = TopBar
 
     local Title = Instance.new("TextLabel")
