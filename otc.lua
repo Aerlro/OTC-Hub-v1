@@ -23,18 +23,51 @@ local BASE_URL = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/"
 local function LoadModule(Path)
     local URL = BASE_URL .. Path
 
-    local Success, Result = pcall(function()
-        return loadstring(game:HttpGet(URL))()
+    print("[OTC Hub] Loading:", URL)
+
+    local Source = game:HttpGet(URL)
+
+    print("[OTC Hub] Downloaded:", Path, #Source, "bytes")
+
+    local CompileSuccess, Module = pcall(function()
+        return loadstring(Source)
     end)
 
-    if not Success then
+    if not CompileSuccess then
         error(
-            "[OTC Hub] Failed to load module: "
+            "[OTC Hub] Compile error in "
+            .. Path
+            .. "\n"
+            .. tostring(Module)
+        )
+    end
+
+    if not Module then
+        error(
+            "[OTC Hub] loadstring returned nil for "
+            .. Path
+        )
+    end
+
+    local RunSuccess, Result = pcall(Module)
+
+    if not RunSuccess then
+        error(
+            "[OTC Hub] Runtime error in "
             .. Path
             .. "\n"
             .. tostring(Result)
         )
     end
+
+    if Result == nil then
+        error(
+            "[OTC Hub] Module returned nil: "
+            .. Path
+        )
+    end
+
+    print("[OTC Hub] Loaded:", Path)
 
     return Result
 end
