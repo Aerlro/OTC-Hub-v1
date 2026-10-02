@@ -211,6 +211,38 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
             ClipsDescendants = false,
 
+            Visible = true,
+            Active = false,
+
+            ZIndex = 1000
+        })
+    else
+        Overlay.Active = false
+        Overlay.Visible = true
+    end
+
+    ----------------------------------------------------------------
+    -- OUTSIDE CLICK BUTTON
+    ----------------------------------------------------------------
+
+    local OutsideButton = Overlay:FindFirstChild("OutsideButton")
+
+    if not OutsideButton then
+        OutsideButton = Create("TextButton", {
+            Name = "OutsideButton",
+            Parent = Overlay,
+
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+
+            Position = UDim2.fromScale(0, 0),
+            Size = UDim2.fromScale(1, 1),
+
+            Text = "",
+
+            AutoButtonColor = false,
+
+            Visible = false,
             Active = false,
 
             ZIndex = 1000
@@ -412,7 +444,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
         ZIndex = 1002
     })
 
-    local OptionsLayout = Create("UIListLayout", {
+    Create("UIListLayout", {
         Parent = OptionsList,
 
         Padding = UDim.new(
@@ -457,7 +489,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
     local RenderConnection = nil
 
     ----------------------------------------------------------------
-    -- UPDATE VALUE
+    -- UPDATE VALUE TEXT
     ----------------------------------------------------------------
 
     local function UpdateValueText()
@@ -502,18 +534,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
             for _, Option in ipairs(Options) do
                 if Selected[Option] then
-                    table.insert(
-                        Values,
-                        Option
-                    )
+                    table.insert(Values, Option)
                 end
             end
 
             task.spawn(function()
-                pcall(
-                    Callback,
-                    Values
-                )
+                pcall(Callback, Values)
             end)
         else
             local Current = nil
@@ -526,16 +552,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
             end
 
             task.spawn(function()
-                pcall(
-                    Callback,
-                    Current
-                )
+                pcall(Callback, Current)
             end)
         end
     end
 
     ----------------------------------------------------------------
-    -- COUNT VISIBLE OPTIONS
+    -- VISIBLE OPTIONS
     ----------------------------------------------------------------
 
     local function GetVisibleCount()
@@ -555,8 +578,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
     ----------------------------------------------------------------
 
     local function UpdateCanvas()
-        local VisibleCount =
-            GetVisibleCount()
+        local VisibleCount = GetVisibleCount()
 
         if VisibleCount <= 0 then
             OptionsList.CanvasSize =
@@ -566,16 +588,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
         end
 
         local ContentHeight =
-            (
-                VisibleCount * OPTION_HEIGHT
-            )
-            +
-            (
+            (VisibleCount * OPTION_HEIGHT)
+            + (
                 math.max(
                     VisibleCount - 1,
                     0
-                )
-                * OPTION_PADDING
+                ) * OPTION_PADDING
             )
             + 5
 
@@ -606,24 +624,18 @@ function Dropdown.Create(TabObject, OTC, Settings)
     ----------------------------------------------------------------
 
     local function UpdateSize()
-        local VisibleCount =
-            GetVisibleCount()
+        local VisibleCount = GetVisibleCount()
 
         local ContentHeight = 0
 
         if VisibleCount > 0 then
             ContentHeight =
-                (
-                    VisibleCount
-                    * OPTION_HEIGHT
-                )
-                +
-                (
+                (VisibleCount * OPTION_HEIGHT)
+                + (
                     math.max(
                         VisibleCount - 1,
                         0
-                    )
-                    * OPTION_PADDING
+                    ) * OPTION_PADDING
                 )
                 + 5
         end
@@ -633,12 +645,11 @@ function Dropdown.Create(TabObject, OTC, Settings)
             + ContentHeight
             + OPTIONS_BOTTOM
 
-        local Height =
-            math.clamp(
-                RequiredHeight,
-                MIN_HEIGHT,
-                MAX_HEIGHT
-            )
+        local Height = math.clamp(
+            RequiredHeight,
+            MIN_HEIGHT,
+            MAX_HEIGHT
+        )
 
         DropdownFrame.Size =
             UDim2.fromOffset(
@@ -658,15 +669,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
             return
         end
 
-        local Camera =
-            workspace.CurrentCamera
+        local Camera = workspace.CurrentCamera
 
         if not Camera then
             return
         end
 
-        local Viewport =
-            Camera.ViewportSize
+        local Viewport = Camera.ViewportSize
 
         local ButtonPosition =
             Button.AbsolutePosition
@@ -677,8 +686,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
         local DropdownSize =
             DropdownFrame.AbsoluteSize
 
-        local X =
-            ButtonPosition.X
+        local X = ButtonPosition.X
 
         local BelowY =
             ButtonPosition.Y
@@ -692,9 +700,11 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
         local Y = BelowY
 
-        if X + DropdownSize.X
-            > Viewport.X - 8 then
+        ------------------------------------------------------------
+        -- HORIZONTAL
+        ------------------------------------------------------------
 
+        if X + DropdownSize.X > Viewport.X - 8 then
             X =
                 Viewport.X
                 - DropdownSize.X
@@ -705,9 +715,11 @@ function Dropdown.Create(TabObject, OTC, Settings)
             X = 8
         end
 
-        if BelowY + DropdownSize.Y
-            > Viewport.Y - 8 then
+        ------------------------------------------------------------
+        -- VERTICAL
+        ------------------------------------------------------------
 
+        if BelowY + DropdownSize.Y > Viewport.Y - 8 then
             Y = AboveY
         end
 
@@ -770,14 +782,14 @@ function Dropdown.Create(TabObject, OTC, Settings)
             OTC._OpenDropdown = nil
         end
 
-        -- IMPORTANT:
-        -- Hide everything instantly.
-        -- No fade-out = no leftover pixels/artefacts.
-
+        -- Instant close.
         DropdownFrame.Visible = false
         DropdownFrame.BackgroundTransparency = 0
 
-        -- Disable overlay so it cannot block clicks.
+        -- Disable outside click layer.
+        OutsideButton.Visible = false
+        OutsideButton.Active = false
+
         Overlay.Active = false
 
         -- Reset arrow.
@@ -805,8 +817,10 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
         Open = true
 
-        -- Enable overlay.
+        -- Enable outside click.
         Overlay.Active = true
+        OutsideButton.Visible = true
+        OutsideButton.Active = true
 
         DropdownFrame.Visible = true
         DropdownFrame.BackgroundTransparency = 1
@@ -847,21 +861,29 @@ function Dropdown.Create(TabObject, OTC, Settings)
             game:GetService("RunService")
 
         RenderConnection =
-            RunService.RenderStepped:Connect(
-                function()
-                    if not Open then
-                        return
-                    end
-
-                    if not Button.Parent then
-                        Object:Close()
-                        return
-                    end
-
-                    UpdatePosition()
+            RunService.RenderStepped:Connect(function()
+                if not Open then
+                    return
                 end
-            )
+
+                if not Button.Parent then
+                    Object:Close()
+                    return
+                end
+
+                UpdatePosition()
+            end)
     end
+
+    ----------------------------------------------------------------
+    -- OUTSIDE CLICK
+    ----------------------------------------------------------------
+
+    OutsideButton.MouseButton1Click:Connect(function()
+        if Open then
+            Object:Close()
+        end
+    end)
 
     ----------------------------------------------------------------
     -- CREATE OPTION
@@ -991,72 +1013,64 @@ function Dropdown.Create(TabObject, OTC, Settings)
         -- HOVER
         ----------------------------------------------------------------
 
-        OptionButton.MouseEnter:Connect(
-            function()
-                if OTC.Tween then
-                    OTC:Tween(
-                        OptionButton,
-                        0.08,
-                        {
-                            BackgroundColor3 =
-                                Theme.Hover
-                        }
-                    )
-                else
-                    OptionButton.BackgroundColor3 =
-                        Theme.Hover
-                end
+        OptionButton.MouseEnter:Connect(function()
+            if OTC.Tween then
+                OTC:Tween(
+                    OptionButton,
+                    0.08,
+                    {
+                        BackgroundColor3 =
+                            Theme.Hover
+                    }
+                )
+            else
+                OptionButton.BackgroundColor3 =
+                    Theme.Hover
             end
-        )
+        end)
 
-        OptionButton.MouseLeave:Connect(
-            function()
-                if Selected[Option] then
-                    OptionButton.BackgroundColor3 =
-                        Theme.Hover
-                else
-                    OptionButton.BackgroundColor3 =
-                        Theme.Element
-                end
+        OptionButton.MouseLeave:Connect(function()
+            if Selected[Option] then
+                OptionButton.BackgroundColor3 =
+                    Theme.Hover
+            else
+                OptionButton.BackgroundColor3 =
+                    Theme.Element
             end
-        )
+        end)
 
         ----------------------------------------------------------------
         -- CLICK
         ----------------------------------------------------------------
 
-        OptionButton.MouseButton1Click:Connect(
-            function()
-                if MultiSelect then
-                    Selected[Option] =
-                        not Selected[Option]
+        OptionButton.MouseButton1Click:Connect(function()
+            if MultiSelect then
+                Selected[Option] =
+                    not Selected[Option]
 
-                    RefreshOption(Option)
-
-                    UpdateValueText()
-
-                    FireCallback()
-
-                    return
-                end
-
-                for _, Existing in ipairs(Options) do
-                    Selected[Existing] = false
-                end
-
-                Selected[Option] = true
-
-                for _, Existing in ipairs(Options) do
-                    RefreshOption(Existing)
-                end
-
+                RefreshOption(Option)
                 UpdateValueText()
-
                 FireCallback()
 
-                Object:Close()
+                -- MultiSelect stays open.
+                return
             end
-        )
+
+            for _, Existing in ipairs(Options) do
+                Selected[Existing] = false
+            end
+
+            Selected[Option] = true
+
+            for _, Existing in ipairs(Options) do
+                RefreshOption(Existing)
+            end
+
+            UpdateValueText()
+            FireCallback()
+
+            Object:Close()
+        end)
 
         RefreshOption(Option)
 
@@ -1064,7 +1078,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
     end
 
     ----------------------------------------------------------------
-    -- REBUILD
+    -- REBUILD OPTIONS
     ----------------------------------------------------------------
 
     local function RebuildOptions()
@@ -1163,15 +1177,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
     -- MAIN CLICK
     ----------------------------------------------------------------
 
-    Button.MouseButton1Click:Connect(
-        function()
-            if Open then
-                Object:Close()
-            else
-                Object:Open()
-            end
+    Button.MouseButton1Click:Connect(function()
+        if Open then
+            Object:Close()
+        else
+            Object:Open()
         end
-    )
+    end)
 
     ----------------------------------------------------------------
     -- SET VALUE
