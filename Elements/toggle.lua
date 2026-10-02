@@ -1,9 +1,3 @@
---[[
-    OTC Hub v1
-    Toggle Element
-    by Aerlro
-]]
-
 local Toggle = {}
 
 local TweenService = game:GetService("TweenService")
@@ -50,11 +44,9 @@ function Toggle.Create(Tab, OTC, Settings)
 
     local Frame = create("Frame", {
         Name = "Toggle",
-
         Parent = Tab.Page,
 
         BackgroundColor3 = Theme.Element,
-
         BorderSizePixel = 0,
 
         Size = UDim2.new(1, 0, 0, FrameHeight)
@@ -62,104 +54,116 @@ function Toggle.Create(Tab, OTC, Settings)
 
     create("UICorner", {
         Parent = Frame,
-
         CornerRadius = UDim.new(0, 8)
     })
 
     local Stroke = create("UIStroke", {
         Parent = Frame,
-
         Color = Theme.Border,
-
         Thickness = 1
     })
 
     local Button = create("TextButton", {
         Name = "Button",
-
         Parent = Frame,
 
         BackgroundTransparency = 1,
-
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 1, 0),
+        Size = UDim2.fromScale(1, 1),
 
         AutoButtonColor = false,
-
         Text = ""
     })
 
-    -- Title
-    local Title = create("TextLabel", {
-        Name = "Title",
+    local Title
 
-        Parent = Button,
+    if Description then
 
-        BackgroundTransparency = 1,
+        Title = create("TextLabel", {
+            Name = "Title",
+            Parent = Button,
 
-        Position = UDim2.fromOffset(15, Description and 9 or 0),
+            BackgroundTransparency = 1,
 
-        Size = UDim2.new(1, -90, 0, 22),
+            Position = UDim2.fromOffset(15, 7),
+            Size = UDim2.new(1, -90, 0, 24),
 
-        Font = Enum.Font.GothamMedium,
+            Font = Enum.Font.GothamMedium,
 
-        Text = Name,
+            Text = Name,
+            TextColor3 = Theme.Text,
+            TextSize = 13,
 
-        TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Center,
 
-        TextSize = 13,
+            TextTruncate = Enum.TextTruncate.AtEnd
+        })
 
-        TextXAlignment = Enum.TextXAlignment.Left,
+    else
 
-        TextYAlignment = Enum.TextYAlignment.Center
-    })
+        Title = create("TextLabel", {
+            Name = "Title",
+            Parent = Button,
 
-    -- Description
+            BackgroundTransparency = 1,
+
+            AnchorPoint = Vector2.new(0, 0.5),
+            Position = UDim2.new(0, 15, 0.5, 0),
+            Size = UDim2.new(1, -90, 0, 24),
+
+            Font = Enum.Font.GothamMedium,
+
+            Text = Name,
+            TextColor3 = Theme.Text,
+            TextSize = 13,
+
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Center,
+
+            TextTruncate = Enum.TextTruncate.AtEnd
+        })
+
+    end
+
     local DescriptionLabel
 
     if Description then
 
         DescriptionLabel = create("TextLabel", {
             Name = "Description",
-
             Parent = Button,
 
             BackgroundTransparency = 1,
 
             Position = UDim2.fromOffset(15, 31),
-
             Size = UDim2.new(1, -90, 0, 20),
 
             Font = Enum.Font.Gotham,
 
             Text = Description,
-
             TextColor3 = Theme.SubText,
-
             TextSize = 11,
 
             TextWrapped = true,
 
             TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Center,
 
-            TextYAlignment = Enum.TextYAlignment.Center
+            TextTruncate = Enum.TextTruncate.AtEnd
         })
 
     end
 
-    -- Toggle background
     local ToggleBackground = create("Frame", {
         Name = "ToggleBackground",
-
         Parent = Button,
 
         BackgroundColor3 = Theme.Background,
-
         BorderSizePixel = 0,
 
         AnchorPoint = Vector2.new(1, 0.5),
-
         Position = UDim2.new(1, -15, 0.5, 0),
 
         Size = UDim2.fromOffset(42, 22)
@@ -167,36 +171,28 @@ function Toggle.Create(Tab, OTC, Settings)
 
     create("UICorner", {
         Parent = ToggleBackground,
-
         CornerRadius = UDim.new(1, 0)
     })
 
     local ToggleStroke = create("UIStroke", {
         Parent = ToggleBackground,
-
         Color = Theme.Border,
-
         Thickness = 1
     })
 
-    -- Toggle circle
     local Circle = create("Frame", {
         Name = "Circle",
-
         Parent = ToggleBackground,
 
         BackgroundColor3 = Theme.SubText,
-
         BorderSizePixel = 0,
 
         Position = UDim2.fromOffset(3, 3),
-
         Size = UDim2.fromOffset(16, 16)
     })
 
     create("UICorner", {
         Parent = Circle,
-
         CornerRadius = UDim.new(1, 0)
     })
 
@@ -243,7 +239,10 @@ function Toggle.Create(Tab, OTC, Settings)
         updateVisual()
 
         if Flag then
-            OTC:SetFlag(Flag, CurrentValue)
+            OTC:SetFlag(
+                Flag,
+                CurrentValue
+            )
         end
 
         if RunCallback then
@@ -270,12 +269,20 @@ function Toggle.Create(Tab, OTC, Settings)
             BackgroundColor3 = Theme.Hover
         })
 
+        tween(Stroke, 0.15, {
+            Color = Theme.AccentDark
+        })
+
     end)
 
     Button.MouseLeave:Connect(function()
 
         tween(Frame, 0.15, {
             BackgroundColor3 = Theme.Element
+        })
+
+        tween(Stroke, 0.15, {
+            Color = Theme.Border
         })
 
     end)
@@ -289,53 +296,45 @@ function Toggle.Create(Tab, OTC, Settings)
 
     end)
 
-    -- Initialize
-    setValue(CurrentValue, false)
+    setValue(
+        CurrentValue,
+        false
+    )
 
     local Object = {}
 
     function Object:SetValue(Value)
-
         setValue(
             Value,
             true
         )
-
     end
 
     function Object:GetValue()
-
         return CurrentValue
-
     end
 
     function Object:SetName(NewName)
-
-        Name = NewName
-        Title.Text = NewName
-
+        Name = tostring(NewName)
+        Title.Text = Name
     end
 
     function Object:SetDescription(NewDescription)
+        Description = NewDescription
 
         if DescriptionLabel then
-            DescriptionLabel.Text = NewDescription
+            DescriptionLabel.Text = tostring(NewDescription)
         end
-
     end
 
     function Object:SetCallback(NewCallback)
-
         if type(NewCallback) == "function" then
             Callback = NewCallback
         end
-
     end
 
     function Object:Destroy()
-
         Frame:Destroy()
-
     end
 
     Object.Instance = Frame
