@@ -74,7 +74,7 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
 
-        Size = UDim2.fromOffset(720, 500),
+        Size = UDim2.fromOffset(620, 420),
 
         Position = UDim2.new(
             0.5,
