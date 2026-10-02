@@ -207,15 +207,19 @@ function Button.Create(Tab, OTC, Settings)
     end)
 
     ButtonObject.MouseButton1Down:Connect(function()
+
         tween(Scale, 0.08, {
             Scale = 0.985
         })
+
     end)
 
     ButtonObject.MouseButton1Up:Connect(function()
+
         tween(Scale, 0.12, {
             Scale = 1
         })
+
     end)
 
     ButtonObject.MouseButton1Click:Connect(function()
@@ -225,20 +229,26 @@ function Button.Create(Tab, OTC, Settings)
         })
 
         task.delay(0.06, function()
+
             if Scale and Scale.Parent then
+
                 tween(Scale, 0.1, {
                     Scale = 1
                 })
+
             end
+
         end)
 
         local Success, Error = pcall(Callback)
 
         if not Success then
+
             warn(
                 "[OTC Hub] Button callback error:",
                 Error
             )
+
         end
 
     end)
@@ -246,26 +256,67 @@ function Button.Create(Tab, OTC, Settings)
     local Object = {}
 
     function Object:SetName(NewName)
+
         Name = tostring(NewName)
+
         Title.Text = Name
+
     end
 
     function Object:SetDescription(NewDescription)
+
         Description = NewDescription
 
         if DescriptionLabel then
-            DescriptionLabel.Text = tostring(NewDescription)
+
+            DescriptionLabel.Text =
+                tostring(NewDescription)
+
         end
+
     end
 
     function Object:SetCallback(NewCallback)
+
         if type(NewCallback) == "function" then
+
             Callback = NewCallback
+
         end
+
+    end
+
+    function Object:RefreshTheme()
+
+        local CurrentTheme =
+            OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes.Default
+
+        Frame.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Stroke.Color =
+            CurrentTheme.Border
+
+        Title.TextColor3 =
+            CurrentTheme.Text
+
+        if DescriptionLabel then
+
+            DescriptionLabel.TextColor3 =
+                CurrentTheme.SubText
+
+        end
+
+        Execute.TextColor3 =
+            CurrentTheme.Accent
+
     end
 
     function Object:Destroy()
+
         Frame:Destroy()
+
     end
 
     Object.Instance = Frame
