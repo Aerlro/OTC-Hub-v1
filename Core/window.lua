@@ -37,8 +37,10 @@ end
 function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
-    --// Window Theme
-    local ThemeName = Settings.Theme or OTC.CurrentTheme or "Default"
+    local ThemeName =
+        Settings.Theme
+        or OTC.CurrentTheme
+        or "Default"
 
     if not OTC._Themes[ThemeName] then
         warn(
@@ -62,10 +64,8 @@ function Window.Create(Settings, OTC)
     Object.Minimized = false
     Object.Closed = false
 
-    --// Theme
     Object.Theme = ThemeName
 
-    --// Toggle
     Object.ToggleKey =
         Settings.ToggleKey
         or Enum.KeyCode.RightControl
@@ -610,7 +610,9 @@ function Window.Create(Settings, OTC)
                 Enum.EasingDirection.In
             ),
             {
-                Position = Main.Position + UDim2.fromOffset(0, 20)
+                Position =
+                    Main.Position
+                    + UDim2.fromOffset(0, 20)
             }
         ):Play()
 
@@ -622,14 +624,17 @@ function Window.Create(Settings, OTC)
     end
 
     local function CreateUnloadConfirmation()
-        if ScreenGui:FindFirstChild("UnloadConfirmation") then
+        if ScreenGui:FindFirstChild(
+            "UnloadConfirmation"
+        ) then
             return
         end
 
         local Overlay = create("Frame", {
             Name = "UnloadConfirmation",
             Parent = ScreenGui,
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            BackgroundColor3 =
+                Color3.fromRGB(0, 0, 0),
             BackgroundTransparency = 0.45,
             BorderSizePixel = 0,
             Size = UDim2.fromScale(1, 1),
@@ -639,11 +644,15 @@ function Window.Create(Settings, OTC)
         local Popup = create("Frame", {
             Name = "Popup",
             Parent = Overlay,
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundColor3 = Theme.Background,
+            AnchorPoint =
+                Vector2.new(0.5, 0.5),
+            BackgroundColor3 =
+                Theme.Background,
             BorderSizePixel = 0,
-            Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.fromOffset(360, 175),
+            Position =
+                UDim2.fromScale(0.5, 0.5),
+            Size =
+                UDim2.fromOffset(360, 175),
             ZIndex = 201
         })
 
@@ -666,9 +675,12 @@ function Window.Create(Settings, OTC)
             TextColor3 = Theme.Text,
             Font = Enum.Font.GothamBold,
             TextSize = 18,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2.fromOffset(20, 18),
-            Size = UDim2.new(1, -40, 0, 28),
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
+            Position =
+                UDim2.fromOffset(20, 18),
+            Size =
+                UDim2.new(1, -40, 0, 28),
             ZIndex = 202
         })
 
@@ -676,14 +688,18 @@ function Window.Create(Settings, OTC)
             Name = "Description",
             Parent = Popup,
             BackgroundTransparency = 1,
-            Text = "Are you sure you want to unload the UI?",
+            Text =
+                "Are you sure you want to unload the UI?",
             TextColor3 = Theme.SubText,
             Font = Enum.Font.Gotham,
             TextSize = 13,
             TextWrapped = true,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2.fromOffset(20, 52),
-            Size = UDim2.new(1, -40, 0, 42),
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
+            Position =
+                UDim2.fromOffset(20, 52),
+            Size =
+                UDim2.new(1, -40, 0, 42),
             ZIndex = 202
         })
 
@@ -696,8 +712,10 @@ function Window.Create(Settings, OTC)
             TextColor3 = Theme.Text,
             Font = Enum.Font.GothamBold,
             TextSize = 13,
-            Position = UDim2.new(1, -190, 1, -48),
-            Size = UDim2.fromOffset(80, 32),
+            Position =
+                UDim2.new(1, -190, 1, -48),
+            Size =
+                UDim2.fromOffset(80, 32),
             AutoButtonColor = false,
             ZIndex = 202
         })
@@ -716,8 +734,10 @@ function Window.Create(Settings, OTC)
             TextColor3 = Theme.Background,
             Font = Enum.Font.GothamBold,
             TextSize = 13,
-            Position = UDim2.new(1, -100, 1, -48),
-            Size = UDim2.fromOffset(80, 32),
+            Position =
+                UDim2.new(1, -100, 1, -48),
+            Size =
+                UDim2.fromOffset(80, 32),
             AutoButtonColor = false,
             ZIndex = 202
         })
@@ -900,7 +920,8 @@ function Window.Create(Settings, OTC)
     local DragInput
 
     local function UpdateDrag(Input)
-        local Delta = Input.Position - DragStart
+        local Delta =
+            Input.Position - DragStart
 
         Main.Position = UDim2.new(
             StartPosition.X.Scale,
@@ -913,15 +934,19 @@ function Window.Create(Settings, OTC)
     end
 
     DragArea.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1
-            or Input.UserInputType == Enum.UserInputType.Touch then
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseButton1
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
 
             Dragging = true
             DragStart = Input.Position
             StartPosition = Main.Position
 
             Input.Changed:Connect(function()
-                if Input.UserInputState == Enum.UserInputState.End then
+                if Input.UserInputState ==
+                    Enum.UserInputState.End then
+
                     Dragging = false
                 end
             end)
@@ -929,8 +954,10 @@ function Window.Create(Settings, OTC)
     end)
 
     DragArea.InputChanged:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement
-            or Input.UserInputType == Enum.UserInputType.Touch then
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseMovement
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
 
             DragInput = Input
         end
@@ -951,10 +978,13 @@ function Window.Create(Settings, OTC)
     local DRAG_THRESHOLD = 8
 
     local function UpdateMiniDrag(Input)
-        local Delta = Input.Position - MiniDragStart
+        local Delta =
+            Input.Position - MiniDragStart
 
-        if math.abs(Delta.X) > DRAG_THRESHOLD
-            or math.abs(Delta.Y) > DRAG_THRESHOLD then
+        if math.abs(Delta.X) >
+            DRAG_THRESHOLD
+            or math.abs(Delta.Y) >
+            DRAG_THRESHOLD then
 
             MiniMoved = true
         end
@@ -968,8 +998,10 @@ function Window.Create(Settings, OTC)
     end
 
     MiniButton.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1
-            or Input.UserInputType == Enum.UserInputType.Touch then
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseButton1
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
 
             MiniDragging = true
             MiniMoved = false
@@ -977,7 +1009,9 @@ function Window.Create(Settings, OTC)
             MiniStartPosition = MiniButton.Position
 
             Input.Changed:Connect(function()
-                if Input.UserInputState == Enum.UserInputState.End then
+                if Input.UserInputState ==
+                    Enum.UserInputState.End then
+
                     MiniDragging = false
 
                     if not MiniMoved then
@@ -989,15 +1023,19 @@ function Window.Create(Settings, OTC)
     end)
 
     MiniButton.InputChanged:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseMovement
-            or Input.UserInputType == Enum.UserInputType.Touch then
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseMovement
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
 
             MiniDragInput = Input
         end
     end)
 
     UserInputService.InputChanged:Connect(function(Input)
-        if Input == MiniDragInput and MiniDragging then
+        if Input == MiniDragInput
+            and MiniDragging then
+
             UpdateMiniDrag(Input)
         end
     end)
@@ -1049,92 +1087,161 @@ function Window.Create(Settings, OTC)
         Unload()
     end
 
-    --// Refresh Theme
-    function Object:RefreshTheme()
-        local NewTheme = self.OTC._Themes[self.Theme]
+    function Object:GetTheme()
+        return self.OTC._Themes[self.Theme]
+            or self.OTC._Themes.Default
+    end
 
-        if not NewTheme then
-            NewTheme = self.OTC._Themes.Default
+    function Object:SetTheme(Name)
+        if self.Closed then
+            return false
         end
 
-        -- Main
-        Main.BackgroundColor3 = NewTheme.Background
-        MainStroke.Color = NewTheme.Border
+        if not self.OTC._Themes[Name] then
+            warn(
+                "[OTC Hub] Theme does not exist:",
+                Name
+            )
 
-        -- TopBar
-        TopBar.BackgroundColor3 = NewTheme.Secondary
-        BottomFix.BackgroundColor3 = NewTheme.Secondary
+            return false
+        end
 
-        -- Header
-        Logo.ImageColor3 = NewTheme.Text
-        Title.TextColor3 = NewTheme.Text
-        Subtitle.TextColor3 = NewTheme.SubText
+        self.Theme = Name
+        self:RefreshTheme()
 
-        -- Buttons
-        MinimizeButton.BackgroundColor3 = NewTheme.Element
-        MinimizeButton.TextColor3 = NewTheme.Text
+        return true
+    end
 
-        CloseButton.BackgroundColor3 = NewTheme.Element
-        CloseButton.TextColor3 = NewTheme.Text
+    function Object:RefreshTheme()
+        local NewTheme = self:GetTheme()
 
-        -- Sidebar
-        Sidebar.BackgroundColor3 = NewTheme.Secondary
-        SidebarSeparator.BackgroundColor3 = NewTheme.Border
+        Main.BackgroundColor3 =
+            NewTheme.Background
 
-        -- Content
-        Content.BackgroundColor3 = NewTheme.Background
+        MainStroke.Color =
+            NewTheme.Border
 
-        -- User
-        UserCard.BackgroundColor3 = NewTheme.Element
-        UserSeparator.BackgroundColor3 = NewTheme.Border
-        DisplayName.TextColor3 = NewTheme.Text
-        Username.TextColor3 = NewTheme.SubText
+        TopBar.BackgroundColor3 =
+            NewTheme.Secondary
 
-        -- Minimized
-        MiniButton.ImageColor3 = NewTheme.Text
+        BottomFix.BackgroundColor3 =
+            NewTheme.Secondary
 
-        -- Confirmation popup
-        local Confirmation = ScreenGui:FindFirstChild("UnloadConfirmation")
+        Logo.ImageColor3 =
+            NewTheme.Text
+
+        Title.TextColor3 =
+            NewTheme.Text
+
+        Subtitle.TextColor3 =
+            NewTheme.SubText
+
+        MinimizeButton.BackgroundColor3 =
+            NewTheme.Element
+
+        MinimizeButton.TextColor3 =
+            NewTheme.Text
+
+        CloseButton.BackgroundColor3 =
+            NewTheme.Element
+
+        CloseButton.TextColor3 =
+            NewTheme.Text
+
+        Sidebar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        SidebarSeparator.BackgroundColor3 =
+            NewTheme.Border
+
+        Content.BackgroundColor3 =
+            NewTheme.Background
+
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserSeparator.BackgroundColor3 =
+            NewTheme.Border
+
+        DisplayName.TextColor3 =
+            NewTheme.Text
+
+        Username.TextColor3 =
+            NewTheme.SubText
+
+        MiniButton.ImageColor3 =
+            NewTheme.Text
+
+        local Confirmation =
+            ScreenGui:FindFirstChild(
+                "UnloadConfirmation"
+            )
 
         if Confirmation then
-            local Popup = Confirmation:FindFirstChild("Popup")
+            local Popup =
+                Confirmation:FindFirstChild(
+                    "Popup"
+                )
 
             if Popup then
-                Popup.BackgroundColor3 = NewTheme.Background
+                Popup.BackgroundColor3 =
+                    NewTheme.Background
 
-                local Stroke = Popup:FindFirstChildOfClass("UIStroke")
+                local Stroke =
+                    Popup:FindFirstChildOfClass(
+                        "UIStroke"
+                    )
 
                 if Stroke then
-                    Stroke.Color = NewTheme.Border
+                    Stroke.Color =
+                        NewTheme.Border
                 end
 
-                local PopupTitle = Popup:FindFirstChild("Title")
-                local PopupText = Popup:FindFirstChild("Description")
-                local CancelButton = Popup:FindFirstChild("Cancel")
-                local UnloadButton = Popup:FindFirstChild("Unload")
+                local PopupTitle =
+                    Popup:FindFirstChild("Title")
+
+                local PopupText =
+                    Popup:FindFirstChild(
+                        "Description"
+                    )
+
+                local CancelButton =
+                    Popup:FindFirstChild(
+                        "Cancel"
+                    )
+
+                local UnloadButton =
+                    Popup:FindFirstChild(
+                        "Unload"
+                    )
 
                 if PopupTitle then
-                    PopupTitle.TextColor3 = NewTheme.Text
+                    PopupTitle.TextColor3 =
+                        NewTheme.Text
                 end
 
                 if PopupText then
-                    PopupText.TextColor3 = NewTheme.SubText
+                    PopupText.TextColor3 =
+                        NewTheme.SubText
                 end
 
                 if CancelButton then
-                    CancelButton.BackgroundColor3 = NewTheme.Element
-                    CancelButton.TextColor3 = NewTheme.Text
+                    CancelButton.BackgroundColor3 =
+                        NewTheme.Element
+
+                    CancelButton.TextColor3 =
+                        NewTheme.Text
                 end
 
                 if UnloadButton then
-                    UnloadButton.BackgroundColor3 = NewTheme.Text
-                    UnloadButton.TextColor3 = NewTheme.Background
+                    UnloadButton.BackgroundColor3 =
+                        NewTheme.Text
+
+                    UnloadButton.TextColor3 =
+                        NewTheme.Background
                 end
             end
         end
-
-        -- Save active theme
-        self.Theme = self.Theme
     end
 
     Animation:Appear(
