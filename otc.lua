@@ -64,18 +64,17 @@ OTC._Themes.Default = {
 OTC.CurrentTheme = "Default"
 
 --// Load Core
-local TabModule = LoadModule("Core/Tab.lua")
-local WindowModule = LoadModule("Core/Window.lua")
-local ThemeModule = LoadModule("Core/Theme.lua")
-local AnimationModule = LoadModule("Core/Animation.lua")
-local NotificationModule = LoadModule("Core/Notification.lua")
+local TabModule = LoadModule("Core/tab.lua")
+local WindowModule = LoadModule("Core/window.lua")
+local ThemeModule = LoadModule("Core/theme.lua")
+local AnimationModule = LoadModule("Core/animation.lua")
+local NotificationModule = LoadModule("Core/notification.lua")
 
---// Load Elements
-local ButtonModule = LoadModule("Elements/Button.lua")
-local ToggleModule = LoadModule("Elements/Toggle.lua")
-local SliderModule = LoadModule("Elements/Slider.lua")
-local DropdownModule = LoadModule("Elements/Dropdown.lua")
-local InputModule = LoadModule("Elements/Input.lua")
+local ButtonModule = LoadModule("Elements/button.lua")
+local ToggleModule = LoadModule("Elements/toggle.lua")
+local SliderModule = LoadModule("Elements/slider.lua")
+local DropdownModule = LoadModule("Elements/dropdown.lua")
+local InputModule = LoadModule("Elements/input.lua")
 
 --// Theme
 function OTC:GetTheme()
