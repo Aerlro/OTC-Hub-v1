@@ -207,15 +207,12 @@ function OTC:CreateWindow(Settings)
     Settings = Settings or {}
 
     local Window = WindowModule.Create(
-        self,
-        Settings
+        Settings,
+        self
     )
 
     -- Store reference
     table.insert(self._Windows, Window)
-
-    -- Save original CreateTab
-    local OriginalCreateTab = Window.CreateTab
 
     function Window:CreateTab(TabSettings)
         TabSettings = TabSettings or {}
