@@ -530,43 +530,84 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = true
 
+        --// Save current position
+        local StartPosition = Main.Position
+
+        local CenterX =
+            StartPosition.X.Offset
+            + WINDOW_WIDTH / 2
+
+        local CenterY =
+            StartPosition.Y.Offset
+            + WINDOW_HEIGHT / 2
+
+        --// Show minimized logo
+        MinimizedButton.Visible = true
+
+        MinimizedButton.Size =
+            UDim2.fromOffset(
+                1,
+                1
+            )
+
+        MinimizedButton.BackgroundTransparency = 1
+        MinimizedButton.ImageTransparency = 1
+
+        --// Shrink Main
         tween(
             Main,
-            0.25,
+            0.3,
             {
                 Size = UDim2.fromOffset(
-                    WINDOW_WIDTH,
+                    0,
                     0
+                ),
+
+                Position = UDim2.new(
+                    StartPosition.X.Scale,
+                    CenterX,
+
+                    StartPosition.Y.Scale,
+                    CenterY
                 ),
 
                 BackgroundTransparency = 1
             }
         )
 
+        --// Show Logo
+        tween(
+            MinimizedButton,
+            0.3,
+            {
+                Size = UDim2.fromOffset(
+                    58,
+                    58
+                ),
+
+                BackgroundTransparency = 0,
+                ImageTransparency = 0
+            }
+        )
+
         task.delay(
-            0.25,
+            0.3,
             function()
 
                 Main.Visible = false
 
-                MinimizedButton.Visible = true
-
-                MinimizedButton.Size =
+                --// Reset Main
+                Main.Size =
                     UDim2.fromOffset(
-                        40,
-                        40
+                        WINDOW_WIDTH,
+                        WINDOW_HEIGHT
                     )
 
-                tween(
-                    MinimizedButton,
-                    0.25,
-                    {
-                        Size = UDim2.fromOffset(
-                            58,
-                            58
-                        )
-                    }
-                )
+                Main.Position =
+                    StartPosition
+
+                Main.BackgroundTransparency = 0
+
             end
         )
     end
@@ -580,37 +621,84 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = false
 
+        --// Save position
+        local TargetPosition =
+            Main.Position
+
+        local CenterX =
+            TargetPosition.X.Offset
+            + WINDOW_WIDTH / 2
+
+        local CenterY =
+            TargetPosition.Y.Offset
+            + WINDOW_HEIGHT / 2
+
+        --// Hide logo
         tween(
             MinimizedButton,
-            0.15,
+            0.2,
             {
                 Size = UDim2.fromOffset(
-                    40,
-                    40
-                )
+                    1,
+                    1
+                ),
+
+                BackgroundTransparency = 1,
+                ImageTransparency = 1
+            }
+        )
+
+        --// Prepare Main
+        Main.Visible = true
+
+        Main.Size =
+            UDim2.fromOffset(
+                0,
+                0
+            )
+
+        Main.Position =
+            UDim2.new(
+                TargetPosition.X.Scale,
+                CenterX,
+
+                TargetPosition.Y.Scale,
+                CenterY
+            )
+
+        Main.BackgroundTransparency = 1
+
+        --// Restore animation
+        tween(
+            Main,
+            0.3,
+            {
+                Size = UDim2.fromOffset(
+                    WINDOW_WIDTH,
+                    WINDOW_HEIGHT
+                ),
+
+                Position = TargetPosition,
+
+                BackgroundTransparency = 0
             }
         )
 
         task.delay(
-            0.15,
+            0.2,
             function()
 
                 MinimizedButton.Visible = false
 
-                Main.Visible = true
+                MinimizedButton.Size =
+                    UDim2.fromOffset(
+                        58,
+                        58
+                    )
 
-                tween(
-                    Main,
-                    0.3,
-                    {
-                        Size = UDim2.fromOffset(
-                            WINDOW_WIDTH,
-                            WINDOW_HEIGHT
-                        ),
+                MinimizedButton.BackgroundTransparency = 0
+                MinimizedButton.ImageTransparency = 0
 
-                        BackgroundTransparency = 0
-                    }
-                )
             end
         )
     end
