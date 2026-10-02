@@ -8,94 +8,100 @@ local Theme = {}
 
 Theme.BuiltIn = {
 
+    --// DEFAULT
     Default = {
-        Background = Color3.fromRGB(10, 10, 10),
-        Secondary = Color3.fromRGB(15, 15, 15),
-        Element = Color3.fromRGB(20, 20, 20),
+        Background = Color3.fromRGB(18, 18, 18),
+        Secondary = Color3.fromRGB(28, 28, 28),
+        Element = Color3.fromRGB(38, 38, 38),
 
-        Hover = Color3.fromRGB(30, 30, 30),
-        Border = Color3.fromRGB(42, 42, 42),
+        Hover = Color3.fromRGB(52, 52, 52),
+        Border = Color3.fromRGB(75, 75, 75),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(155, 155, 155),
+        SubText = Color3.fromRGB(190, 190, 190),
 
         Accent = Color3.fromRGB(255, 255, 255),
-        AccentDark = Color3.fromRGB(190, 190, 190)
+        AccentDark = Color3.fromRGB(200, 200, 200)
     },
 
+    --// RED
     Red = {
-        Background = Color3.fromRGB(10, 8, 8),
-        Secondary = Color3.fromRGB(17, 12, 12),
-        Element = Color3.fromRGB(25, 17, 17),
+        Background = Color3.fromRGB(32, 10, 10),
+        Secondary = Color3.fromRGB(50, 15, 15),
+        Element = Color3.fromRGB(68, 20, 20),
 
-        Hover = Color3.fromRGB(40, 22, 22),
-        Border = Color3.fromRGB(55, 30, 30),
+        Hover = Color3.fromRGB(90, 27, 27),
+        Border = Color3.fromRGB(125, 40, 40),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(165, 145, 145),
+        SubText = Color3.fromRGB(215, 175, 175),
 
-        Accent = Color3.fromRGB(255, 65, 65),
-        AccentDark = Color3.fromRGB(190, 35, 35)
+        Accent = Color3.fromRGB(255, 70, 70),
+        AccentDark = Color3.fromRGB(205, 35, 35)
     },
 
+    --// GREEN
     Green = {
-        Background = Color3.fromRGB(8, 11, 9),
-        Secondary = Color3.fromRGB(12, 19, 14),
-        Element = Color3.fromRGB(18, 28, 21),
+        Background = Color3.fromRGB(8, 30, 16),
+        Secondary = Color3.fromRGB(12, 48, 24),
+        Element = Color3.fromRGB(18, 68, 34),
 
-        Hover = Color3.fromRGB(25, 42, 30),
-        Border = Color3.fromRGB(35, 60, 43),
+        Hover = Color3.fromRGB(25, 90, 45),
+        Border = Color3.fromRGB(40, 125, 62),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(145, 165, 150),
+        SubText = Color3.fromRGB(175, 215, 185),
 
         Accent = Color3.fromRGB(70, 255, 120),
-        AccentDark = Color3.fromRGB(35, 190, 80)
+        AccentDark = Color3.fromRGB(35, 200, 80)
     },
 
+    --// BLUE
     Blue = {
-        Background = Color3.fromRGB(8, 10, 14),
-        Secondary = Color3.fromRGB(12, 16, 23),
-        Element = Color3.fromRGB(18, 23, 32),
+        Background = Color3.fromRGB(8, 20, 40),
+        Secondary = Color3.fromRGB(12, 32, 62),
+        Element = Color3.fromRGB(18, 45, 85),
 
-        Hover = Color3.fromRGB(25, 34, 48),
-        Border = Color3.fromRGB(35, 48, 68),
+        Hover = Color3.fromRGB(25, 62, 115),
+        Border = Color3.fromRGB(40, 85, 150),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(145, 155, 175),
+        SubText = Color3.fromRGB(175, 195, 225),
 
         Accent = Color3.fromRGB(80, 150, 255),
-        AccentDark = Color3.fromRGB(40, 100, 200)
+        AccentDark = Color3.fromRGB(40, 100, 210)
     },
 
+    --// PURPLE
     Purple = {
-        Background = Color3.fromRGB(10, 8, 13),
-        Secondary = Color3.fromRGB(17, 12, 22),
-        Element = Color3.fromRGB(24, 17, 31),
+        Background = Color3.fromRGB(25, 10, 38),
+        Secondary = Color3.fromRGB(40, 15, 60),
+        Element = Color3.fromRGB(58, 22, 85),
 
-        Hover = Color3.fromRGB(37, 25, 48),
-        Border = Color3.fromRGB(55, 38, 70),
+        Hover = Color3.fromRGB(78, 30, 115),
+        Border = Color3.fromRGB(110, 45, 155),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(160, 145, 175),
+        SubText = Color3.fromRGB(205, 180, 220),
 
-        Accent = Color3.fromRGB(180, 90, 255),
-        AccentDark = Color3.fromRGB(125, 50, 190)
+        Accent = Color3.fromRGB(185, 95, 255),
+        AccentDark = Color3.fromRGB(130, 55, 200)
     },
 
+    --// ORANGE
     Orange = {
-        Background = Color3.fromRGB(13, 10, 7),
-        Secondary = Color3.fromRGB(21, 16, 10),
-        Element = Color3.fromRGB(30, 22, 14),
+        Background = Color3.fromRGB(38, 20, 7),
+        Secondary = Color3.fromRGB(58, 30, 10),
+        Element = Color3.fromRGB(82, 43, 14),
 
-        Hover = Color3.fromRGB(45, 31, 17),
-        Border = Color3.fromRGB(65, 45, 24),
+        Hover = Color3.fromRGB(108, 57, 18),
+        Border = Color3.fromRGB(150, 78, 25),
 
         Text = Color3.fromRGB(255, 255, 255),
-        SubText = Color3.fromRGB(175, 160, 140),
+        SubText = Color3.fromRGB(225, 200, 170),
 
-        Accent = Color3.fromRGB(255, 150, 50),
-        AccentDark = Color3.fromRGB(200, 100, 25)
+        Accent = Color3.fromRGB(255, 155, 50),
+        AccentDark = Color3.fromRGB(205, 105, 25)
     }
 
 }
