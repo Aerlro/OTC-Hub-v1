@@ -8,6 +8,7 @@ local Tab = {}
 
 local TweenService = game:GetService("TweenService")
 
+--// Tween
 local function tween(Object, Time, Properties)
     if not Object then
         return
@@ -30,6 +31,7 @@ local function tween(Object, Time, Properties)
     return Animation
 end
 
+--// Create
 local function create(Class, Properties)
     local Object = Instance.new(Class)
 
@@ -40,6 +42,7 @@ local function create(Class, Properties)
     return Object
 end
 
+--// Create Icon
 local function createIcon(
     Button,
     IconValue,
@@ -47,18 +50,34 @@ local function createIcon(
     OTC
 )
     if IconValue == nil then
+
         return create("TextLabel", {
             Name = "Icon",
             Parent = Button,
+
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(10, 0),
-            Size = UDim2.fromOffset(25, 38),
-            Font = Enum.Font.GothamMedium,
+
+            Position =
+                UDim2.fromOffset(10, 0),
+
+            Size =
+                UDim2.fromOffset(25, 38),
+
+            Font =
+                Enum.Font.GothamMedium,
+
             Text = "•",
-            TextColor3 = Theme.SubText,
+
+            TextColor3 =
+                Theme.SubText,
+
             TextSize = 15,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            TextYAlignment = Enum.TextYAlignment.Center
+
+            TextXAlignment =
+                Enum.TextXAlignment.Center,
+
+            TextYAlignment =
+                Enum.TextYAlignment.Center
         })
     end
 
@@ -68,6 +87,7 @@ local function createIcon(
             .. tostring(IconValue)
     end
 
+    --// Roblox / HTTP Image
     if type(IconValue) == "string"
         and (
             IconValue:match("^rbxassetid://")
@@ -78,17 +98,29 @@ local function createIcon(
         return create("ImageLabel", {
             Name = "Icon",
             Parent = Button,
+
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Position = UDim2.fromOffset(12, 9),
-            Size = UDim2.fromOffset(20, 20),
+
+            Position =
+                UDim2.fromOffset(12, 9),
+
+            Size =
+                UDim2.fromOffset(20, 20),
+
             Image = IconValue,
-            ImageColor3 = Theme.SubText,
+
+            ImageColor3 =
+                Theme.SubText,
+
             ImageTransparency = 0,
-            ScaleType = Enum.ScaleType.Fit
+
+            ScaleType =
+                Enum.ScaleType.Fit
         })
     end
 
+    --// Lucide
     if type(IconValue) == "string"
         and OTC
         and OTC._Lucide
@@ -105,55 +137,101 @@ local function createIcon(
             return create("ImageLabel", {
                 Name = "Icon",
                 Parent = Button,
+
                 BackgroundTransparency = 1,
                 BorderSizePixel = 0,
-                Position = UDim2.fromOffset(12, 9),
-                Size = UDim2.fromOffset(20, 20),
-                Image = LucideIcon.Url,
+
+                Position =
+                    UDim2.fromOffset(12, 9),
+
+                Size =
+                    UDim2.fromOffset(20, 20),
+
+                Image =
+                    LucideIcon.Url,
+
                 ImageRectSize =
                     LucideIcon.ImageRectSize,
+
                 ImageRectOffset =
                     LucideIcon.ImageRectOffset,
+
                 ImageColor3 =
                     Theme.SubText,
+
                 ImageTransparency = 0,
+
                 ScaleType =
                     Enum.ScaleType.Fit
             })
         end
     end
 
+    --// Text Icon
     if type(IconValue) == "string" then
+
         return create("TextLabel", {
             Name = "Icon",
             Parent = Button,
+
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(10, 0),
-            Size = UDim2.fromOffset(25, 38),
-            Font = Enum.Font.GothamMedium,
-            Text = IconValue,
-            TextColor3 = Theme.SubText,
+
+            Position =
+                UDim2.fromOffset(10, 0),
+
+            Size =
+                UDim2.fromOffset(25, 38),
+
+            Font =
+                Enum.Font.GothamMedium,
+
+            Text =
+                IconValue,
+
+            TextColor3 =
+                Theme.SubText,
+
             TextSize = 15,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            TextYAlignment = Enum.TextYAlignment.Center
+
+            TextXAlignment =
+                Enum.TextXAlignment.Center,
+
+            TextYAlignment =
+                Enum.TextYAlignment.Center
         })
     end
 
     return create("TextLabel", {
         Name = "Icon",
         Parent = Button,
+
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(10, 0),
-        Size = UDim2.fromOffset(25, 38),
-        Font = Enum.Font.GothamMedium,
+
+        Position =
+            UDim2.fromOffset(10, 0),
+
+        Size =
+            UDim2.fromOffset(25, 38),
+
+        Font =
+            Enum.Font.GothamMedium,
+
         Text = "•",
-        TextColor3 = Theme.SubText,
+
+        TextColor3 =
+            Theme.SubText,
+
         TextSize = 15,
-        TextXAlignment = Enum.TextXAlignment.Center,
-        TextYAlignment = Enum.TextYAlignment.Center
+
+        TextXAlignment =
+            Enum.TextXAlignment.Center,
+
+        TextYAlignment =
+            Enum.TextYAlignment.Center
     })
 end
 
+--// Create Tab
 function Tab.Create(
     Window,
     OTC,
@@ -167,6 +245,7 @@ function Tab.Create(
         or OTC._Themes.Default
 
     local TabObject = {
+
         Window = Window,
         OTC = OTC,
 
@@ -182,6 +261,7 @@ function Tab.Create(
         Selected = false
     }
 
+    --// Tab Button
     local Button = create(
         "TextButton",
         {
@@ -220,6 +300,7 @@ function Tab.Create(
         "UICorner",
         {
             Parent = Button,
+
             CornerRadius =
                 UDim.new(
                     0,
@@ -228,6 +309,7 @@ function Tab.Create(
         }
     )
 
+    --// Icon
     local Icon = createIcon(
         Button,
         Settings.Icon,
@@ -235,11 +317,13 @@ function Tab.Create(
         OTC
     )
 
+    --// Tab Name
     local Name = create(
         "TextLabel",
         {
             Name = "Name",
             Parent = Button,
+
             BackgroundTransparency = 1,
 
             Position =
@@ -275,6 +359,7 @@ function Tab.Create(
         }
     )
 
+    --// Selected Indicator
     local Indicator = create(
         "Frame",
         {
@@ -308,6 +393,7 @@ function Tab.Create(
         "UICorner",
         {
             Parent = Indicator,
+
             CornerRadius =
                 UDim.new(
                     1,
@@ -316,6 +402,7 @@ function Tab.Create(
         }
     )
 
+    --// Page
     local Page = create(
         "ScrollingFrame",
         {
@@ -353,6 +440,7 @@ function Tab.Create(
         }
     )
 
+    --// Padding
     create(
         "UIPadding",
         {
@@ -384,6 +472,7 @@ function Tab.Create(
         }
     )
 
+    --// Layout
     create(
         "UIListLayout",
         {
@@ -400,6 +489,7 @@ function Tab.Create(
         }
     )
 
+    --// Store UI
     TabObject.Button =
         Button
 
@@ -415,12 +505,17 @@ function Tab.Create(
     TabObject.NameLabel =
         Name
 
+    --// Current Theme
     local function getTheme()
+
         return OTC._Themes[Window.Theme]
             or OTC._Themes.Default
+
     end
 
+    --// Icon Color
     local function setIconColor(Color)
+
         if not Icon then
             return
         end
@@ -428,21 +523,50 @@ function Tab.Create(
         if Icon:IsA("ImageLabel")
             or Icon:IsA("ImageButton") then
 
-            Icon.ImageColor3 = Color
+            Icon.ImageColor3 =
+                Color
 
         elseif Icon:IsA("TextLabel")
             or Icon:IsA("TextButton") then
 
-            Icon.TextColor3 = Color
+            Icon.TextColor3 =
+                Color
         end
+
     end
 
+    --// Add Element
+    function TabObject:AddElement(Element)
+
+        if not Element then
+            return
+        end
+
+        -- Prevent duplicate registration
+        for _, Existing in ipairs(self.Elements) do
+            if Existing == Element then
+                return Element
+            end
+        end
+
+        table.insert(
+            self.Elements,
+            Element
+        )
+
+        return Element
+    end
+
+    --// Select
     function TabObject:SetSelected(Value)
+
         self.Selected = Value
 
-        local CurrentTheme = getTheme()
+        local CurrentTheme =
+            getTheme()
 
         if Value then
+
             Page.Visible = true
             Indicator.Visible = true
 
@@ -450,7 +574,9 @@ function Tab.Create(
                 Button,
                 0.2,
                 {
-                    BackgroundTransparency = 0
+                    BackgroundTransparency = 0,
+                    BackgroundColor3 =
+                        CurrentTheme.Element
                 }
             )
 
@@ -466,7 +592,9 @@ function Tab.Create(
             setIconColor(
                 CurrentTheme.Text
             )
+
         else
+
             Page.Visible = false
             Indicator.Visible = false
 
@@ -493,19 +621,24 @@ function Tab.Create(
         end
     end
 
+    --// Hover
     Button.MouseEnter:Connect(
         function()
+
             if TabObject.Selected then
                 return
             end
 
-            local CurrentTheme = getTheme()
+            local CurrentTheme =
+                getTheme()
 
             tween(
                 Button,
                 0.15,
                 {
-                    BackgroundTransparency = 0.7
+                    BackgroundTransparency = 0.7,
+                    BackgroundColor3 =
+                        CurrentTheme.Hover
                 }
             )
 
@@ -526,11 +659,13 @@ function Tab.Create(
 
     Button.MouseLeave:Connect(
         function()
+
             if TabObject.Selected then
                 return
             end
 
-            local CurrentTheme = getTheme()
+            local CurrentTheme =
+                getTheme()
 
             tween(
                 Button,
@@ -555,27 +690,22 @@ function Tab.Create(
         end
     )
 
+    --// Click
     Button.MouseButton1Click:Connect(
         function()
+
             Window:SelectTab(
                 TabObject
             )
+
         end
     )
 
-    function TabObject:AddElement(Element)
-        if Element then
-            table.insert(
-                self.Elements,
-                Element
-            )
-        end
-
-        return Element
-    end
-
+    --// Section
     function TabObject:CreateSection(Text)
-        local CurrentTheme = getTheme()
+
+        local CurrentTheme =
+            getTheme()
 
         local Section = create(
             "TextLabel",
@@ -614,13 +744,29 @@ function Tab.Create(
             }
         )
 
-        self:AddElement(Section)
+        --// Theme Refresh
+        function Section:RefreshTheme()
+
+            local Theme =
+                getTheme()
+
+            self.TextColor3 =
+                Theme.Text
+
+        end
+
+        self:AddElement(
+            Section
+        )
 
         return Section
     end
 
+    --// Text
     function TabObject:CreateText(Text)
-        local CurrentTheme = getTheme()
+
+        local CurrentTheme =
+            getTheme()
 
         local Label = create(
             "TextLabel",
@@ -661,12 +807,27 @@ function Tab.Create(
             }
         )
 
-        self:AddElement(Label)
+        --// Theme Refresh
+        function Label:RefreshTheme()
+
+            local Theme =
+                getTheme()
+
+            self.TextColor3 =
+                Theme.SubText
+
+        end
+
+        self:AddElement(
+            Label
+        )
 
         return Label
     end
 
+    --// Button
     function TabObject:CreateButton(Settings)
+
         Settings = Settings or {}
 
         local Module =
@@ -679,18 +840,20 @@ function Tab.Create(
             )
         end
 
-        local Element = Module.Create(
-            self,
-            self.OTC,
-            Settings
-        )
+        local Element =
+            Module.Create(
+                self,
+                self.OTC,
+                Settings
+            )
 
-        self:AddElement(Element)
-
+        -- Module already registers itself
         return Element
     end
 
+    --// Toggle
     function TabObject:CreateToggle(Settings)
+
         Settings = Settings or {}
 
         local Module =
@@ -703,18 +866,20 @@ function Tab.Create(
             )
         end
 
-        local Element = Module.Create(
-            self,
-            self.OTC,
-            Settings
-        )
+        local Element =
+            Module.Create(
+                self,
+                self.OTC,
+                Settings
+            )
 
-        self:AddElement(Element)
-
+        -- Module already registers itself
         return Element
     end
 
+    --// Slider
     function TabObject:CreateSlider(Settings)
+
         Settings = Settings or {}
 
         local Module =
@@ -727,18 +892,20 @@ function Tab.Create(
             )
         end
 
-        local Element = Module.Create(
-            self,
-            self.OTC,
-            Settings
-        )
+        local Element =
+            Module.Create(
+                self,
+                self.OTC,
+                Settings
+            )
 
-        self:AddElement(Element)
-
+        -- Module already registers itself
         return Element
     end
 
+    --// Dropdown
     function TabObject:CreateDropdown(Settings)
+
         Settings = Settings or {}
 
         local Module =
@@ -751,18 +918,20 @@ function Tab.Create(
             )
         end
 
-        local Element = Module.Create(
-            self,
-            self.OTC,
-            Settings
-        )
+        local Element =
+            Module.Create(
+                self,
+                self.OTC,
+                Settings
+            )
 
-        self:AddElement(Element)
-
+        -- Module already registers itself
         return Element
     end
 
+    --// Input
     function TabObject:CreateInput(Settings)
+
         Settings = Settings or {}
 
         local Module =
@@ -775,30 +944,38 @@ function Tab.Create(
             )
         end
 
-        local Element = Module.Create(
-            self,
-            self.OTC,
-            Settings
-        )
+        local Element =
+            Module.Create(
+                self,
+                self.OTC,
+                Settings
+            )
 
-        self:AddElement(Element)
-
+        -- Module already registers itself
         return Element
     end
 
+    --// Refresh Theme
     function TabObject:RefreshTheme()
-        local CurrentTheme = getTheme()
 
+        local CurrentTheme =
+            getTheme()
+
+        --// Tab Button
         Button.BackgroundColor3 =
             CurrentTheme.Element
 
+        --// Indicator
         Indicator.BackgroundColor3 =
             CurrentTheme.Accent
 
+        --// Page Scrollbar
         Page.ScrollBarImageColor3 =
             CurrentTheme.Border
 
+        --// Selected / Unselected
         if self.Selected then
+
             Button.BackgroundTransparency = 0
 
             Name.TextColor3 =
@@ -807,7 +984,9 @@ function Tab.Create(
             setIconColor(
                 CurrentTheme.Text
             )
+
         else
+
             Button.BackgroundTransparency = 1
 
             Name.TextColor3 =
@@ -818,21 +997,42 @@ function Tab.Create(
             )
         end
 
+        --// Refresh Elements
         for _, Element in ipairs(
             self.Elements
         ) do
-            if Element
-                and Element.RefreshTheme then
 
-                Element:RefreshTheme()
+            if Element
+                and type(Element.RefreshTheme)
+                    == "function" then
+
+                local Success, ErrorMessage =
+                    pcall(
+                        function()
+                            Element:RefreshTheme()
+                        end
+                    )
+
+                if not Success then
+                    warn(
+                        "[OTC Hub] Failed to refresh element theme:",
+                        ErrorMessage
+                    )
+                end
             end
         end
     end
 
-    Window:AddTab(TabObject)
+    --// Register Tab
+    Window:AddTab(
+        TabObject
+    )
 
+    --// First Tab
     if #Window.Tabs == 1 then
-        Window:SelectTab(TabObject)
+        Window:SelectTab(
+            TabObject
+        )
     end
 
     return TabObject
