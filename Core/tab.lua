@@ -44,8 +44,10 @@ function Tab.Create(Window, OTC, Settings)
     local TabObject = {
         Window = Window,
         OTC = OTC,
+
         Name = Settings.Name or "Tab",
         Icon = Settings.Icon,
+
         Elements = {},
         Selected = false
     }
@@ -65,23 +67,28 @@ function Tab.Create(Window, OTC, Settings)
         AutoButtonColor = false,
 
         Font = Enum.Font.GothamMedium,
+
         Text = "",
+
         TextColor3 = Theme.Text
     })
 
     create("UICorner", {
         Parent = Button,
+
         CornerRadius = UDim.new(0, 7)
     })
 
     --// Icon
     local Icon = create("TextLabel", {
         Name = "Icon",
+
         Parent = Button,
 
         BackgroundTransparency = 1,
 
         Position = UDim2.fromOffset(10, 0),
+
         Size = UDim2.fromOffset(25, 38),
 
         Font = Enum.Font.GothamMedium,
@@ -89,20 +96,24 @@ function Tab.Create(Window, OTC, Settings)
         Text = Settings.Icon or "•",
 
         TextColor3 = Theme.SubText,
+
         TextSize = 15,
 
         TextXAlignment = Enum.TextXAlignment.Center,
+
         TextYAlignment = Enum.TextYAlignment.Center
     })
 
     --// Name
     local Name = create("TextLabel", {
         Name = "Name",
+
         Parent = Button,
 
         BackgroundTransparency = 1,
 
         Position = UDim2.fromOffset(42, 0),
+
         Size = UDim2.new(1, -48, 1, 0),
 
         Font = Enum.Font.GothamMedium,
@@ -110,45 +121,63 @@ function Tab.Create(Window, OTC, Settings)
         Text = TabObject.Name,
 
         TextColor3 = Theme.SubText,
+
         TextSize = 13,
 
         TextXAlignment = Enum.TextXAlignment.Left,
+
         TextYAlignment = Enum.TextYAlignment.Center
     })
 
     --// Selected Indicator
     local Indicator = create("Frame", {
         Name = "Indicator",
+
         Parent = Button,
 
         BackgroundColor3 = Theme.Accent,
+
         BorderSizePixel = 0,
 
-        Position = UDim2.new(0, 0, 0.5, -9),
-        Size = UDim2.fromOffset(3, 18),
+        Position = UDim2.new(
+            0,
+            0,
+            0.5,
+            -9
+        ),
+
+        Size = UDim2.fromOffset(
+            3,
+            18
+        ),
 
         Visible = false
     })
 
     create("UICorner", {
         Parent = Indicator,
+
         CornerRadius = UDim.new(1, 0)
     })
 
     --// Content Page
     local Page = create("ScrollingFrame", {
         Name = TabObject.Name .. "_Page",
+
         Parent = Window.Content,
 
         BackgroundTransparency = 1,
+
         BorderSizePixel = 0,
 
         Size = UDim2.new(1, 0, 1, 0),
 
         CanvasSize = UDim2.new(),
+
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
 
         ScrollBarThickness = 3,
+
         ScrollBarImageColor3 = Theme.Border,
 
         Visible = false
@@ -167,16 +196,18 @@ function Tab.Create(Window, OTC, Settings)
         Parent = Page,
 
         Padding = UDim.new(0, 8),
+
         SortOrder = Enum.SortOrder.LayoutOrder
     })
 
     TabObject.Button = Button
     TabObject.Page = Page
+
     TabObject.Indicator = Indicator
     TabObject.IconLabel = Icon
     TabObject.NameLabel = Name
 
-    --// Select
+    --// Selected
     function TabObject:SetSelected(Value)
         self.Selected = Value
 
@@ -253,7 +284,10 @@ function Tab.Create(Window, OTC, Settings)
 
     --// Add Element
     function TabObject:AddElement(Element)
-        table.insert(self.Elements, Element)
+        if Element then
+            table.insert(self.Elements, Element)
+        end
+
         return Element
     end
 
@@ -261,6 +295,7 @@ function Tab.Create(Window, OTC, Settings)
     function TabObject:CreateSection(Text)
         local Section = create("TextLabel", {
             Name = "Section",
+
             Parent = Page,
 
             BackgroundTransparency = 1,
@@ -272,9 +307,11 @@ function Tab.Create(Window, OTC, Settings)
             Text = Text or "Section",
 
             TextColor3 = Theme.Text,
+
             TextSize = 14,
 
             TextXAlignment = Enum.TextXAlignment.Left,
+
             TextYAlignment = Enum.TextYAlignment.Center
         })
 
@@ -287,6 +324,7 @@ function Tab.Create(Window, OTC, Settings)
     function TabObject:CreateText(Text)
         local Label = create("TextLabel", {
             Name = "Text",
+
             Parent = Page,
 
             BackgroundTransparency = 1,
@@ -298,11 +336,13 @@ function Tab.Create(Window, OTC, Settings)
             Text = Text or "",
 
             TextColor3 = Theme.SubText,
+
             TextSize = 13,
 
             TextWrapped = true,
 
             TextXAlignment = Enum.TextXAlignment.Left,
+
             TextYAlignment = Enum.TextYAlignment.Center
         })
 
@@ -311,10 +351,100 @@ function Tab.Create(Window, OTC, Settings)
         return Label
     end
 
+    --// Button
+    function TabObject:CreateButton(Settings)
+        Settings = Settings or {}
+
+        local Module = self.OTC._Modules
+            and self.OTC._Modules.Button
+
+        if not Module then
+            error("[OTC Hub] Button module is not loaded")
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    --// Toggle
+    function TabObject:CreateToggle(Settings)
+        Settings = Settings or {}
+
+        local Module = self.OTC._Modules
+            and self.OTC._Modules.Toggle
+
+        if not Module then
+            error("[OTC Hub] Toggle module is not loaded")
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    --// Slider
+    function TabObject:CreateSlider(Settings)
+        Settings = Settings or {}
+
+        local Module = self.OTC._Modules
+            and self.OTC._Modules.Slider
+
+        if not Module then
+            error("[OTC Hub] Slider module is not loaded")
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    --// Dropdown
+    function TabObject:CreateDropdown(Settings)
+        Settings = Settings or {}
+
+        local Module = self.OTC._Modules
+            and self.OTC._Modules.Dropdown
+
+        if not Module then
+            error("[OTC Hub] Dropdown module is not loaded")
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    --// Input
+    function TabObject:CreateInput(Settings)
+        Settings = Settings or {}
+
+        local Module = self.OTC._Modules
+            and self.OTC._Modules.Input
+
+        if not Module then
+            error("[OTC Hub] Input module is not loaded")
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
     --// Register Tab
     Window:AddTab(TabObject)
 
-    --// Select First Tab
+    --// First Tab
     if #Window.Tabs == 1 then
         Window:SelectTab(TabObject)
     end
