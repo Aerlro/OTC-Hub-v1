@@ -98,7 +98,7 @@ function Window.Create(Settings, OTC)
         CornerRadius = UDim.new(0, 10)
     })
 
-    create("Frame", {
+    local BottomFix = create("Frame", {
         Name = "BottomFix",
         Parent = TopBar,
         BackgroundColor3 = Theme.Secondary,
@@ -159,13 +159,15 @@ function Window.Create(Settings, OTC)
         ZIndex = 7
     })
 
-    local MinimizeButton = create("ImageButton", {
+    local MinimizeButton = create("TextButton", {
         Name = "Minimize",
         Parent = TopBar,
         BackgroundColor3 = Theme.Element,
         BorderSizePixel = 0,
-        Image = LOGO_URL,
-        ImageColor3 = Theme.Text,
+        Text = "−",
+        TextColor3 = Theme.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 20,
         Position = UDim2.new(1, -75, 0, 15),
         Size = UDim2.fromOffset(30, 30),
         AutoButtonColor = false,
@@ -215,7 +217,7 @@ function Window.Create(Settings, OTC)
         ZIndex = 2
     })
 
-    create("Frame", {
+    local SidebarSeparator = create("Frame", {
         Name = "Separator",
         Parent = Sidebar,
         BackgroundColor3 = Theme.Border,
@@ -233,7 +235,12 @@ function Window.Create(Settings, OTC)
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Position = UDim2.fromOffset(10, 15),
-        Size = UDim2.new(1, -20, 1, -(15 + USER_AREA_HEIGHT)),
+        Size = UDim2.new(
+            1,
+            -20,
+            1,
+            -(15 + USER_AREA_HEIGHT)
+        ),
         ClipsDescendants = true,
         ZIndex = 2
     })
@@ -266,12 +273,22 @@ function Window.Create(Settings, OTC)
         Parent = Sidebar,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -USER_AREA_HEIGHT),
-        Size = UDim2.new(1, 0, 0, USER_AREA_HEIGHT),
+        Position = UDim2.new(
+            0,
+            0,
+            1,
+            -USER_AREA_HEIGHT
+        ),
+        Size = UDim2.new(
+            1,
+            0,
+            0,
+            USER_AREA_HEIGHT
+        ),
         ZIndex = 10
     })
 
-    create("Frame", {
+    local UserSeparator = create("Frame", {
         Name = "UserSeparator",
         Parent = UserArea,
         BackgroundColor3 = Theme.Border,
@@ -311,7 +328,7 @@ function Window.Create(Settings, OTC)
         CornerRadius = UDim.new(1, 0)
     })
 
-    create("TextLabel", {
+    local DisplayName = create("TextLabel", {
         Name = "DisplayName",
         Parent = UserCard,
         BackgroundTransparency = 1,
@@ -326,7 +343,7 @@ function Window.Create(Settings, OTC)
         ZIndex = 12
     })
 
-    create("TextLabel", {
+    local Username = create("TextLabel", {
         Name = "Username",
         Parent = UserCard,
         BackgroundTransparency = 1,
@@ -374,7 +391,7 @@ function Window.Create(Settings, OTC)
         CornerRadius = UDim.new(0, 12)
     })
 
-    create("UIStroke", {
+    local MiniStroke = create("UIStroke", {
         Parent = MiniButton,
         Color = Theme.Border,
         Thickness = 1
@@ -386,6 +403,7 @@ function Window.Create(Settings, OTC)
 
     local OpenPosition = Main.Position
     local OpenSize = Main.Size
+    local CurrentPosition = OpenPosition
 
     local function Minimize()
         if Object.Minimized or Object.Closed then
@@ -393,10 +411,15 @@ function Window.Create(Settings, OTC)
         end
 
         Object.Minimized = true
+        CurrentPosition = Main.Position
 
         Animation:Scale(Main, 0.94, 0.12)
 
         task.delay(0.08, function()
+            if Object.Closed then
+                return
+            end
+
             Animation:FadeOut(Logo, 0.12)
             Animation:FadeOut(Title, 0.12)
             Animation:FadeOut(Subtitle, 0.12)
@@ -404,19 +427,40 @@ function Window.Create(Settings, OTC)
             Animation:FadeOut(CloseButton, 0.12)
 
             task.delay(0.12, function()
+                if Object.Closed then
+                    return
+                end
+
                 Animation:Scale(Main, 0.01, 0.22)
 
                 task.delay(0.22, function()
+                    if Object.Closed then
+                        return
+                    end
+
                     Main.Visible = false
-                    Main.Position = OpenPosition
+                    Main.Position = CurrentPosition
                     Main.Size = OpenSize
 
                     MiniButton.Visible = true
                     MiniButton.ImageTransparency = 1
 
-                    Animation:Scale(MiniButton, 0.8, 0)
-                    Animation:FadeIn(MiniButton, 0.2)
-                    Animation:Scale(MiniButton, 1, 0.2)
+                    Animation:Scale(
+                        MiniButton,
+                        0.8,
+                        0
+                    )
+
+                    Animation:FadeIn(
+                        MiniButton,
+                        0.2
+                    )
+
+                    Animation:Scale(
+                        MiniButton,
+                        1,
+                        0.2
+                    )
                 end)
             end)
         end)
@@ -432,32 +476,65 @@ function Window.Create(Settings, OTC)
         MiniButton.Visible = false
 
         Main.Visible = true
-        Main.Position = OpenPosition
+        Main.Position = CurrentPosition
         Main.Size = OpenSize
 
         Logo.ImageTransparency = 1
         Title.TextTransparency = 1
         Subtitle.TextTransparency = 1
-        MinimizeButton.ImageTransparency = 1
+        MinimizeButton.TextTransparency = 1
         CloseButton.TextTransparency = 1
 
-        Animation:Scale(Main, 0.94, 0)
+        Animation:Scale(
+            Main,
+            0.94,
+            0
+        )
 
-        Animation:Scale(Main, 1, 0.25)
+        Animation:Scale(
+            Main,
+            1,
+            0.25
+        )
 
-        Animation:Appear(Logo, "Left", 12, 0.22)
-        Animation:Appear(Title, "Left", 12, 0.22)
-        Animation:Appear(Subtitle, "Left", 12, 0.22)
-        Animation:Appear(MinimizeButton, "Right", 12, 0.22)
-        Animation:Appear(CloseButton, "Right", 12, 0.22)
+        Animation:Appear(
+            Logo,
+            "Left",
+            12,
+            0.22
+        )
+
+        Animation:Appear(
+            Title,
+            "Left",
+            12,
+            0.22
+        )
+
+        Animation:Appear(
+            Subtitle,
+            "Left",
+            12,
+            0.22
+        )
+
+        Animation:Appear(
+            MinimizeButton,
+            "Right",
+            12,
+            0.22
+        )
+
+        Animation:Appear(
+            CloseButton,
+            "Right",
+            12,
+            0.22
+        )
     end
 
     MinimizeButton.MouseButton1Click:Connect(function()
         Minimize()
-    end)
-
-    MiniButton.MouseButton1Click:Connect(function()
-        Restore()
     end)
 
     CloseButton.MouseButton1Click:Connect(function()
@@ -467,8 +544,16 @@ function Window.Create(Settings, OTC)
 
         Object.Closed = true
 
-        Animation:Scale(Main, 0.92, 0.18)
-        Animation:FadeOut(Main, 0.18)
+        Animation:Scale(
+            Main,
+            0.92,
+            0.18
+        )
+
+        Animation:FadeOut(
+            Main,
+            0.18
+        )
 
         task.delay(0.2, function()
             if ScreenGui then
@@ -478,19 +563,35 @@ function Window.Create(Settings, OTC)
     end)
 
     MinimizeButton.MouseEnter:Connect(function()
-        Animation:Scale(MinimizeButton, 1.08, 0.12)
+        Animation:Scale(
+            MinimizeButton,
+            1.08,
+            0.12
+        )
     end)
 
     MinimizeButton.MouseLeave:Connect(function()
-        Animation:Scale(MinimizeButton, 1, 0.12)
+        Animation:Scale(
+            MinimizeButton,
+            1,
+            0.12
+        )
     end)
 
     CloseButton.MouseEnter:Connect(function()
-        Animation:Scale(CloseButton, 1.08, 0.12)
+        Animation:Scale(
+            CloseButton,
+            1.08,
+            0.12
+        )
     end)
 
     CloseButton.MouseLeave:Connect(function()
-        Animation:Scale(CloseButton, 1, 0.12)
+        Animation:Scale(
+            CloseButton,
+            1,
+            0.12
+        )
     end)
 
     local Dragging = false
@@ -507,6 +608,8 @@ function Window.Create(Settings, OTC)
             StartPosition.Y.Scale,
             StartPosition.Y.Offset + Delta.Y
         )
+
+        CurrentPosition = Main.Position
     end
 
     DragArea.InputBegan:Connect(function(Input)
@@ -540,12 +643,21 @@ function Window.Create(Settings, OTC)
     end)
 
     local MiniDragging = false
+    local MiniMoved = false
     local MiniDragStart
     local MiniStartPosition
     local MiniDragInput
 
+    local DRAG_THRESHOLD = 8
+
     local function UpdateMiniDrag(Input)
         local Delta = Input.Position - MiniDragStart
+
+        if math.abs(Delta.X) > DRAG_THRESHOLD
+            or math.abs(Delta.Y) > DRAG_THRESHOLD then
+
+            MiniMoved = true
+        end
 
         MiniButton.Position = UDim2.new(
             MiniStartPosition.X.Scale,
@@ -560,12 +672,18 @@ function Window.Create(Settings, OTC)
             or Input.UserInputType == Enum.UserInputType.Touch then
 
             MiniDragging = true
+            MiniMoved = false
+
             MiniDragStart = Input.Position
             MiniStartPosition = MiniButton.Position
 
             Input.Changed:Connect(function()
                 if Input.UserInputState == Enum.UserInputState.End then
                     MiniDragging = false
+
+                    if not MiniMoved then
+                        Restore()
+                    end
                 end
             end)
         end
@@ -586,7 +704,10 @@ function Window.Create(Settings, OTC)
     end)
 
     function Object:AddTab(TabObject)
-        table.insert(self.Tabs, TabObject)
+        table.insert(
+            self.Tabs,
+            TabObject
+        )
 
         if #self.Tabs == 1 then
             self:SelectTab(TabObject)
@@ -597,7 +718,9 @@ function Window.Create(Settings, OTC)
 
     function Object:SelectTab(TabObject)
         for _, Tab in ipairs(self.Tabs) do
-            Tab:SetSelected(Tab == TabObject)
+            Tab:SetSelected(
+                Tab == TabObject
+            )
         end
 
         self.SelectedTab = TabObject
@@ -626,32 +749,70 @@ function Window.Create(Settings, OTC)
     function Object:RefreshTheme()
         local NewTheme = self.OTC:GetTheme()
 
-        Main.BackgroundColor3 = NewTheme.Background
-        MainStroke.Color = NewTheme.Border
+        Main.BackgroundColor3 =
+            NewTheme.Background
 
-        TopBar.BackgroundColor3 = NewTheme.Secondary
-        TopBar:FindFirstChild("BottomFix").BackgroundColor3 = NewTheme.Secondary
+        MainStroke.Color =
+            NewTheme.Border
 
-        Sidebar.BackgroundColor3 = NewTheme.Secondary
-        Content.BackgroundColor3 = NewTheme.Background
+        TopBar.BackgroundColor3 =
+            NewTheme.Secondary
 
-        UserCard.BackgroundColor3 = NewTheme.Element
+        BottomFix.BackgroundColor3 =
+            NewTheme.Secondary
 
-        Logo.ImageColor3 = NewTheme.Text
-        Title.TextColor3 = NewTheme.Text
-        Subtitle.TextColor3 = NewTheme.SubText
+        Sidebar.BackgroundColor3 =
+            NewTheme.Secondary
 
-        MinimizeButton.BackgroundColor3 = NewTheme.Element
-        MinimizeButton.ImageColor3 = NewTheme.Text
+        SidebarSeparator.BackgroundColor3 =
+            NewTheme.Border
 
-        CloseButton.BackgroundColor3 = NewTheme.Element
-        CloseButton.TextColor3 = NewTheme.Text
+        Content.BackgroundColor3 =
+            NewTheme.Background
 
-        MiniButton.BackgroundColor3 = NewTheme.Element
-        MiniButton.ImageColor3 = NewTheme.Text
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserSeparator.BackgroundColor3 =
+            NewTheme.Border
+
+        Logo.ImageColor3 =
+            NewTheme.Text
+
+        Title.TextColor3 =
+            NewTheme.Text
+
+        Subtitle.TextColor3 =
+            NewTheme.SubText
+
+        MinimizeButton.BackgroundColor3 =
+            NewTheme.Element
+
+        MinimizeButton.TextColor3 =
+            NewTheme.Text
+
+        CloseButton.BackgroundColor3 =
+            NewTheme.Element
+
+        CloseButton.TextColor3 =
+            NewTheme.Text
+
+        MiniButton.BackgroundColor3 =
+            NewTheme.Element
+
+        MiniButton.ImageColor3 =
+            NewTheme.Text
+
+        MiniStroke.Color =
+            NewTheme.Border
     end
 
-    Animation:Appear(Main, "Bottom", 20, 0.3)
+    Animation:Appear(
+        Main,
+        "Bottom",
+        20,
+        0.3
+    )
 
     Object.MainOpenPosition = OpenPosition
     Object.MainOpenSize = OpenSize
