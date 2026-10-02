@@ -15,6 +15,7 @@ end
 
 local function GetTheme(Object)
     return Object.OTC._Themes[Object.OTC.CurrentTheme]
+        or Object.OTC._Themes[Object.Theme]
         or Object.OTC._Themes.Default
 end
 
@@ -40,8 +41,7 @@ function Window.Create(Settings, OTC)
     Object.Closed = false
     Object.UnloadConfirmation = nil
 
-    local Theme = OTC._Themes[ThemeName]
-        or OTC._Themes.Default
+    local Theme = GetTheme(Object)
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "OTC_Hub"
@@ -329,24 +329,6 @@ function Window.Create(Settings, OTC)
     Object.MiniButton = MiniButton
     Object.MiniStroke = MiniStroke
 
-    function Object:GetTheme()
-        return self.OTC._Themes[self.OTC.CurrentTheme]
-            or self.OTC._Themes.Default
-    end
-
-    function Object:SetTheme(Name)
-        if not self.OTC._Themes[Name] then
-            return false
-        end
-
-        self.OTC.CurrentTheme = Name
-        self.Theme = Name
-
-        self:RefreshTheme()
-
-        return true
-    end
-
     local Dragging = false
     local DragStart
     local StartPosition
@@ -424,9 +406,9 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        local CurrentTheme =
-            Object.OTC._Themes[Object.OTC.CurrentTheme]
-            or Object.OTC._Themes.Default
+        local CurrentTheme = OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes[Object.Theme]
+            or OTC._Themes.Default
 
         local Overlay = Instance.new("Frame")
         Overlay.Name = "UnloadOverlay"
@@ -518,29 +500,29 @@ function Window.Create(Settings, OTC)
         UnloadCorner.Parent = UnloadButton
 
         CancelButton.MouseEnter:Connect(function()
-            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
-                or Object.OTC._Themes.Default
+            local Current = OTC._Themes[OTC.CurrentTheme]
+                or OTC._Themes.Default
 
             CancelButton.BackgroundColor3 = Current.Hover
         end)
 
         CancelButton.MouseLeave:Connect(function()
-            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
-                or Object.OTC._Themes.Default
+            local Current = OTC._Themes[OTC.CurrentTheme]
+                or OTC._Themes.Default
 
             CancelButton.BackgroundColor3 = Current.Element
         end)
 
         UnloadButton.MouseEnter:Connect(function()
-            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
-                or Object.OTC._Themes.Default
+            local Current = OTC._Themes[OTC.CurrentTheme]
+                or OTC._Themes.Default
 
             UnloadButton.BackgroundColor3 = Current.AccentDark
         end)
 
         UnloadButton.MouseLeave:Connect(function()
-            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
-                or Object.OTC._Themes.Default
+            local Current = OTC._Themes[OTC.CurrentTheme]
+                or OTC._Themes.Default
 
             UnloadButton.BackgroundColor3 = Current.Accent
         end)
@@ -615,11 +597,7 @@ function Window.Create(Settings, OTC)
     MinimizeButton.MouseEnter:Connect(function()
         Tween(
             MinimizeButton,
-            TweenInfo.new(
-                0.12,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
                 Size = UDim2.new(0, 38, 0, 38),
                 Position = UDim2.new(1, -80, 0.5, -19)
@@ -630,11 +608,7 @@ function Window.Create(Settings, OTC)
     MinimizeButton.MouseLeave:Connect(function()
         Tween(
             MinimizeButton,
-            TweenInfo.new(
-                0.12,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
                 Size = UDim2.new(0, 34, 0, 34),
                 Position = UDim2.new(1, -78, 0.5, -17)
@@ -645,11 +619,7 @@ function Window.Create(Settings, OTC)
     CloseButton.MouseEnter:Connect(function()
         Tween(
             CloseButton,
-            TweenInfo.new(
-                0.12,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
                 Size = UDim2.new(0, 38, 0, 38),
                 Position = UDim2.new(1, -42, 0.5, -19)
@@ -660,11 +630,7 @@ function Window.Create(Settings, OTC)
     CloseButton.MouseLeave:Connect(function()
         Tween(
             CloseButton,
-            TweenInfo.new(
-                0.12,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
                 Size = UDim2.new(0, 34, 0, 34),
                 Position = UDim2.new(1, -40, 0.5, -17)
@@ -675,6 +641,23 @@ function Window.Create(Settings, OTC)
     MiniButton.MouseButton1Click:Connect(function()
         Object:Toggle()
     end)
+
+    function Object:GetTheme()
+        return self.OTC._Themes[self.OTC.CurrentTheme]
+            or self.OTC._Themes[self.Theme]
+            or self.OTC._Themes.Default
+    end
+
+    function Object:SetTheme(Name)
+        if not self.OTC._Themes[Name] then
+            return false
+        end
+
+        self.Theme = Name
+        self:RefreshTheme()
+
+        return true
+    end
 
     function Object:Toggle()
         if self.Closed then
@@ -697,15 +680,12 @@ function Window.Create(Settings, OTC)
 
         Main.Visible = false
         MiniButton.Visible = true
+
         MiniButton.Size = UDim2.new(0, 0, 0, 0)
 
         Tween(
             MiniButton,
-            TweenInfo.new(
-                0.2,
-                Enum.EasingStyle.Back,
-                Enum.EasingDirection.Out
-            ),
+            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
             {
                 Size = UDim2.new(0, 70, 0, 70)
             }
@@ -721,11 +701,7 @@ function Window.Create(Settings, OTC)
 
         Tween(
             MiniButton,
-            TweenInfo.new(
-                0.15,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.In
-            ),
+            TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
             {
                 Size = UDim2.new(0, 0, 0, 0)
             }
@@ -776,8 +752,8 @@ function Window.Create(Settings, OTC)
     function Object:RefreshTheme()
         local ThemeName = self.OTC.CurrentTheme
 
-        local NewTheme =
-            self.OTC._Themes[ThemeName]
+        local NewTheme = self.OTC._Themes[ThemeName]
+            or self.OTC._Themes[self.Theme]
             or self.OTC._Themes.Default
 
         self.Theme = ThemeName
@@ -802,6 +778,7 @@ function Window.Create(Settings, OTC)
         SidebarFix.BackgroundColor3 = NewTheme.Secondary
 
         Separator.BackgroundColor3 = NewTheme.Border
+
         Content.BackgroundColor3 = NewTheme.Background
 
         TabsContainer.ScrollBarImageColor3 = NewTheme.Border
