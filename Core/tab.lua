@@ -922,7 +922,7 @@ function Tab.Create(
         if not Module then
 
             error(
-                "[OTC Hub] Slider module is not loaded
+                "[OTC Hub] Slider module is not loaded"
             )
         end
 
