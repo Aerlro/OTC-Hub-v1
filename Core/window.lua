@@ -2,6 +2,7 @@ local Window = {}
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -405,6 +406,15 @@ function Window.Create(Settings, OTC)
     local OpenSize = Main.Size
     local CurrentPosition = OpenPosition
 
+    local MainScale = Main:FindFirstChildOfClass("UIScale")
+
+    if not MainScale then
+        MainScale = Instance.new("UIScale")
+        MainScale.Name = "AnimationScale"
+        MainScale.Scale = 1
+        MainScale.Parent = Main
+    end
+
     local function Minimize()
         if Object.Minimized or Object.Closed then
             return
@@ -412,57 +422,88 @@ function Window.Create(Settings, OTC)
 
         Object.Minimized = true
         CurrentPosition = Main.Position
+        Main.Active = false
 
-        Animation:Scale(Main, 0.94, 0.12)
+        local TargetPosition =
+            CurrentPosition + UDim2.fromOffset(0, 35)
 
-        task.delay(0.08, function()
+        local PositionTween = TweenService:Create(
+            Main,
+            TweenInfo.new(
+                0.14,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.In
+            ),
+            {
+                Position = TargetPosition
+            }
+        )
+
+        local ScaleTween = TweenService:Create(
+            MainScale,
+            TweenInfo.new(
+                0.14,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.In
+            ),
+            {
+                Scale = 0.96
+            }
+        )
+
+        PositionTween:Play()
+        ScaleTween:Play()
+
+        PositionTween.Completed:Once(function()
             if Object.Closed then
                 return
             end
 
-            Animation:FadeOut(Logo, 0.12)
-            Animation:FadeOut(Title, 0.12)
-            Animation:FadeOut(Subtitle, 0.12)
-            Animation:FadeOut(MinimizeButton, 0.12)
-            Animation:FadeOut(CloseButton, 0.12)
+            Main.Visible = false
+            Main.Position = CurrentPosition
+            Main.Size = OpenSize
+            MainScale.Scale = 1
 
-            task.delay(0.12, function()
-                if Object.Closed then
-                    return
-                end
+            MiniButton.Visible = true
+            MiniButton.ImageTransparency = 1
 
-                Animation:Scale(Main, 0.01, 0.22)
+            local MiniScale =
+                MiniButton:FindFirstChildOfClass("UIScale")
 
-                task.delay(0.22, function()
-                    if Object.Closed then
-                        return
-                    end
+            if not MiniScale then
+                MiniScale = Instance.new("UIScale")
+                MiniScale.Name = "AnimationScale"
+                MiniScale.Parent = MiniButton
+            end
 
-                    Main.Visible = false
-                    Main.Position = CurrentPosition
-                    Main.Size = OpenSize
+            MiniScale.Scale = 0.85
 
-                    MiniButton.Visible = true
-                    MiniButton.ImageTransparency = 1
+            local MiniFadeTween = TweenService:Create(
+                MiniButton,
+                TweenInfo.new(
+                    0.09,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    ImageTransparency = 0
+                }
+            )
 
-                    Animation:Scale(
-                        MiniButton,
-                        0.8,
-                        0
-                    )
+            local MiniScaleTween = TweenService:Create(
+                MiniScale,
+                TweenInfo.new(
+                    0.12,
+                    Enum.EasingStyle.Back,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    Scale = 1
+                }
+            )
 
-                    Animation:FadeIn(
-                        MiniButton,
-                        0.2
-                    )
-
-                    Animation:Scale(
-                        MiniButton,
-                        1,
-                        0.2
-                    )
-                end)
-            end)
+            MiniFadeTween:Play()
+            MiniScaleTween:Play()
         end)
     end
 
@@ -473,64 +514,60 @@ function Window.Create(Settings, OTC)
 
         Object.Minimized = false
 
-        MiniButton.Visible = false
-
         Main.Visible = true
-        Main.Position = CurrentPosition
+        Main.Active = true
+        Main.Position =
+            CurrentPosition + UDim2.fromOffset(0, 35)
         Main.Size = OpenSize
+        MainScale.Scale = 0.96
 
-        Logo.ImageTransparency = 1
-        Title.TextTransparency = 1
-        Subtitle.TextTransparency = 1
-        MinimizeButton.TextTransparency = 1
-        CloseButton.TextTransparency = 1
+        local MiniFadeTween = TweenService:Create(
+            MiniButton,
+            TweenInfo.new(
+                0.08,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.In
+            ),
+            {
+                ImageTransparency = 1
+            }
+        )
 
-        Animation:Scale(
+        MiniFadeTween:Play()
+
+        local PositionTween = TweenService:Create(
             Main,
-            0.94,
-            0
+            TweenInfo.new(
+                0.16,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.Out
+            ),
+            {
+                Position = CurrentPosition
+            }
         )
 
-        Animation:Scale(
-            Main,
-            1,
-            0.25
+        local ScaleTween = TweenService:Create(
+            MainScale,
+            TweenInfo.new(
+                0.16,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.Out
+            ),
+            {
+                Scale = 1
+            }
         )
 
-        Animation:Appear(
-            Logo,
-            "Left",
-            12,
-            0.22
-        )
+        PositionTween:Play()
+        ScaleTween:Play()
 
-        Animation:Appear(
-            Title,
-            "Left",
-            12,
-            0.22
-        )
-
-        Animation:Appear(
-            Subtitle,
-            "Left",
-            12,
-            0.22
-        )
-
-        Animation:Appear(
-            MinimizeButton,
-            "Right",
-            12,
-            0.22
-        )
-
-        Animation:Appear(
-            CloseButton,
-            "Right",
-            12,
-            0.22
-        )
+        MiniFadeTween.Completed:Once(function()
+            if not Object.Closed then
+                MiniButton.Visible = false
+                MiniButton.ImageTransparency = 0
+            end
+        end)
     end
 
     MinimizeButton.MouseButton1Click:Connect(function()
@@ -673,7 +710,6 @@ function Window.Create(Settings, OTC)
 
             MiniDragging = true
             MiniMoved = false
-
             MiniDragStart = Input.Position
             MiniStartPosition = MiniButton.Position
 
@@ -749,62 +785,25 @@ function Window.Create(Settings, OTC)
     function Object:RefreshTheme()
         local NewTheme = self.OTC:GetTheme()
 
-        Main.BackgroundColor3 =
-            NewTheme.Background
-
-        MainStroke.Color =
-            NewTheme.Border
-
-        TopBar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        BottomFix.BackgroundColor3 =
-            NewTheme.Secondary
-
-        Sidebar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        SidebarSeparator.BackgroundColor3 =
-            NewTheme.Border
-
-        Content.BackgroundColor3 =
-            NewTheme.Background
-
-        UserCard.BackgroundColor3 =
-            NewTheme.Element
-
-        UserSeparator.BackgroundColor3 =
-            NewTheme.Border
-
-        Logo.ImageColor3 =
-            NewTheme.Text
-
-        Title.TextColor3 =
-            NewTheme.Text
-
-        Subtitle.TextColor3 =
-            NewTheme.SubText
-
-        MinimizeButton.BackgroundColor3 =
-            NewTheme.Element
-
-        MinimizeButton.TextColor3 =
-            NewTheme.Text
-
-        CloseButton.BackgroundColor3 =
-            NewTheme.Element
-
-        CloseButton.TextColor3 =
-            NewTheme.Text
-
-        MiniButton.BackgroundColor3 =
-            NewTheme.Element
-
-        MiniButton.ImageColor3 =
-            NewTheme.Text
-
-        MiniStroke.Color =
-            NewTheme.Border
+        Main.BackgroundColor3 = NewTheme.Background
+        MainStroke.Color = NewTheme.Border
+        TopBar.BackgroundColor3 = NewTheme.Secondary
+        BottomFix.BackgroundColor3 = NewTheme.Secondary
+        Sidebar.BackgroundColor3 = NewTheme.Secondary
+        SidebarSeparator.BackgroundColor3 = NewTheme.Border
+        Content.BackgroundColor3 = NewTheme.Background
+        UserCard.BackgroundColor3 = NewTheme.Element
+        UserSeparator.BackgroundColor3 = NewTheme.Border
+        Logo.ImageColor3 = NewTheme.Text
+        Title.TextColor3 = NewTheme.Text
+        Subtitle.TextColor3 = NewTheme.SubText
+        MinimizeButton.BackgroundColor3 = NewTheme.Element
+        MinimizeButton.TextColor3 = NewTheme.Text
+        CloseButton.BackgroundColor3 = NewTheme.Element
+        CloseButton.TextColor3 = NewTheme.Text
+        MiniButton.BackgroundColor3 = NewTheme.Element
+        MiniButton.ImageColor3 = NewTheme.Text
+        MiniStroke.Color = NewTheme.Border
     end
 
     Animation:Appear(
