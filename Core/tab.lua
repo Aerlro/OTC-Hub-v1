@@ -46,40 +46,23 @@ end
 local function createIcon(
     Button,
     IconValue,
-    Theme
+    Theme,
+    OTC
 )
     --// No icon
     if IconValue == nil then
         return create("TextLabel", {
             Name = "Icon",
-
             Parent = Button,
-
             BackgroundTransparency = 1,
-
-            Position = UDim2.fromOffset(
-                10,
-                0
-            ),
-
-            Size = UDim2.fromOffset(
-                25,
-                38
-            ),
-
+            Position = UDim2.fromOffset(10, 0),
+            Size = UDim2.fromOffset(25, 38),
             Font = Enum.Font.GothamMedium,
-
             Text = "•",
-
             TextColor3 = Theme.SubText,
-
             TextSize = 15,
-
-            TextXAlignment =
-                Enum.TextXAlignment.Center,
-
-            TextYAlignment =
-                Enum.TextYAlignment.Center
+            TextXAlignment = Enum.TextXAlignment.Center,
+            TextYAlignment = Enum.TextYAlignment.Center
         })
     end
 
@@ -93,117 +76,107 @@ local function createIcon(
     --// Roblox Asset
     if type(IconValue) == "string"
         and (
-            IconValue:match(
-                "^rbxassetid://"
-            )
-            or IconValue:match(
-                "^rbxasset://"
-            )
-            or IconValue:match(
-                "^https?://"
-            )
+            IconValue:match("^rbxassetid://")
+            or IconValue:match("^rbxasset://")
+            or IconValue:match("^https?://")
         ) then
 
         return create("ImageLabel", {
             Name = "Icon",
-
             Parent = Button,
-
             BackgroundTransparency = 1,
-
             BorderSizePixel = 0,
-
-            Position = UDim2.fromOffset(
-                12,
-                9
-            ),
-
-            Size = UDim2.fromOffset(
-                20,
-                20
-            ),
-
+            Position = UDim2.fromOffset(12, 9),
+            Size = UDim2.fromOffset(20, 20),
             Image = IconValue,
-
-            ImageColor3 =
-                Theme.SubText,
-
+            ImageColor3 = Theme.SubText,
             ImageTransparency = 0,
-
-            ScaleType =
-                Enum.ScaleType.Fit
+            ScaleType = Enum.ScaleType.Fit
         })
+    end
+
+    --// Lucide
+    if type(IconValue) == "string"
+        and OTC
+        and OTC._Lucide
+        and OTC._Lucide.Available then
+
+        local LucideIcon =
+            OTC._Lucide:GetIcon(IconValue)
+
+        if LucideIcon
+            and LucideIcon.Url
+            and LucideIcon.ImageRectSize
+            and LucideIcon.ImageRectOffset then
+
+            return create("ImageLabel", {
+                Name = "Icon",
+
+                Parent = Button,
+
+                BackgroundTransparency = 1,
+
+                BorderSizePixel = 0,
+
+                Position = UDim2.fromOffset(
+                    12,
+                    9
+                ),
+
+                Size = UDim2.fromOffset(
+                    20,
+                    20
+                ),
+
+                Image = LucideIcon.Url,
+
+                ImageRectSize =
+                    LucideIcon.ImageRectSize,
+
+                ImageRectOffset =
+                    LucideIcon.ImageRectOffset,
+
+                ImageColor3 =
+                    Theme.SubText,
+
+                ImageTransparency = 0,
+
+                ScaleType =
+                    Enum.ScaleType.Fit
+            })
+        end
     end
 
     --// Emoji / Text
     if type(IconValue) == "string" then
-
         return create("TextLabel", {
             Name = "Icon",
-
             Parent = Button,
-
             BackgroundTransparency = 1,
-
-            Position = UDim2.fromOffset(
-                10,
-                0
-            ),
-
-            Size = UDim2.fromOffset(
-                25,
-                38
-            ),
-
+            Position = UDim2.fromOffset(10, 0),
+            Size = UDim2.fromOffset(25, 38),
             Font = Enum.Font.GothamMedium,
-
             Text = IconValue,
-
-            TextColor3 =
-                Theme.SubText,
-
+            TextColor3 = Theme.SubText,
             TextSize = 15,
-
-            TextXAlignment =
-                Enum.TextXAlignment.Center,
-
-            TextYAlignment =
-                Enum.TextYAlignment.Center
+            TextXAlignment = Enum.TextXAlignment.Center,
+            TextYAlignment = Enum.TextYAlignment.Center
         })
     end
 
     --// Fallback
     return create("TextLabel", {
         Name = "Icon",
-
         Parent = Button,
-
         BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(
-            10,
-            0
-        ),
-
-        Size = UDim2.fromOffset(
-            25,
-            38
-        ),
-
+        Position = UDim2.fromOffset(10, 0),
+        Size = UDim2.fromOffset(25, 38),
         Font = Enum.Font.GothamMedium,
-
         Text = "•",
-
-        TextColor3 =
-            Theme.SubText,
-
+        TextColor3 = Theme.SubText,
         TextSize = 15,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Center,
-
-        TextYAlignment =
-            Enum.TextYAlignment.Center
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Center
     })
 end
 
@@ -288,7 +261,8 @@ function Tab.Create(
     local Icon = createIcon(
         Button,
         Settings.Icon,
-        Theme
+        Theme,
+        OTC
     )
 
     --// Name
@@ -486,22 +460,14 @@ function Tab.Create(
             return
         end
 
-        if Icon:IsA(
-            "ImageLabel"
-        )
-        or Icon:IsA(
-            "ImageButton"
-        ) then
+        if Icon:IsA("ImageLabel")
+            or Icon:IsA("ImageButton") then
 
             Icon.ImageColor3 =
                 Color
 
-        elseif Icon:IsA(
-            "TextLabel"
-        )
-        or Icon:IsA(
-            "TextButton"
-        ) then
+        elseif Icon:IsA("TextLabel")
+            or Icon:IsA("TextButton") then
 
             Icon.TextColor3 =
                 Color
