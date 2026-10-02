@@ -16,8 +16,8 @@ local LocalPlayer = Players.LocalPlayer
 local LOGO_URL = "rbxassetid://82435776198191"
 
 --// Window Size
-local WINDOW_WIDTH = 500
-local WINDOW_HEIGHT = 330
+local WINDOW_WIDTH = 560
+local WINDOW_HEIGHT = 380
 
 --// Tween
 local function tween(Object, Time, Properties)
