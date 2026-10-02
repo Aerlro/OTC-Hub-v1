@@ -225,6 +225,10 @@ local NotificationModule = LoadModule(
     "Core/notification.lua"
 )
 
+local LucideModule = LoadModule(
+    "Core/lucide.lua"
+)
+
 --// Load Element Modules
 local ButtonModule = LoadModule(
     "Elements/button.lua"
@@ -254,6 +258,9 @@ OTC._Modules = {
     Dropdown = DropdownModule,
     Input = InputModule,
 }    
+
+--// Register Lucide
+OTC._Lucide = LucideModule
 
 --// Notification
 function OTC:Notify(Data)
