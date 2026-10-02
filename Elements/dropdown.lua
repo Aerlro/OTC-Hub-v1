@@ -211,6 +211,8 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
             ClipsDescendants = false,
 
+            Active = false,
+
             ZIndex = 1000
         })
     end
@@ -583,10 +585,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 ContentHeight
             )
 
-        ------------------------------------------------------------
-        -- Keep scroll position valid
-        ------------------------------------------------------------
-
         local MaxScroll =
             math.max(
                 0,
@@ -611,11 +609,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
         local VisibleCount =
             GetVisibleCount()
 
-        local ContentHeight
+        local ContentHeight = 0
 
-        if VisibleCount <= 0 then
-            ContentHeight = 0
-        else
+        if VisibleCount > 0 then
             ContentHeight =
                 (
                     VisibleCount
@@ -650,9 +646,7 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 Height
             )
 
-        task.defer(function()
-            UpdateCanvas()
-        end)
+        task.defer(UpdateCanvas)
     end
 
     ----------------------------------------------------------------
@@ -698,10 +692,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
         local Y = BelowY
 
-        ------------------------------------------------------------
-        -- HORIZONTAL
-        ------------------------------------------------------------
-
         if X + DropdownSize.X
             > Viewport.X - 8 then
 
@@ -714,10 +704,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         if X < 8 then
             X = 8
         end
-
-        ------------------------------------------------------------
-        -- VERTICAL
-        ------------------------------------------------------------
 
         if BelowY + DropdownSize.Y
             > Viewport.Y - 8 then
@@ -784,33 +770,18 @@ function Dropdown.Create(TabObject, OTC, Settings)
             OTC._OpenDropdown = nil
         end
 
-        if OTC.Tween then
-            OTC:Tween(
-                DropdownFrame,
-                0.12,
-                {
-                    BackgroundTransparency = 1
-                }
-            )
+        -- IMPORTANT:
+        -- Hide everything instantly.
+        -- No fade-out = no leftover pixels/artefacts.
 
-            OTC:Tween(
-                Arrow,
-                0.12,
-                {
-                    Rotation = 0
-                }
-            )
+        DropdownFrame.Visible = false
+        DropdownFrame.BackgroundTransparency = 0
 
-            task.delay(0.12, function()
-                if not Open then
-                    DropdownFrame.Visible = false
-                    DropdownFrame.BackgroundTransparency = 0
-                end
-            end)
-        else
-            DropdownFrame.Visible = false
-            Arrow.Rotation = 0
-        end
+        -- Disable overlay so it cannot block clicks.
+        Overlay.Active = false
+
+        -- Reset arrow.
+        Arrow.Rotation = 0
     end
 
     ----------------------------------------------------------------
@@ -833,6 +804,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
         OTC._OpenDropdown = Object
 
         Open = true
+
+        -- Enable overlay.
+        Overlay.Active = true
 
         DropdownFrame.Visible = true
         DropdownFrame.BackgroundTransparency = 1
@@ -865,9 +839,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
             Arrow.Rotation = 180
         end
 
-        ------------------------------------------------------------
-        -- FOLLOW BUTTON / SCROLL
-        ------------------------------------------------------------
+        ----------------------------------------------------------------
+        -- FOLLOW BUTTON
+        ----------------------------------------------------------------
 
         local RunService =
             game:GetService("RunService")
@@ -1128,7 +1102,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         end
 
         UpdateValueText()
-
         UpdateSize()
 
         task.defer(function()
@@ -1229,7 +1202,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         end
 
         RebuildOptions()
-
         FireCallback()
     end
 
