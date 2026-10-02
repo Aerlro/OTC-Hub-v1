@@ -4,1402 +4,986 @@
     by Aerlro
 ]]
 
-local Dropdown = {}
+return function(OTC)
 
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
+    local Dropdown = {}
 
-local function create(Class, Properties)
-    local Object = Instance.new(Class)
+    local function create(ClassName, Properties)
+        local Object = Instance.new(ClassName)
 
-    for Property, Value in pairs(Properties or {}) do
-        Object[Property] = Value
-    end
-
-    return Object
-end
-
-local function tween(Object, Time, Properties)
-    local Animation = TweenService:Create(
-        Object,
-        TweenInfo.new(
-            Time or 0.2,
-            Enum.EasingStyle.Quint,
-            Enum.EasingDirection.Out
-        ),
-        Properties
-    )
-
-    Animation:Play()
-
-    return Animation
-end
-
-function Dropdown.Create(Tab, OTC, Settings)
-
-    Settings = Settings or {}
-
-    local Theme = OTC:GetTheme()
-
-    local Name = Settings.Name or "Dropdown"
-    local Description = Settings.Description
-    local Options = Settings.Options or {}
-    local CurrentOption = Settings.CurrentOption
-    local MultiSelect = Settings.MultiSelect == true
-    local Flag = Settings.Flag
-
-    local Callback = Settings.Callback or function() end
-
-    local Selected = {}
-
-    if MultiSelect then
-
-        if type(CurrentOption) == "table" then
-            for _, Option in ipairs(CurrentOption) do
-                Selected[Option] = true
-            end
+        for Property, Value in pairs(Properties or {}) do
+            Object[Property] = Value
         end
 
-    elseif CurrentOption ~= nil then
-
-        Selected[CurrentOption] = true
-
+        return Object
     end
 
-    local Open = false
+    local function getTheme()
+        return OTC:GetTheme()
+    end
 
-    local FrameHeight = Description and 62 or 48
+    local function normalizeValue(Value)
+        if type(Value) == "table" then
+            return Value
+        end
 
-    --// Main dropdown frame
-    local Frame = create("Frame", {
-        Name = "Dropdown",
+        if Value == nil then
+            return ""
+        end
 
-        Parent = Tab.Page,
+        return tostring(Value)
+    end
 
-        BackgroundColor3 = Theme.Element,
+    function Dropdown.Create(Parent, Settings)
 
-        BorderSizePixel = 0,
+        Settings = Settings or {}
 
-        Size = UDim2.new(
-            1,
-            0,
-            0,
-            FrameHeight
-        ),
+        local Theme = getTheme()
 
-        ClipsDescendants = false,
+        local Options = Settings.Options or {}
+        local MultiSelect = Settings.MultiSelect == true
 
-        ZIndex = 5
-    })
+        local CurrentOption = Settings.CurrentOption
 
-    create("UICorner", {
-        Parent = Frame,
-        CornerRadius = UDim.new(0, 8)
-    })
+        if MultiSelect then
+            if type(CurrentOption) ~= "table" then
+                CurrentOption = {}
+            end
+        else
+            if type(CurrentOption) == "table" then
+                CurrentOption = CurrentOption[1]
+            end
 
-    local Stroke = create("UIStroke", {
-        Parent = Frame,
+            CurrentOption = CurrentOption or Options[1]
+        end
 
-        Color = Theme.Border,
+        local Object = {}
 
-        Thickness = 1
-    })
+        local Opened = false
 
-    --// Button
-    local Button = create("TextButton", {
-        Name = "Button",
+        --------------------------------------------------
+        -- MAIN FRAME
+        --------------------------------------------------
 
-        Parent = Frame,
+        local Frame = create("Frame", {
+            Name = "Dropdown",
+            Parent = Parent,
 
-        BackgroundTransparency = 1,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
 
-        BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 48),
 
-        Size = UDim2.new(
-            1,
-            0,
-            1,
-            0
-        ),
+            ClipsDescendants = false,
 
-        AutoButtonColor = false,
+            ZIndex = 10
+        })
 
-        Text = "",
+        --------------------------------------------------
+        -- BUTTON
+        --------------------------------------------------
 
-        ZIndex = 6
-    })
+        local Button = create("TextButton", {
+            Name = "Button",
+            Parent = Frame,
 
-    --// Title
-    local Title = create("TextLabel", {
-        Name = "Title",
+            BackgroundColor3 = Theme.Element,
+            BackgroundTransparency = 0,
 
-        Parent = Button,
+            BorderSizePixel = 0,
 
-        BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 48),
 
-        Position = UDim2.fromOffset(
-            15,
-            Description and 8 or 0
-        ),
+            Text = "",
 
-        Size = UDim2.new(
-            1,
-            -180,
-            0,
-            22
-        ),
+            AutoButtonColor = false,
 
-        Font = Enum.Font.GothamMedium,
+            ZIndex = 11
+        })
 
-        Text = Name,
+        local ButtonCorner = create("UICorner", {
+            Parent = Button,
+            CornerRadius = UDim.new(0, 8)
+        })
 
-        TextColor3 = Theme.Text,
-
-        TextSize = 13,
-
-        TextXAlignment = Enum.TextXAlignment.Left,
-
-        ZIndex = 7
-    })
-
-    --// Description
-    local DescriptionLabel
-
-    if Description then
-
-        DescriptionLabel = create("TextLabel", {
-            Name = "Description",
-
+        local NameLabel = create("TextLabel", {
+            Name = "Name",
             Parent = Button,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(
-                15,
-                30
-            ),
+            Position = UDim2.fromOffset(14, 6),
+            Size = UDim2.new(0.55, 0, 0, 18),
 
-            Size = UDim2.new(
-                1,
-                -180,
-                0,
-                20
-            ),
+            Font = Enum.Font.GothamMedium,
+            Text = Settings.Name or "Dropdown",
 
-            Font = Enum.Font.Gotham,
-
-            Text = Description,
-
-            TextColor3 = Theme.SubText,
-
-            TextSize = 10,
-
-            TextWrapped = true,
+            TextColor3 = Theme.Text,
+            TextSize = 13,
 
             TextXAlignment = Enum.TextXAlignment.Left,
 
-            ZIndex = 7
+            ZIndex = 12
         })
 
-    end
+        local ValueLabel = create("TextLabel", {
+            Name = "Value",
+            Parent = Button,
 
-    --// Selected
-    local SelectedText = create("TextLabel", {
-        Name = "Selected",
+            BackgroundTransparency = 1,
 
-        Parent = Button,
+            Position = UDim2.fromOffset(14, 25),
+            Size = UDim2.new(1, -45, 0, 16),
 
-        BackgroundTransparency = 1,
+            Font = Enum.Font.Gotham,
+            TextColor3 = Theme.SubText,
+            TextSize = 11,
 
-        AnchorPoint = Vector2.new(
-            1,
-            0.5
-        ),
+            TextXAlignment = Enum.TextXAlignment.Left,
 
-        Position = UDim2.new(
-            1,
-            -40,
-            0.5,
-            0
-        ),
+            TextTruncate = Enum.TextTruncate.AtEnd,
 
-        Size = UDim2.fromOffset(
-            130,
-            24
-        ),
+            ZIndex = 12
+        })
 
-        Font = Enum.Font.Gotham,
+        --------------------------------------------------
+        -- ARROW
+        --------------------------------------------------
 
-        Text = "None",
+        local Arrow = create("TextLabel", {
+            Name = "Arrow",
+            Parent = Button,
 
-        TextColor3 = Theme.SubText,
+            BackgroundTransparency = 1,
 
-        TextSize = 11,
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.new(1, -14, 0.5, 0),
 
-        TextTruncate = Enum.TextTruncate.AtEnd,
+            Size = UDim2.fromOffset(20, 20),
 
-        TextXAlignment = Enum.TextXAlignment.Right,
+            Font = Enum.Font.GothamBold,
+            Text = "⌄",
 
-        TextYAlignment = Enum.TextYAlignment.Center,
+            TextColor3 = Theme.SubText,
+            TextSize = 16,
 
-        ZIndex = 7
-    })
+            ZIndex = 12
+        })
 
-    --// Arrow
-    local Arrow = create("TextLabel", {
-        Name = "Arrow",
+        --------------------------------------------------
+        -- DROPDOWN OVERLAY
+        --------------------------------------------------
 
-        Parent = Button,
+        local DropdownFrame = create("Frame", {
+            Name = "DropdownFrame",
+            Parent = Frame,
 
-        BackgroundTransparency = 1,
-
-        AnchorPoint = Vector2.new(
-            1,
-            0.5
-        ),
-
-        Position = UDim2.new(
-            1,
-            -15,
-            0.5,
-            0
-        ),
-
-        Size = UDim2.fromOffset(
-            18,
-            20
-        ),
-
-        Font = Enum.Font.GothamBold,
-
-        Text = "⌄",
-
-        TextColor3 = Theme.SubText,
-
-        TextSize = 14,
-
-        TextXAlignment = Enum.TextXAlignment.Center,
-
-        TextYAlignment = Enum.TextYAlignment.Center,
-
-        ZIndex = 7
-    })
-
-    --==================================================
-    -- DROPDOWN POPUP
-    --==================================================
-
-    local Window = Tab.Window
-
-    local PopupParent
-
-    if Window and Window.ScreenGui then
-        PopupParent = Window.ScreenGui
-    else
-        PopupParent = Tab.Page
-    end
-
-    local DropdownFrame = create("Frame", {
-
-        Name = "Options",
-
-        Parent = PopupParent,
-
-        BackgroundColor3 = Theme.Secondary,
-
-        BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            0,
-            0
-        ),
-
-        Size = UDim2.fromOffset(
-            0,
-            0
-        ),
-
-        ClipsDescendants = true,
-
-        Visible = false,
-
-        ZIndex = 200
-    })
-
-    create("UICorner", {
-        Parent = DropdownFrame,
-
-        CornerRadius = UDim.new(
-            0,
-            8
-        )
-    })
-
-    create("UIStroke", {
-        Parent = DropdownFrame,
-
-        Color = Theme.Border,
-
-        Thickness = 1
-    })
-
-    --// Options List
-    local OptionsList = create("ScrollingFrame", {
-
-        Name = "List",
-
-        Parent = DropdownFrame,
-
-        BackgroundTransparency = 1,
-
-        BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            5,
-            5
-        ),
-
-        Size = UDim2.new(
-            1,
-            -10,
-            1,
-            -10
-        ),
-
-        CanvasSize = UDim2.new(),
-
-        AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-        ScrollBarThickness = 2,
-
-        ScrollBarImageColor3 = Theme.Accent,
-
-        ZIndex = 201
-    })
-
-    create("UIListLayout", {
-        Parent = OptionsList,
-
-        Padding = UDim.new(
-            0,
-            3
-        ),
-
-        SortOrder = Enum.SortOrder.LayoutOrder
-    })
-
-    --// Search
-    local SearchBox
-
-    if Settings.Search == true then
-
-        SearchBox = create("TextBox", {
-
-            Name = "Search",
-
-            Parent = DropdownFrame,
-
-            BackgroundColor3 = Theme.Element,
+            BackgroundColor3 = Theme.Secondary,
+            BackgroundTransparency = 0,
 
             BorderSizePixel = 0,
 
-            Position = UDim2.fromOffset(
-                8,
-                8
-            ),
+            Position = UDim2.new(0, 0, 0, 53),
 
-            Size = UDim2.new(
-                1,
-                -16,
-                0,
-                30
-            ),
+            Size = UDim2.new(1, 0, 0, 0),
+
+            Visible = false,
+
+            ClipsDescendants = true,
+
+            ZIndex = 100
+        })
+
+        local DropdownCorner = create("UICorner", {
+            Parent = DropdownFrame,
+            CornerRadius = UDim.new(0, 8)
+        })
+
+        local DropdownStroke = create("UIStroke", {
+            Parent = DropdownFrame,
+
+            Color = Theme.Border,
+            Thickness = 1,
+
+            Transparency = 0
+        })
+
+        --------------------------------------------------
+        -- SEARCH
+        --------------------------------------------------
+
+        local SearchFrame = create("Frame", {
+            Name = "Search",
+            Parent = DropdownFrame,
+
+            BackgroundColor3 = Theme.Element,
+            BackgroundTransparency = 0,
+
+            BorderSizePixel = 0,
+
+            Position = UDim2.fromOffset(7, 7),
+
+            Size = UDim2.new(1, -14, 0, 36),
+
+            ZIndex = 101
+        })
+
+        local SearchCorner = create("UICorner", {
+            Parent = SearchFrame,
+            CornerRadius = UDim.new(0, 7)
+        })
+
+        --------------------------------------------------
+        -- SEARCH ICON
+        --------------------------------------------------
+
+        local SearchIcon
+
+        if OTC._Lucide and OTC._Lucide.Available then
+
+            local IconData = OTC._Lucide:GetIcon("search")
+
+            if IconData then
+
+                SearchIcon = create("ImageLabel", {
+                    Name = "Icon",
+                    Parent = SearchFrame,
+
+                    BackgroundTransparency = 1,
+
+                    Position = UDim2.fromOffset(10, 8),
+                    Size = UDim2.fromOffset(20, 20),
+
+                    Image = IconData.Url,
+
+                    ImageRectSize = IconData.ImageRectSize,
+                    ImageRectOffset = IconData.ImageRectOffset,
+
+                    ImageColor3 = Theme.SubText,
+
+                    ScaleType = Enum.ScaleType.Fit,
+
+                    ZIndex = 103
+                })
+
+            end
+        end
+
+        --------------------------------------------------
+        -- FALLBACK SEARCH ICON
+        --------------------------------------------------
+
+        if not SearchIcon then
+
+            SearchIcon = create("TextLabel", {
+                Name = "Icon",
+                Parent = SearchFrame,
+
+                BackgroundTransparency = 1,
+
+                Position = UDim2.fromOffset(10, 8),
+                Size = UDim2.fromOffset(20, 20),
+
+                Font = Enum.Font.GothamBold,
+                Text = "⌕",
+
+                TextColor3 = Theme.SubText,
+                TextSize = 18,
+
+                ZIndex = 103
+            })
+
+        end
+
+        --------------------------------------------------
+        -- SEARCH BOX
+        --------------------------------------------------
+
+        local SearchBox = create("TextBox", {
+            Name = "SearchBox",
+            Parent = SearchFrame,
+
+            BackgroundTransparency = 1,
+
+            Position = UDim2.fromOffset(36, 0),
+            Size = UDim2.new(1, -42, 1, 0),
 
             Font = Enum.Font.Gotham,
 
+            Text = "",
             PlaceholderText = "Search...",
 
+            TextColor3 = Theme.Text,
             PlaceholderColor3 = Theme.SubText,
 
-            Text = "",
+            TextSize = 12,
 
-            TextColor3 = Theme.Text,
-
-            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
 
             ClearTextOnFocus = false,
 
-            ZIndex = 202
+            ZIndex = 103
         })
 
-        create("UICorner", {
-            Parent = SearchBox,
+        --------------------------------------------------
+        -- OPTIONS LIST
+        --------------------------------------------------
 
-            CornerRadius = UDim.new(
-                0,
-                6
-            )
+        local OptionsList = create("ScrollingFrame", {
+            Name = "Options",
+            Parent = DropdownFrame,
+
+            BackgroundTransparency = 1,
+
+            BorderSizePixel = 0,
+
+            Position = UDim2.fromOffset(7, 50),
+
+            Size = UDim2.new(1, -14, 1, -57),
+
+            CanvasSize = UDim2.fromOffset(0, 0),
+
+            ScrollBarThickness = 3,
+
+            ScrollBarImageColor3 = Theme.Border,
+
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+
+            ZIndex = 101
         })
 
-        OptionsList.Position = UDim2.fromOffset(
-            8,
-            45
-        )
+        local OptionsLayout = create("UIListLayout", {
+            Parent = OptionsList,
 
-        OptionsList.Size = UDim2.new(
-            1,
-            -16,
-            1,
-            -53
-        )
+            SortOrder = Enum.SortOrder.LayoutOrder,
 
-    end
+            Padding = UDim.new(0, 4)
+        })
 
-    local OptionButtons = {}
+        --------------------------------------------------
+        -- CURRENT VALUE TEXT
+        --------------------------------------------------
 
-    --==================================================
-    -- SELECTED TEXT
-    --==================================================
+        local function updateValueText()
 
-    local function getSelectedText()
+            if MultiSelect then
 
-        local Values = {}
+                if #CurrentOption == 0 then
+                    ValueLabel.Text = "None"
+                    return
+                end
 
-        for Option in pairs(Selected) do
+                local Text = {}
 
-            if Selected[Option] then
+                for _, Value in ipairs(CurrentOption) do
+                    table.insert(Text, tostring(Value))
+                end
 
-                table.insert(
-                    Values,
-                    tostring(Option)
+                ValueLabel.Text = table.concat(Text, ", ")
+
+            else
+
+                if CurrentOption == nil or CurrentOption == "" then
+                    ValueLabel.Text = "None"
+                else
+                    ValueLabel.Text = tostring(CurrentOption)
+                end
+
+            end
+        end
+
+        updateValueText()
+
+        --------------------------------------------------
+        -- CHECK SELECTED
+        --------------------------------------------------
+
+        local function isSelected(Value)
+
+            if not MultiSelect then
+                return CurrentOption == Value
+            end
+
+            for _, Selected in ipairs(CurrentOption) do
+                if Selected == Value then
+                    return true
+                end
+            end
+
+            return false
+        end
+
+        --------------------------------------------------
+        -- REMOVE MULTI VALUE
+        --------------------------------------------------
+
+        local function removeValue(Value)
+
+            for Index, Selected in ipairs(CurrentOption) do
+
+                if Selected == Value then
+                    table.remove(CurrentOption, Index)
+                    break
+                end
+
+            end
+        end
+
+        --------------------------------------------------
+        -- CALLBACK
+        --------------------------------------------------
+
+        local function callback(Value)
+
+            if Settings.Callback then
+
+                task.spawn(function()
+
+                    pcall(
+                        Settings.Callback,
+                        Value
+                    )
+
+                end)
+
+            end
+        end
+
+        --------------------------------------------------
+        -- OPTION BUTTON
+        --------------------------------------------------
+
+        local function createOption(Value, LayoutOrder)
+
+            local OptionButton = create("TextButton", {
+                Name = "Option",
+
+                Parent = OptionsList,
+
+                BackgroundColor3 = Theme.Element,
+
+                BackgroundTransparency = 0,
+
+                BorderSizePixel = 0,
+
+                Size = UDim2.new(1, 0, 0, 34),
+
+                Text = "",
+
+                AutoButtonColor = false,
+
+                LayoutOrder = LayoutOrder,
+
+                ZIndex = 103
+            })
+
+            local Corner = create("UICorner", {
+                Parent = OptionButton,
+
+                CornerRadius = UDim.new(0, 6)
+            })
+
+            local Label = create("TextLabel", {
+                Name = "Text",
+
+                Parent = OptionButton,
+
+                BackgroundTransparency = 1,
+
+                Position = UDim2.fromOffset(10, 0),
+
+                Size = UDim2.new(1, -40, 1, 0),
+
+                Font = Enum.Font.Gotham,
+
+                Text = tostring(Value),
+
+                TextColor3 = Theme.Text,
+
+                TextSize = 12,
+
+                TextXAlignment = Enum.TextXAlignment.Left,
+
+                ZIndex = 104
+            })
+
+            local Check = create("TextLabel", {
+                Name = "Check",
+
+                Parent = OptionButton,
+
+                BackgroundTransparency = 1,
+
+                AnchorPoint = Vector2.new(1, 0.5),
+
+                Position = UDim2.new(1, -10, 0.5, 0),
+
+                Size = UDim2.fromOffset(20, 20),
+
+                Font = Enum.Font.GothamBold,
+
+                Text = "",
+
+                TextColor3 = Theme.Text,
+
+                TextSize = 14,
+
+                ZIndex = 104
+            })
+
+            local function updateCheck()
+
+                if isSelected(Value) then
+                    Check.Text = "✓"
+                    Check.TextColor3 = Theme.Accent
+                else
+                    Check.Text = ""
+                end
+
+            end
+
+            updateCheck()
+
+            OptionButton.MouseEnter:Connect(function()
+
+                OTC:Tween(
+                    OptionButton,
+                    {
+                        BackgroundColor3 = Theme.Hover
+                    },
+                    0.12
                 )
 
-            end
+            end)
 
-        end
+            OptionButton.MouseLeave:Connect(function()
 
-        table.sort(Values)
+                OTC:Tween(
+                    OptionButton,
+                    {
+                        BackgroundColor3 = Theme.Element
+                    },
+                    0.12
+                )
 
-        if #Values == 0 then
-            return "None"
-        end
+            end)
 
-        if #Values > 3 then
-            return tostring(#Values)
-                .. " selected"
-        end
+            OptionButton.MouseButton1Click:Connect(function()
 
-        return table.concat(
-            Values,
-            ", "
-        )
+                if MultiSelect then
 
-    end
-
-    local function updateSelectedText()
-
-        SelectedText.Text =
-            getSelectedText()
-
-    end
-
-    --==================================================
-    -- CALLBACK
-    --==================================================
-
-    local function callback()
-
-        local Value
-
-        if MultiSelect then
-
-            Value = {}
-
-            for Option in pairs(Selected) do
-
-                if Selected[Option] then
-
-                    table.insert(
-                        Value,
-                        Option
-                    )
-
-                end
-
-            end
-
-        else
-
-            for Option in pairs(Selected) do
-
-                if Selected[Option] then
-
-                    Value = Option
-
-                    break
-
-                end
-
-            end
-
-        end
-
-        if Flag then
-
-            OTC:SetFlag(
-                Flag,
-                Value
-            )
-
-        end
-
-        local Success, Error =
-            pcall(
-                Callback,
-                Value
-            )
-
-        if not Success then
-
-            warn(
-                "[OTC Hub] Dropdown callback error:",
-                Error
-            )
-
-        end
-
-    end
-
-    --==================================================
-    -- SELECT OPTION
-    --==================================================
-
-    local function selectOption(Option)
-
-        if MultiSelect then
-
-            Selected[Option] =
-                not Selected[Option]
-
-        else
-
-            table.clear(Selected)
-
-            Selected[Option] = true
-
-            Open = false
-
-        end
-
-        updateSelectedText()
-
-        callback()
-
-        for Value, OptionButton in pairs(
-            OptionButtons
-        ) do
-
-            local IsSelected =
-                Selected[Value] == true
-
-            OptionButton.BackgroundColor3 =
-                IsSelected
-                and Theme.Hover
-                or Theme.Element
-
-        end
-
-        if not MultiSelect then
-
-            tween(
-                DropdownFrame,
-                0.2,
-                {
-                    Size = UDim2.fromOffset(
-                        DropdownFrame.AbsoluteSize.X,
-                        0
-                    )
-                }
-            )
-
-            tween(
-                Arrow,
-                0.2,
-                {
-                    Rotation = 0
-                }
-            )
-
-            tween(
-                Stroke,
-                0.2,
-                {
-                    Color = Theme.Border
-                }
-            )
-
-            task.delay(
-                0.2,
-                function()
-
-                    if not Open then
-
-                        DropdownFrame.Visible =
-                            false
-
+                    if isSelected(Value) then
+                        removeValue(Value)
+                    else
+                        table.insert(CurrentOption, Value)
                     end
 
+                    updateCheck()
+                    updateValueText()
+
+                    callback(CurrentOption)
+
+                else
+
+                    CurrentOption = Value
+
+                    updateValueText()
+
+                    callback(Value)
+
+                    Object:Close()
+
                 end
-            )
+
+            end)
+
+            return OptionButton
+        end
+
+        --------------------------------------------------
+        -- OPTIONS
+        --------------------------------------------------
+
+        local OptionObjects = {}
+
+        local function rebuildOptions(SearchText)
+
+            for _, Object in ipairs(OptionObjects) do
+
+                if Object and Object.Parent then
+                    Object:Destroy()
+                end
+
+            end
+
+            table.clear(OptionObjects)
+
+            SearchText = tostring(SearchText or ""):lower()
+
+            for Index, Value in ipairs(Options) do
+
+                local ValueString = tostring(Value)
+
+                if SearchText == ""
+                    or ValueString:lower():find(
+                        SearchText,
+                        1,
+                        true
+                    ) then
+
+                    local OptionButton =
+                        createOption(
+                            Value,
+                            Index
+                        )
+
+                    table.insert(
+                        OptionObjects,
+                        OptionButton
+                    )
+
+                end
+
+            end
 
         end
 
-    end
+        rebuildOptions("")
 
-    --==================================================
-    -- CREATE OPTION
-    --==================================================
+        --------------------------------------------------
+        -- HEIGHT
+        --------------------------------------------------
 
-    local function createOption(Option)
+        local function calculateHeight()
 
-        local OptionButton =
-            create(
-                "TextButton",
+            local Count = #OptionObjects
+
+            local SearchHeight = 50
+            local OptionHeight = 38
+
+            local ListHeight =
+                math.min(
+                    math.max(
+                        Count * OptionHeight,
+                        38
+                    ),
+                    220
+                )
+
+            return SearchHeight + ListHeight + 7
+        end
+
+        --------------------------------------------------
+        -- OPEN
+        --------------------------------------------------
+
+        function Object:Open()
+
+            if Opened then
+                return
+            end
+
+            Opened = true
+
+            DropdownFrame.Visible = true
+
+            local Height = calculateHeight()
+
+            DropdownFrame.Size =
+                UDim2.new(
+                    1,
+                    0,
+                    0,
+                    0
+                )
+
+            OTC:Tween(
+                DropdownFrame,
                 {
-                    Name = tostring(Option),
-
-                    Parent = OptionsList,
-
-                    BackgroundColor3 =
-                        Selected[Option]
-                        and Theme.Hover
-                        or Theme.Element,
-
-                    BorderSizePixel = 0,
-
                     Size = UDim2.new(
                         1,
                         0,
                         0,
-                        32
-                    ),
-
-                    AutoButtonColor = false,
-
-                    Font = Enum.Font.Gotham,
-
-                    Text = tostring(Option),
-
-                    TextColor3 = Theme.Text,
-
-                    TextSize = 11,
-
-                    TextXAlignment =
-                        Enum.TextXAlignment.Left,
-
-                    ZIndex = 203
-                }
+                        Height
+                    )
+                },
+                0.16
             )
 
-        create("UICorner", {
-            Parent = OptionButton,
+            OTC:Tween(
+                Arrow,
+                {
+                    Rotation = 180
+                },
+                0.16
+            )
 
-            CornerRadius =
-                UDim.new(
-                    0,
-                    6
-                )
-        })
+        end
 
-        create("UIPadding", {
-            Parent = OptionButton,
+        --------------------------------------------------
+        -- CLOSE
+        --------------------------------------------------
 
-            PaddingLeft =
-                UDim.new(
-                    0,
-                    10
-                )
-        })
+        function Object:Close()
 
-        OptionButtons[Option] =
-            OptionButton
-
-        OptionButton.MouseEnter:Connect(
-            function()
-
-                tween(
-                    OptionButton,
-                    0.12,
-                    {
-                        BackgroundColor3 =
-                            Theme.Hover
-                    }
-                )
-
+            if not Opened then
+                return
             end
-        )
 
-        OptionButton.MouseLeave:Connect(
-            function()
+            Opened = false
 
-                if Selected[Option] then
-                    return
+            OTC:Tween(
+                DropdownFrame,
+                {
+                    Size = UDim2.new(
+                        1,
+                        0,
+                        0,
+                        0
+                    )
+                },
+                0.14
+            )
+
+            OTC:Tween(
+                Arrow,
+                {
+                    Rotation = 0
+                },
+                0.14
+            )
+
+            task.delay(0.15, function()
+
+                if not Opened then
+                    DropdownFrame.Visible = false
                 end
 
-                tween(
-                    OptionButton,
-                    0.12,
-                    {
-                        BackgroundColor3 =
-                            Theme.Element
-                    }
-                )
+            end)
 
+        end
+
+        --------------------------------------------------
+        -- BUTTON CLICK
+        --------------------------------------------------
+
+        Button.MouseButton1Click:Connect(function()
+
+            if Opened then
+                Object:Close()
+            else
+                Object:Open()
             end
-        )
 
-        OptionButton.MouseButton1Click:Connect(
-            function()
+        end)
 
-                selectOption(
-                    Option
-                )
-
-            end
-        )
-
-    end
-
-    for _, Option in ipairs(Options) do
-        createOption(Option)
-    end
-
-    --==================================================
-    -- SEARCH
-    --==================================================
-
-    if SearchBox then
+        --------------------------------------------------
+        -- SEARCH
+        --------------------------------------------------
 
         SearchBox:GetPropertyChangedSignal(
             "Text"
-        ):Connect(
-            function()
+        ):Connect(function()
 
-                local Search =
-                    string.lower(
-                        SearchBox.Text
-                    )
+            rebuildOptions(
+                SearchBox.Text
+            )
 
-                for Option, ButtonObject in pairs(
-                    OptionButtons
-                ) do
+            if Opened then
 
-                    local Match =
-                        Search == ""
-                        or string.find(
-                            string.lower(
-                                tostring(Option)
-                            ),
-                            Search,
+                local Height =
+                    calculateHeight()
+
+                OTC:Tween(
+                    DropdownFrame,
+                    {
+                        Size = UDim2.new(
                             1,
-                            true
+                            0,
+                            0,
+                            Height
                         )
+                    },
+                    0.1
+                )
 
-                    ButtonObject.Visible =
-                        Match == true
+            end
+
+        end)
+
+        --------------------------------------------------
+        -- SET VALUE
+        --------------------------------------------------
+
+        function Object:SetValue(Value)
+
+            if MultiSelect then
+
+                if type(Value) == "table" then
+
+                    CurrentOption = Value
+
+                else
+
+                    CurrentOption = {
+                        Value
+                    }
 
                 end
 
-            end
-        )
+            else
 
-    end
+                CurrentOption = Value
 
-    --==================================================
-    -- HEIGHT
-    --==================================================
-
-    local function calculateHeight()
-
-        local Count = 0
-
-        for _, ButtonObject in pairs(
-            OptionButtons
-        ) do
-
-            if ButtonObject.Visible then
-                Count += 1
             end
 
-        end
+            updateValueText()
 
-        local Height =
-            math.clamp(
-                Count * 35 + 10,
-                45,
-                220
+            rebuildOptions(
+                SearchBox.Text
             )
 
-        if SearchBox then
-            Height += 38
         end
 
-        return Height
+        --------------------------------------------------
+        -- GET VALUE
+        --------------------------------------------------
 
-    end
+        function Object:GetValue()
 
-    --==================================================
-    -- POSITION POPUP
-    --==================================================
-
-    local function updatePopupPosition()
-
-        if not DropdownFrame then
-            return
-        end
-
-        if not Window
-            or not Window.ScreenGui then
-
-            return
-        end
-
-        local AbsolutePosition =
-            Frame.AbsolutePosition
-
-        local AbsoluteSize =
-            Frame.AbsoluteSize
-
-        local ViewportSize =
-            workspace.CurrentCamera
-            and workspace.CurrentCamera.ViewportSize
-
-        if not ViewportSize then
-            return
-        end
-
-        local PopupHeight =
-            calculateHeight()
-
-        local PopupWidth =
-            AbsoluteSize.X
-
-        local X =
-            AbsolutePosition.X
-
-        local BelowY =
-            AbsolutePosition.Y
-            + AbsoluteSize.Y
-            + 7
-
-        local AboveY =
-            AbsolutePosition.Y
-            - PopupHeight
-            - 7
-
-        local Y = BelowY
-
-        --// If there isn't enough space below,
-        --// open above the dropdown.
-        if BelowY + PopupHeight
-            > ViewportSize.Y
-        then
-
-            Y = AboveY
+            return CurrentOption
 
         end
 
-        --// Keep inside screen horizontally
-        if X + PopupWidth
-            > ViewportSize.X
-        then
+        --------------------------------------------------
+        -- SET OPTIONS
+        --------------------------------------------------
 
-            X =
-                ViewportSize.X
-                - PopupWidth
-                - 5
+        function Object:SetOptions(NewOptions)
 
-        end
+            Options = NewOptions or {}
 
-        if X < 5 then
-            X = 5
-        end
-
-        if Y < 5 then
-            Y = 5
-        end
-
-        DropdownFrame.Position =
-            UDim2.fromOffset(
-                X,
-                Y
+            rebuildOptions(
+                SearchBox.Text
             )
 
-        DropdownFrame.Size =
-            UDim2.fromOffset(
-                PopupWidth,
-                0
-            )
+            if Opened then
 
-    end
+                local Height =
+                    calculateHeight()
 
-    --==================================================
-    -- OPEN / CLOSE
-    --==================================================
-
-    local function setOpen(Value)
-
-        Open = Value
-
-        if Open then
-
-            --// Make sure the correct tab is visible
-            if Tab.Page then
-                Tab.Page.Visible = true
-            end
-
-            local Height =
-                calculateHeight()
-
-            local AbsoluteSize =
-                Frame.AbsoluteSize
-
-            local PopupWidth =
-                AbsoluteSize.X
-
-            updatePopupPosition()
-
-            DropdownFrame.Visible = true
-
-            DropdownFrame.Size =
-                UDim2.fromOffset(
-                    PopupWidth,
-                    0
-                )
-
-            tween(
-                DropdownFrame,
-                0.25,
-                {
-                    Size = UDim2.fromOffset(
-                        PopupWidth,
+                DropdownFrame.Size =
+                    UDim2.new(
+                        1,
+                        0,
+                        0,
                         Height
                     )
-                }
-            )
-
-            tween(
-                Arrow,
-                0.2,
-                {
-                    Rotation = 180
-                }
-            )
-
-            tween(
-                Stroke,
-                0.2,
-                {
-                    Color = Theme.Accent
-                }
-            )
-
-        else
-
-            tween(
-                DropdownFrame,
-                0.2,
-                {
-                    Size = UDim2.fromOffset(
-                        DropdownFrame.AbsoluteSize.X,
-                        0
-                    )
-                }
-            )
-
-            tween(
-                Arrow,
-                0.2,
-                {
-                    Rotation = 0
-                }
-            )
-
-            tween(
-                Stroke,
-                0.2,
-                {
-                    Color = Theme.Border
-                }
-            )
-
-            task.delay(
-                0.2,
-                function()
-
-                    if not Open then
-
-                        DropdownFrame.Visible =
-                            false
-
-                    end
-
-                end
-            )
-
-        end
-
-    end
-
-    --==================================================
-    -- BUTTON
-    --==================================================
-
-    Button.MouseButton1Click:Connect(
-        function()
-
-            setOpen(
-                not Open
-            )
-
-        end
-    )
-
-    Button.MouseEnter:Connect(
-        function()
-
-            tween(
-                Frame,
-                0.15,
-                {
-                    BackgroundColor3 =
-                        Theme.Hover
-                }
-            )
-
-        end
-    )
-
-    Button.MouseLeave:Connect(
-        function()
-
-            if not Open then
-
-                tween(
-                    Frame,
-                    0.15,
-                    {
-                        BackgroundColor3 =
-                            Theme.Element
-                    }
-                )
 
             end
 
         end
-    )
 
-    --==================================================
-    -- CLOSE WHEN CLICKING OUTSIDE
-    --==================================================
+        --------------------------------------------------
+        -- ADD OPTION
+        --------------------------------------------------
 
-    UserInputService.InputBegan:Connect(
-        function(Input, GameProcessed)
+        function Object:AddOption(Value)
 
-            if not Open then
-                return
-            end
+            table.insert(
+                Options,
+                Value
+            )
 
-            if GameProcessed then
-                return
-            end
-
-            if Input.UserInputType
-                ~= Enum.UserInputType.MouseButton1
-                and Input.UserInputType
-                ~= Enum.UserInputType.Touch then
-
-                return
-            end
-
-            local Position =
-                Input.Position
-
-            local FramePosition =
-                Frame.AbsolutePosition
-
-            local FrameSize =
-                Frame.AbsoluteSize
-
-            local PopupPosition =
-                DropdownFrame.AbsolutePosition
-
-            local PopupSize =
-                DropdownFrame.AbsoluteSize
-
-            local InFrame =
-                Position.X >= FramePosition.X
-                and Position.X <=
-                    FramePosition.X
-                    + FrameSize.X
-                and Position.Y >= FramePosition.Y
-                and Position.Y <=
-                    FramePosition.Y
-                    + FrameSize.Y
-
-            local InPopup =
-                Position.X >= PopupPosition.X
-                and Position.X <=
-                    PopupPosition.X
-                    + PopupSize.X
-                and Position.Y >= PopupPosition.Y
-                and Position.Y <=
-                    PopupPosition.Y
-                    + PopupSize.Y
-
-            if not InFrame and not InPopup then
-                setOpen(false)
-            end
-
-        end
-    )
-
-    --==================================================
-    -- UPDATE POSITION WHEN SCROLLING
-    --==================================================
-
-    if Tab.Page then
-
-        Tab.Page:GetPropertyChangedSignal(
-            "CanvasPosition"
-        ):Connect(
-            function()
-
-                if Open then
-                    updatePopupPosition()
-                end
-
-            end
-        )
-
-    end
-
-    --==================================================
-    -- UPDATE POSITION WHEN FRAME MOVES
-    --==================================================
-
-    Frame:GetPropertyChangedSignal(
-        "AbsolutePosition"
-    ):Connect(
-        function()
-
-            if Open then
-                updatePopupPosition()
-            end
-
-        end
-    )
-
-    Frame:GetPropertyChangedSignal(
-        "AbsoluteSize"
-    ):Connect(
-        function()
-
-            if Open then
-                updatePopupPosition()
-            end
-
-        end
-    )
-
-    --==================================================
-    -- INITIAL
-    --==================================================
-
-    updateSelectedText()
-
-    --==================================================
-    -- OBJECT
-    --==================================================
-
-    local Object = {}
-
-    function Object:SetValue(Value)
-
-        table.clear(Selected)
-
-        if MultiSelect then
-
-            if type(Value) == "table" then
-
-                for _, Option in ipairs(Value) do
-                    Selected[Option] = true
-                end
-
-            end
-
-        else
-
-            if Value ~= nil then
-                Selected[Value] = true
-            end
+            rebuildOptions(
+                SearchBox.Text
+            )
 
         end
 
-        updateSelectedText()
+        --------------------------------------------------
+        -- REMOVE OPTION
+        --------------------------------------------------
 
-        callback()
+        function Object:RemoveOption(Value)
 
-    end
+            for Index, Option in ipairs(Options) do
 
-    function Object:GetValue()
+                if Option == Value then
 
-        if MultiSelect then
-
-            local Values = {}
-
-            for Option in pairs(Selected) do
-
-                if Selected[Option] then
-
-                    table.insert(
-                        Values,
-                        Option
+                    table.remove(
+                        Options,
+                        Index
                     )
 
+                    break
                 end
 
             end
 
-            return Values
+            rebuildOptions(
+                SearchBox.Text
+            )
 
         end
 
-        for Option in pairs(Selected) do
+        --------------------------------------------------
+        -- SET NAME
+        --------------------------------------------------
 
-            if Selected[Option] then
-                return Option
+        function Object:SetName(Name)
+
+            NameLabel.Text =
+                tostring(Name)
+
+        end
+
+        --------------------------------------------------
+        -- SET CALLBACK
+        --------------------------------------------------
+
+        function Object:SetCallback(Callback)
+
+            Settings.Callback = Callback
+
+        end
+
+        --------------------------------------------------
+        -- CLEAR SEARCH
+        --------------------------------------------------
+
+        function Object:ClearSearch()
+
+            SearchBox.Text = ""
+
+        end
+
+        --------------------------------------------------
+        -- DESTROY
+        --------------------------------------------------
+
+        function Object:Destroy()
+
+            if Frame then
+                Frame:Destroy()
             end
 
         end
 
-        return nil
+        --------------------------------------------------
+        -- PUBLIC REFERENCES
+        --------------------------------------------------
 
+        Object.Frame = Frame
+        Object.Button = Button
+        Object.DropdownFrame = DropdownFrame
+        Object.SearchBox = SearchBox
+        Object.OptionsList = OptionsList
+
+        Object.MultiSelect = MultiSelect
+
+        return Object
     end
 
-    function Object:SetOptions(NewOptions)
-
-        Options = NewOptions or {}
-
-        for _, ButtonObject in pairs(
-            OptionButtons
-        ) do
-
-            ButtonObject:Destroy()
-
-        end
-
-        table.clear(OptionButtons)
-
-        for _, Option in ipairs(Options) do
-            createOption(Option)
-        end
-
-        updateSelectedText()
-
-    end
-
-    function Object:AddOption(Option)
-
-        table.insert(
-            Options,
-            Option
-        )
-
-        createOption(Option)
-
-    end
-
-    function Object:RemoveOption(Option)
-
-        for Index, Value in ipairs(Options) do
-
-            if Value == Option then
-
-                table.remove(
-                    Options,
-                    Index
-                )
-
-                break
-
-            end
-
-        end
-
-        if OptionButtons[Option] then
-
-            OptionButtons[Option]:Destroy()
-
-            OptionButtons[Option] = nil
-
-        end
-
-        Selected[Option] = nil
-
-        updateSelectedText()
-
-    end
-
-    function Object:Open()
-
-        setOpen(true)
-
-    end
-
-    function Object:Close()
-
-        setOpen(false)
-
-    end
-
-    function Object:SetName(NewName)
-
-        Name = NewName
-
-        Title.Text = NewName
-
-    end
-
-    function Object:SetCallback(NewCallback)
-
-        if type(NewCallback) == "function" then
-            Callback = NewCallback
-        end
-
-    end
-
-    function Object:Destroy()
-
-        if DropdownFrame then
-            DropdownFrame:Destroy()
-        end
-
-        if Frame then
-            Frame:Destroy()
-        end
-
-    end
-
-    Object.Instance = Frame
-
-    Object.Button = Button
-
-    Object.Options = DropdownFrame
-
-    Tab:AddElement(Object)
-
-    return Object
+    return Dropdown
 end
-
-return Dropdown
