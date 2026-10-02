@@ -8,7 +8,6 @@ local Tab = {}
 
 local TweenService = game:GetService("TweenService")
 
---// Tween
 local function tween(Object, Time, Properties)
     if not Object then
         return
@@ -31,7 +30,6 @@ local function tween(Object, Time, Properties)
     return Animation
 end
 
---// Create Instance
 local function create(Class, Properties)
     local Object = Instance.new(Class)
 
@@ -42,14 +40,12 @@ local function create(Class, Properties)
     return Object
 end
 
---// Create Icon
 local function createIcon(
     Button,
     IconValue,
     Theme,
     OTC
 )
-    --// No icon
     if IconValue == nil then
         return create("TextLabel", {
             Name = "Icon",
@@ -66,14 +62,12 @@ local function createIcon(
         })
     end
 
-    --// Number Asset ID
     if type(IconValue) == "number" then
         IconValue =
             "rbxassetid://"
             .. tostring(IconValue)
     end
 
-    --// Roblox Asset
     if type(IconValue) == "string"
         and (
             IconValue:match("^rbxassetid://")
@@ -95,7 +89,6 @@ local function createIcon(
         })
     end
 
-    --// Lucide
     if type(IconValue) == "string"
         and OTC
         and OTC._Lucide
@@ -111,43 +104,25 @@ local function createIcon(
 
             return create("ImageLabel", {
                 Name = "Icon",
-
                 Parent = Button,
-
                 BackgroundTransparency = 1,
-
                 BorderSizePixel = 0,
-
-                Position = UDim2.fromOffset(
-                    12,
-                    9
-                ),
-
-                Size = UDim2.fromOffset(
-                    20,
-                    20
-                ),
-
+                Position = UDim2.fromOffset(12, 9),
+                Size = UDim2.fromOffset(20, 20),
                 Image = LucideIcon.Url,
-
                 ImageRectSize =
                     LucideIcon.ImageRectSize,
-
                 ImageRectOffset =
                     LucideIcon.ImageRectOffset,
-
                 ImageColor3 =
                     Theme.SubText,
-
                 ImageTransparency = 0,
-
                 ScaleType =
                     Enum.ScaleType.Fit
             })
         end
     end
 
-    --// Emoji / Text
     if type(IconValue) == "string" then
         return create("TextLabel", {
             Name = "Icon",
@@ -164,7 +139,6 @@ local function createIcon(
         })
     end
 
-    --// Fallback
     return create("TextLabel", {
         Name = "Icon",
         Parent = Button,
@@ -189,12 +163,11 @@ function Tab.Create(
     Settings = Settings or {}
 
     local Theme =
-        OTC:GetTheme()
+        OTC._Themes[Window.Theme]
+        or OTC._Themes.Default
 
-    --// Tab Object
     local TabObject = {
         Window = Window,
-
         OTC = OTC,
 
         Name =
@@ -209,7 +182,6 @@ function Tab.Create(
         Selected = false
     }
 
-    --// Sidebar Button
     local Button = create(
         "TextButton",
         {
@@ -248,7 +220,6 @@ function Tab.Create(
         "UICorner",
         {
             Parent = Button,
-
             CornerRadius =
                 UDim.new(
                     0,
@@ -257,7 +228,6 @@ function Tab.Create(
         }
     )
 
-    --// Icon
     local Icon = createIcon(
         Button,
         Settings.Icon,
@@ -265,14 +235,11 @@ function Tab.Create(
         OTC
     )
 
-    --// Name
     local Name = create(
         "TextLabel",
         {
             Name = "Name",
-
             Parent = Button,
-
             BackgroundTransparency = 1,
 
             Position =
@@ -308,12 +275,10 @@ function Tab.Create(
         }
     )
 
-    --// Selected Indicator
     local Indicator = create(
         "Frame",
         {
             Name = "Indicator",
-
             Parent = Button,
 
             BackgroundColor3 =
@@ -343,7 +308,6 @@ function Tab.Create(
         "UICorner",
         {
             Parent = Indicator,
-
             CornerRadius =
                 UDim.new(
                     1,
@@ -352,7 +316,6 @@ function Tab.Create(
         }
     )
 
-    --// Content Page
     local Page = create(
         "ScrollingFrame",
         {
@@ -437,7 +400,6 @@ function Tab.Create(
         }
     )
 
-    --// References
     TabObject.Button =
         Button
 
@@ -453,9 +415,12 @@ function Tab.Create(
     TabObject.NameLabel =
         Name
 
-    --// Icon Color
-    local function setIconColor(Color)
+    local function getTheme()
+        return OTC._Themes[Window.Theme]
+            or OTC._Themes.Default
+    end
 
+    local function setIconColor(Color)
         if not Icon then
             return
         end
@@ -463,28 +428,22 @@ function Tab.Create(
         if Icon:IsA("ImageLabel")
             or Icon:IsA("ImageButton") then
 
-            Icon.ImageColor3 =
-                Color
+            Icon.ImageColor3 = Color
 
         elseif Icon:IsA("TextLabel")
             or Icon:IsA("TextButton") then
 
-            Icon.TextColor3 =
-                Color
+            Icon.TextColor3 = Color
         end
     end
 
-    --// Selected
-    function TabObject:SetSelected(
-        Value
-    )
-
+    function TabObject:SetSelected(Value)
         self.Selected = Value
 
+        local CurrentTheme = getTheme()
+
         if Value then
-
             Page.Visible = true
-
             Indicator.Visible = true
 
             tween(
@@ -500,18 +459,15 @@ function Tab.Create(
                 0.2,
                 {
                     TextColor3 =
-                        Theme.Text
+                        CurrentTheme.Text
                 }
             )
 
             setIconColor(
-                Theme.Text
+                CurrentTheme.Text
             )
-
         else
-
             Page.Visible = false
-
             Indicator.Visible = false
 
             tween(
@@ -527,30 +483,29 @@ function Tab.Create(
                 0.2,
                 {
                     TextColor3 =
-                        Theme.SubText
+                        CurrentTheme.SubText
                 }
             )
 
             setIconColor(
-                Theme.SubText
+                CurrentTheme.SubText
             )
         end
     end
 
-    --// Hover
     Button.MouseEnter:Connect(
         function()
-
             if TabObject.Selected then
                 return
             end
+
+            local CurrentTheme = getTheme()
 
             tween(
                 Button,
                 0.15,
                 {
-                    BackgroundTransparency =
-                        0.7
+                    BackgroundTransparency = 0.7
                 }
             )
 
@@ -559,22 +514,23 @@ function Tab.Create(
                 0.15,
                 {
                     TextColor3 =
-                        Theme.Text
+                        CurrentTheme.Text
                 }
             )
 
             setIconColor(
-                Theme.Text
+                CurrentTheme.Text
             )
         end
     )
 
     Button.MouseLeave:Connect(
         function()
-
             if TabObject.Selected then
                 return
             end
+
+            local CurrentTheme = getTheme()
 
             tween(
                 Button,
@@ -589,33 +545,26 @@ function Tab.Create(
                 0.15,
                 {
                     TextColor3 =
-                        Theme.SubText
+                        CurrentTheme.SubText
                 }
             )
 
             setIconColor(
-                Theme.SubText
+                CurrentTheme.SubText
             )
         end
     )
 
-    --// Click
     Button.MouseButton1Click:Connect(
         function()
-
             Window:SelectTab(
                 TabObject
             )
         end
     )
 
-    --// Add Element
-    function TabObject:AddElement(
-        Element
-    )
-
+    function TabObject:AddElement(Element)
         if Element then
-
             table.insert(
                 self.Elements,
                 Element
@@ -625,10 +574,8 @@ function Tab.Create(
         return Element
     end
 
-    --// Section
-    function TabObject:CreateSection(
-        Text
-    )
+    function TabObject:CreateSection(Text)
+        local CurrentTheme = getTheme()
 
         local Section = create(
             "TextLabel",
@@ -655,7 +602,7 @@ function Tab.Create(
                     or "Section",
 
                 TextColor3 =
-                    Theme.Text,
+                    CurrentTheme.Text,
 
                 TextSize = 14,
 
@@ -667,17 +614,13 @@ function Tab.Create(
             }
         )
 
-        self:AddElement(
-            Section
-        )
+        self:AddElement(Section)
 
         return Section
     end
 
-    --// Text
-    function TabObject:CreateText(
-        Text
-    )
+    function TabObject:CreateText(Text)
+        local CurrentTheme = getTheme()
 
         local Label = create(
             "TextLabel",
@@ -704,7 +647,7 @@ function Tab.Create(
                     or "",
 
                 TextColor3 =
-                    Theme.SubText,
+                    CurrentTheme.SubText,
 
                 TextSize = 13,
 
@@ -718,18 +661,12 @@ function Tab.Create(
             }
         )
 
-        self:AddElement(
-            Label
-        )
+        self:AddElement(Label)
 
         return Label
     end
 
-    --// Button
-    function TabObject:CreateButton(
-        Settings
-    )
-
+    function TabObject:CreateButton(Settings)
         Settings = Settings or {}
 
         local Module =
@@ -742,18 +679,18 @@ function Tab.Create(
             )
         end
 
-        return Module.Create(
+        local Element = Module.Create(
             self,
             self.OTC,
             Settings
         )
+
+        self:AddElement(Element)
+
+        return Element
     end
 
-    --// Toggle
-    function TabObject:CreateToggle(
-        Settings
-    )
-
+    function TabObject:CreateToggle(Settings)
         Settings = Settings or {}
 
         local Module =
@@ -766,18 +703,18 @@ function Tab.Create(
             )
         end
 
-        return Module.Create(
+        local Element = Module.Create(
             self,
             self.OTC,
             Settings
         )
+
+        self:AddElement(Element)
+
+        return Element
     end
 
-    --// Slider
-    function TabObject:CreateSlider(
-        Settings
-    )
-
+    function TabObject:CreateSlider(Settings)
         Settings = Settings or {}
 
         local Module =
@@ -790,18 +727,18 @@ function Tab.Create(
             )
         end
 
-        return Module.Create(
+        local Element = Module.Create(
             self,
             self.OTC,
             Settings
         )
+
+        self:AddElement(Element)
+
+        return Element
     end
 
-    --// Dropdown
-    function TabObject:CreateDropdown(
-        Settings
-    )
-
+    function TabObject:CreateDropdown(Settings)
         Settings = Settings or {}
 
         local Module =
@@ -814,18 +751,18 @@ function Tab.Create(
             )
         end
 
-        return Module.Create(
+        local Element = Module.Create(
             self,
             self.OTC,
             Settings
         )
+
+        self:AddElement(Element)
+
+        return Element
     end
 
-    --// Input
-    function TabObject:CreateInput(
-        Settings
-    )
-
+    function TabObject:CreateInput(Settings)
         Settings = Settings or {}
 
         local Module =
@@ -838,23 +775,64 @@ function Tab.Create(
             )
         end
 
-        return Module.Create(
+        local Element = Module.Create(
             self,
             self.OTC,
             Settings
         )
+
+        self:AddElement(Element)
+
+        return Element
     end
 
-    --// Register Tab
-    Window:AddTab(
-        TabObject
-    )
+    function TabObject:RefreshTheme()
+        local CurrentTheme = getTheme()
 
-    --// First Tab
+        Button.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Indicator.BackgroundColor3 =
+            CurrentTheme.Accent
+
+        Page.ScrollBarImageColor3 =
+            CurrentTheme.Border
+
+        if self.Selected then
+            Button.BackgroundTransparency = 0
+
+            Name.TextColor3 =
+                CurrentTheme.Text
+
+            setIconColor(
+                CurrentTheme.Text
+            )
+        else
+            Button.BackgroundTransparency = 1
+
+            Name.TextColor3 =
+                CurrentTheme.SubText
+
+            setIconColor(
+                CurrentTheme.SubText
+            )
+        end
+
+        for _, Element in ipairs(
+            self.Elements
+        ) do
+            if Element
+                and Element.RefreshTheme then
+
+                Element:RefreshTheme()
+            end
+        end
+    end
+
+    Window:AddTab(TabObject)
+
     if #Window.Tabs == 1 then
-        Window:SelectTab(
-            TabObject
-        )
+        Window:SelectTab(TabObject)
     end
 
     return TabObject
