@@ -8,8 +8,9 @@ local LocalPlayer = Players.LocalPlayer
 
 local LOGO_URL = "rbxassetid://82435776198191"
 
-local WINDOW_SIZE = UDim2.fromOffset(560, 380)
-local MINIMIZED_SIZE = UDim2.fromOffset(45, 45)
+local WINDOW_WIDTH = 560
+local WINDOW_HEIGHT = 380
+local MINI_SIZE = 58
 
 local function create(Class, Properties)
     local Object = Instance.new(Class)
@@ -29,7 +30,7 @@ local function tween(Object, Time, Properties)
     local Animation = TweenService:Create(
         Object,
         TweenInfo.new(
-            Time or 0.2,
+            Time or 0.25,
             Enum.EasingStyle.Quint,
             Enum.EasingDirection.Out
         ),
@@ -68,6 +69,7 @@ function Window.Create(Settings, OTC)
     Object.OTC = OTC
     Object.Settings = Settings
     Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
+
     Object.Tabs = {}
     Object.SelectedTab = nil
 
@@ -85,8 +87,16 @@ function Window.Create(Settings, OTC)
         Parent = ScreenGui,
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
-        Position = UDim2.new(0.5, -280, 0.5, -190),
-        Size = WINDOW_SIZE,
+        Position = UDim2.new(
+            0.5,
+            -WINDOW_WIDTH / 2,
+            0.5,
+            -WINDOW_HEIGHT / 2
+        ),
+        Size = UDim2.fromOffset(
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT
+        ),
         ClipsDescendants = true,
         ZIndex = 1
     })
@@ -169,18 +179,22 @@ function Window.Create(Settings, OTC)
         ZIndex = 20
     })
 
-    local MinimizeButton = create("TextButton", {
+    local MinimizeButton = create("ImageButton", {
         Name = "Minimize",
         Parent = Controls,
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(0, 0),
-        Size = UDim2.fromOffset(45, 60),
-        Font = Enum.Font.GothamMedium,
-        Text = "−",
-        TextColor3 = Theme.SubText,
-        TextSize = 22,
+        BackgroundColor3 = Theme.Element,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(5, 15),
+        Size = UDim2.fromOffset(30, 30),
+        Image = LOGO_URL,
+        ScaleType = Enum.ScaleType.Fit,
         AutoButtonColor = false,
         ZIndex = 21
+    })
+
+    create("UICorner", {
+        Parent = MinimizeButton,
+        CornerRadius = UDim.new(0, 6)
     })
 
     Object.MinimizeButton = MinimizeButton
@@ -194,7 +208,7 @@ function Window.Create(Settings, OTC)
         Font = Enum.Font.GothamMedium,
         Text = "×",
         TextColor3 = Theme.SubText,
-        TextSize = 24,
+        TextSize = 23,
         AutoButtonColor = false,
         ZIndex = 21
     })
@@ -203,13 +217,13 @@ function Window.Create(Settings, OTC)
 
     MinimizeButton.MouseEnter:Connect(function()
         tween(MinimizeButton, 0.15, {
-            TextColor3 = Theme.Text
+            BackgroundColor3 = Theme.Hover
         })
     end)
 
     MinimizeButton.MouseLeave:Connect(function()
         tween(MinimizeButton, 0.15, {
-            TextColor3 = Theme.SubText
+            BackgroundColor3 = Theme.Element
         })
     end)
 
@@ -246,7 +260,12 @@ function Window.Create(Settings, OTC)
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Position = UDim2.fromOffset(10, 15),
-        Size = UDim2.new(1, -20, 1, -(15 + USER_AREA_HEIGHT)),
+        Size = UDim2.new(
+            1,
+            -20,
+            1,
+            -(15 + USER_AREA_HEIGHT)
+        ),
         ClipsDescendants = true,
         ZIndex = 2
     })
@@ -281,8 +300,18 @@ function Window.Create(Settings, OTC)
         Parent = Sidebar,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -USER_AREA_HEIGHT),
-        Size = UDim2.new(1, 0, 0, USER_AREA_HEIGHT),
+        Position = UDim2.new(
+            0,
+            0,
+            1,
+            -USER_AREA_HEIGHT
+        ),
+        Size = UDim2.new(
+            1,
+            0,
+            0,
+            USER_AREA_HEIGHT
+        ),
         ZIndex = 10
     })
 
@@ -428,25 +457,22 @@ function Window.Create(Settings, OTC)
     local DragStart
     local StartPosition
 
-    TopBar.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1
-        or Input.UserInputType == Enum.UserInputType.Touch then
+    local DragArea = create("TextButton", {
+        Name = "DragArea",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(0, 0),
+        Size = UDim2.new(1, -90, 1, 0),
+        Text = "",
+        AutoButtonColor = false,
+        ZIndex = 4
+    })
 
-            if Input.Target == MinimizeButton
-            or Input.Target == CloseButton then
-                return
-            end
-
-            Dragging = true
-            DragStart = Input.Position
-            StartPosition = Main.Position
-
-            Input.Changed:Connect(function()
-                if Input.UserInputState == Enum.UserInputState.End then
-                    Dragging = false
-                end
-            end)
-        end
+    DragArea.MouseButton1Down:Connect(function()
+        Dragging = true
+        DragStart = UserInputService:GetMouseLocation()
+        StartPosition = Main.Position
     end)
 
     UserInputService.InputChanged:Connect(function(Input)
@@ -454,10 +480,9 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        if Input.UserInputType == Enum.UserInputType.MouseMovement
-        or Input.UserInputType == Enum.UserInputType.Touch then
-
-            local Delta = Input.Position - DragStart
+        if Input.UserInputType == Enum.UserInputType.MouseMovement then
+            local CurrentPosition = UserInputService:GetMouseLocation()
+            local Delta = CurrentPosition - DragStart
 
             Main.Position = UDim2.new(
                 StartPosition.X.Scale,
@@ -468,13 +493,19 @@ function Window.Create(Settings, OTC)
         end
     end)
 
+    UserInputService.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+            Dragging = false
+        end
+    end)
+
     local MiniButton = create("ImageButton", {
         Name = "OTC_Minimized",
         Parent = ScreenGui,
         BackgroundColor3 = Theme.Element,
         BorderSizePixel = 0,
         Position = Main.Position,
-        Size = MINIMIZED_SIZE,
+        Size = UDim2.fromOffset(MINI_SIZE, MINI_SIZE),
         Image = LOGO_URL,
         ScaleType = Enum.ScaleType.Fit,
         Visible = false,
@@ -484,90 +515,22 @@ function Window.Create(Settings, OTC)
 
     create("UICorner", {
         Parent = MiniButton,
-        CornerRadius = UDim.new(0, 8)
+        CornerRadius = UDim.new(1, 0)
     })
 
     Object.MinimizedButton = MiniButton
 
-    local Minimized = false
-    local Closed = false
-
-    MinimizeButton.MouseButton1Click:Connect(function()
-        if Minimized or Closed then
-            return
-        end
-
-        Minimized = true
-
-        local CurrentPosition = Main.Position
-
-        MiniButton.Position = UDim2.new(
-            CurrentPosition.X.Scale,
-            CurrentPosition.X.Offset,
-            CurrentPosition.Y.Scale,
-            CurrentPosition.Y.Offset
-        )
-
-        tween(Main, 0.25, {
-            Size = UDim2.fromOffset(45, 45)
-        })
-
-        task.delay(0.25, function()
-            if Closed or not Minimized then
-                return
-            end
-
-            Main.Visible = false
-            MiniButton.Visible = true
-        end)
-    end)
-
-    MiniButton.MouseButton1Click:Connect(function()
-        if not Minimized or Closed then
-            return
-        end
-
-        Minimized = false
-
-        MiniButton.Visible = false
-
-        Main.Visible = true
-        Main.Size = UDim2.fromOffset(45, 45)
-
-        tween(Main, 0.25, {
-            Size = WINDOW_SIZE
-        })
-    end)
-
-    CloseButton.MouseButton1Click:Connect(function()
-        if Closed then
-            return
-        end
-
-        Closed = true
-
-        tween(Main, 0.2, {
-            Size = UDim2.fromOffset(0, 0)
-        })
-
-        task.delay(0.2, function()
-            if ScreenGui then
-                ScreenGui:Destroy()
-            end
-        end)
-    end)
-
     local MiniDragging = false
     local MiniDragStart
     local MiniStartPosition
-    local MiniMoved = false
+    local MiniWasDragged = false
 
     MiniButton.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1
         or Input.UserInputType == Enum.UserInputType.Touch then
 
             MiniDragging = true
-            MiniMoved = false
+            MiniWasDragged = false
             MiniDragStart = Input.Position
             MiniStartPosition = MiniButton.Position
 
@@ -589,8 +552,9 @@ function Window.Create(Settings, OTC)
 
             local Delta = Input.Position - MiniDragStart
 
-            if math.abs(Delta.X) > 3 or math.abs(Delta.Y) > 3 then
-                MiniMoved = true
+            if math.abs(Delta.X) > 3
+            or math.abs(Delta.Y) > 3 then
+                MiniWasDragged = true
             end
 
             MiniButton.Position = UDim2.new(
@@ -600,6 +564,98 @@ function Window.Create(Settings, OTC)
                 MiniStartPosition.Y.Offset + Delta.Y
             )
         end
+    end)
+
+    local Minimized = false
+    local Closed = false
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        if Minimized or Closed then
+            return
+        end
+
+        Minimized = true
+
+        MiniButton.Position = UDim2.new(
+            Main.Position.X.Scale,
+            Main.Position.X.Offset + (WINDOW_WIDTH - MINI_SIZE) / 2,
+            Main.Position.Y.Scale,
+            Main.Position.Y.Offset + (WINDOW_HEIGHT - MINI_SIZE) / 2
+        )
+
+        Main.ClipsDescendants = true
+
+        tween(Main, 0.3, {
+            Size = UDim2.fromOffset(
+                MINI_SIZE,
+                MINI_SIZE
+            )
+        })
+
+        task.delay(0.3, function()
+            if Closed or not Minimized then
+                return
+            end
+
+            Main.Visible = false
+            MiniButton.Visible = true
+        end)
+    end)
+
+    MiniButton.MouseButton1Click:Connect(function()
+        if MiniWasDragged then
+            return
+        end
+
+        if not Minimized or Closed then
+            return
+        end
+
+        Minimized = false
+
+        Main.Position = UDim2.new(
+            MiniButton.Position.X.Scale,
+            MiniButton.Position.X.Offset - (WINDOW_WIDTH - MINI_SIZE) / 2,
+            MiniButton.Position.Y.Scale,
+            MiniButton.Position.Y.Offset - (WINDOW_HEIGHT - MINI_SIZE) / 2
+        )
+
+        MiniButton.Visible = false
+
+        Main.Visible = true
+
+        Main.Size = UDim2.fromOffset(
+            MINI_SIZE,
+            MINI_SIZE
+        )
+
+        tween(Main, 0.3, {
+            Size = UDim2.fromOffset(
+                WINDOW_WIDTH,
+                WINDOW_HEIGHT
+            )
+        })
+    end)
+
+    CloseButton.MouseButton1Click:Connect(function()
+        if Closed then
+            return
+        end
+
+        Closed = true
+
+        tween(Main, 0.25, {
+            Size = UDim2.fromOffset(
+                0,
+                0
+            )
+        })
+
+        task.delay(0.25, function()
+            if ScreenGui then
+                ScreenGui:Destroy()
+            end
+        end)
     end)
 
     function Object:RefreshTheme()
@@ -613,9 +669,8 @@ function Window.Create(Settings, OTC)
         Title.TextColor3 = NewTheme.Text
         Subtitle.TextColor3 = NewTheme.SubText
 
-        MinimizeButton.TextColor3 = NewTheme.SubText
+        MinimizeButton.BackgroundColor3 = NewTheme.Element
         CloseButton.TextColor3 = NewTheme.SubText
-
         MiniButton.BackgroundColor3 = NewTheme.Element
 
         UserCard.BackgroundColor3 = NewTheme.Element
