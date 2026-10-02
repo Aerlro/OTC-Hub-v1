@@ -532,7 +532,6 @@ function Tab.Create(
             Icon.TextColor3 =
                 Color
         end
-
     end
 
     --// Add Element
@@ -544,9 +543,11 @@ function Tab.Create(
 
         -- Prevent duplicate registration
         for _, Existing in ipairs(self.Elements) do
+
             if Existing == Element then
                 return Element
             end
+
         end
 
         table.insert(
@@ -575,6 +576,7 @@ function Tab.Create(
                 0.2,
                 {
                     BackgroundTransparency = 0,
+
                     BackgroundColor3 =
                         CurrentTheme.Element
                 }
@@ -637,6 +639,7 @@ function Tab.Create(
                 0.15,
                 {
                     BackgroundTransparency = 0.7,
+
                     BackgroundColor3 =
                         CurrentTheme.Hover
                 }
@@ -707,7 +710,7 @@ function Tab.Create(
         local CurrentTheme =
             getTheme()
 
-        local Section = create(
+        local SectionLabel = create(
             "TextLabel",
             {
                 Name = "Section",
@@ -744,22 +747,36 @@ function Tab.Create(
             }
         )
 
+        --// Wrapper Object
+        local Object = {
+
+            Type = "Section",
+
+            Instance = SectionLabel,
+
+            Label = SectionLabel
+        }
+
         --// Theme Refresh
-        function Section:RefreshTheme()
+        function Object:RefreshTheme()
+
+            if not self.Label
+                or not self.Label.Parent then
+                return
+            end
 
             local Theme =
                 getTheme()
 
-            self.TextColor3 =
+            self.Label.TextColor3 =
                 Theme.Text
-
         end
 
         self:AddElement(
-            Section
+            Object
         )
 
-        return Section
+        return Object
     end
 
     --// Text
@@ -768,7 +785,7 @@ function Tab.Create(
         local CurrentTheme =
             getTheme()
 
-        local Label = create(
+        local TextLabel = create(
             "TextLabel",
             {
                 Name = "Text",
@@ -807,22 +824,36 @@ function Tab.Create(
             }
         )
 
+        --// Wrapper Object
+        local Object = {
+
+            Type = "Text",
+
+            Instance = TextLabel,
+
+            Label = TextLabel
+        }
+
         --// Theme Refresh
-        function Label:RefreshTheme()
+        function Object:RefreshTheme()
+
+            if not self.Label
+                or not self.Label.Parent then
+                return
+            end
 
             local Theme =
                 getTheme()
 
-            self.TextColor3 =
+            self.Label.TextColor3 =
                 Theme.SubText
-
         end
 
         self:AddElement(
-            Label
+            Object
         )
 
-        return Label
+        return Object
     end
 
     --// Button
@@ -835,6 +866,7 @@ function Tab.Create(
             and self.OTC._Modules.Button
 
         if not Module then
+
             error(
                 "[OTC Hub] Button module is not loaded"
             )
@@ -861,6 +893,7 @@ function Tab.Create(
             and self.OTC._Modules.Toggle
 
         if not Module then
+
             error(
                 "[OTC Hub] Toggle module is not loaded"
             )
@@ -887,8 +920,9 @@ function Tab.Create(
             and self.OTC._Modules.Slider
 
         if not Module then
+
             error(
-                "[OTC Hub] Slider module is not loaded"
+                "[OTC Hub] Slider module is not loaded
             )
         end
 
@@ -913,6 +947,7 @@ function Tab.Create(
             and self.OTC._Modules.Dropdown
 
         if not Module then
+
             error(
                 "[OTC Hub] Dropdown module is not loaded"
             )
@@ -939,6 +974,7 @@ function Tab.Create(
             and self.OTC._Modules.Input
 
         if not Module then
+
             error(
                 "[OTC Hub] Input module is not loaded"
             )
@@ -1003,8 +1039,8 @@ function Tab.Create(
         ) do
 
             if Element
-                and type(Element.RefreshTheme)
-                    == "function" then
+                and type(Element) == "table"
+                and type(Element.RefreshTheme) == "function" then
 
                 local Success, ErrorMessage =
                     pcall(
@@ -1014,6 +1050,7 @@ function Tab.Create(
                     )
 
                 if not Success then
+
                     warn(
                         "[OTC Hub] Failed to refresh element theme:",
                         ErrorMessage
@@ -1030,6 +1067,7 @@ function Tab.Create(
 
     --// First Tab
     if #Window.Tabs == 1 then
+
         Window:SelectTab(
             TabObject
         )
