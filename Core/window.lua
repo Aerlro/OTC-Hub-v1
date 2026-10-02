@@ -15,6 +15,10 @@ local LocalPlayer = Players.LocalPlayer
 --// Roblox Logo
 local LOGO_URL = "rbxassetid://82435776198191"
 
+--// Window Size
+local WINDOW_WIDTH = 500
+local WINDOW_HEIGHT = 330
+
 --// Tween
 local function tween(Object, Time, Properties)
     local Info = TweenInfo.new(
@@ -74,13 +78,16 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
 
-        Size = UDim2.fromOffset(400, 280),
+        Size = UDim2.fromOffset(
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT
+        ),
 
         Position = UDim2.new(
             0.5,
-            -360,
+            -WINDOW_WIDTH / 2,
             0.5,
-            -250
+            -WINDOW_HEIGHT / 2
         )
     })
 
@@ -103,7 +110,12 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Secondary,
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 0, 60)
+        Size = UDim2.new(
+            1,
+            0,
+            0,
+            60
+        )
     })
 
     create("UICorner", {
@@ -140,9 +152,15 @@ function Window.Create(Settings, OTC)
 
         BackgroundTransparency = 1,
 
-        Position = UDim2.fromOffset(18, 8),
+        Position = UDim2.fromOffset(
+            18,
+            8
+        ),
 
-        Size = UDim2.fromOffset(250, 25),
+        Size = UDim2.fromOffset(
+            250,
+            25
+        ),
 
         Font = Enum.Font.GothamBold,
 
@@ -162,9 +180,15 @@ function Window.Create(Settings, OTC)
 
         BackgroundTransparency = 1,
 
-        Position = UDim2.fromOffset(19, 32),
+        Position = UDim2.fromOffset(
+            19,
+            32
+        ),
 
-        Size = UDim2.fromOffset(250, 20),
+        Size = UDim2.fromOffset(
+            250,
+            20
+        ),
 
         Font = Enum.Font.Gotham,
 
@@ -191,7 +215,10 @@ function Window.Create(Settings, OTC)
             15
         ),
 
-        Size = UDim2.fromOffset(30, 30),
+        Size = UDim2.fromOffset(
+            30,
+            30
+        ),
 
         Font = Enum.Font.GothamBold,
 
@@ -218,7 +245,10 @@ function Window.Create(Settings, OTC)
             15
         ),
 
-        Size = UDim2.fromOffset(30, 30),
+        Size = UDim2.fromOffset(
+            30,
+            30
+        ),
 
         Font = Enum.Font.GothamBold,
 
@@ -240,7 +270,10 @@ function Window.Create(Settings, OTC)
 
         BorderSizePixel = 0,
 
-        Position = UDim2.fromOffset(0, 60),
+        Position = UDim2.fromOffset(
+            0,
+            60
+        ),
 
         Size = UDim2.new(
             0,
@@ -259,7 +292,10 @@ function Window.Create(Settings, OTC)
 
         BorderSizePixel = 0,
 
-        Position = UDim2.fromOffset(10, 15),
+        Position = UDim2.fromOffset(
+            10,
+            15
+        ),
 
         Size = UDim2.new(
             1,
@@ -278,7 +314,10 @@ function Window.Create(Settings, OTC)
     create("UIListLayout", {
         Parent = TabContainer,
 
-        Padding = UDim.new(0, 5),
+        Padding = UDim.new(
+            0,
+            5
+        ),
 
         SortOrder = Enum.SortOrder.LayoutOrder
     })
@@ -292,7 +331,10 @@ function Window.Create(Settings, OTC)
 
         BorderSizePixel = 0,
 
-        Position = UDim2.fromOffset(170, 60),
+        Position = UDim2.fromOffset(
+            170,
+            60
+        ),
 
         Size = UDim2.new(
             1,
@@ -340,7 +382,10 @@ function Window.Create(Settings, OTC)
     create("UICorner", {
         Parent = MinimizedButton,
 
-        CornerRadius = UDim.new(1, 0)
+        CornerRadius = UDim.new(
+            1,
+            0
+        )
     })
 
     create("UIStroke", {
@@ -353,21 +398,31 @@ function Window.Create(Settings, OTC)
 
     --// Logo Hover
     MinimizedButton.MouseEnter:Connect(function()
-        tween(MinimizedButton, 0.15, {
-            Size = UDim2.fromOffset(
-                64,
-                64
-            )
-        })
+
+        tween(
+            MinimizedButton,
+            0.15,
+            {
+                Size = UDim2.fromOffset(
+                    64,
+                    64
+                )
+            }
+        )
     end)
 
     MinimizedButton.MouseLeave:Connect(function()
-        tween(MinimizedButton, 0.15, {
-            Size = UDim2.fromOffset(
-                58,
-                58
-            )
-        })
+
+        tween(
+            MinimizedButton,
+            0.15,
+            {
+                Size = UDim2.fromOffset(
+                    58,
+                    58
+                )
+            }
+        )
     end)
 
     --// Window Object
@@ -475,39 +530,45 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = true
 
-        tween(Main, 0.25, {
+        tween(
+            Main,
+            0.25,
+            {
+                Size = UDim2.fromOffset(
+                    WINDOW_WIDTH,
+                    0
+                ),
 
-            Size = UDim2.fromOffset(
-                720,
-                0
-            ),
+                BackgroundTransparency = 1
+            }
+        )
 
-            BackgroundTransparency = 1
-        })
+        task.delay(
+            0.25,
+            function()
 
-        task.delay(0.25, function()
+                Main.Visible = false
 
-            Main.Visible = false
+                MinimizedButton.Visible = true
 
-            MinimizedButton.Visible = true
-
-            MinimizedButton.Size =
-                UDim2.fromOffset(
-                    40,
-                    40
-                )
-
-            tween(
-                MinimizedButton,
-                0.25,
-                {
-                    Size = UDim2.fromOffset(
-                        58,
-                        58
+                MinimizedButton.Size =
+                    UDim2.fromOffset(
+                        40,
+                        40
                     )
-                }
-            )
-        end)
+
+                tween(
+                    MinimizedButton,
+                    0.25,
+                    {
+                        Size = UDim2.fromOffset(
+                            58,
+                            58
+                        )
+                    }
+                )
+            end
+        )
     end
 
     --// Restore
@@ -530,22 +591,28 @@ function Window.Create(Settings, OTC)
             }
         )
 
-        task.delay(0.15, function()
+        task.delay(
+            0.15,
+            function()
 
-            MinimizedButton.Visible = false
+                MinimizedButton.Visible = false
 
-            Main.Visible = true
+                Main.Visible = true
 
-            tween(Main, 0.3, {
+                tween(
+                    Main,
+                    0.3,
+                    {
+                        Size = UDim2.fromOffset(
+                            WINDOW_WIDTH,
+                            WINDOW_HEIGHT
+                        ),
 
-                Size = UDim2.fromOffset(
-                    720,
-                    500
-                ),
-
-                BackgroundTransparency = 0
-            })
-        end)
+                        BackgroundTransparency = 0
+                    }
+                )
+            end
+        )
     end
 
     --// Destroy
@@ -716,36 +783,45 @@ function Window.Create(Settings, OTC)
     --// Close Hover
     Close.MouseEnter:Connect(function()
 
-        tween(Close, 0.15, {
-
-            TextColor3 =
-                Color3.fromRGB(
-                    255,
-                    80,
-                    80
-                )
-        })
+        tween(
+            Close,
+            0.15,
+            {
+                TextColor3 =
+                    Color3.fromRGB(
+                        255,
+                        80,
+                        80
+                    )
+            }
+        )
     end)
 
     Close.MouseLeave:Connect(function()
 
-        tween(Close, 0.15, {
-
-            TextColor3 =
-                Theme.SubText
-        })
+        tween(
+            Close,
+            0.15,
+            {
+                TextColor3 =
+                    Theme.SubText
+            }
+        )
     end)
 
     --// Close
     Close.MouseButton1Click:Connect(function()
 
-        tween(Main, 0.2, {
-
-            Size = UDim2.fromOffset(
-                720,
-                0
-            )
-        })
+        tween(
+            Main,
+            0.2,
+            {
+                Size = UDim2.fromOffset(
+                    WINDOW_WIDTH,
+                    0
+                )
+            }
+        )
 
         task.wait(0.2)
 
