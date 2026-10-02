@@ -1,1438 +1,812 @@
 local Window = {}
 
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
-local LOGO_URL = "rbxassetid://116094782851554"
-
-local function create(ClassName, Properties)
-    local Object = Instance.new(ClassName)
-
-    for Property, Value in pairs(Properties or {}) do
-        Object[Property] = Value
-    end
-
-    return Object
+local function Tween(Object, Info, Properties)
+    local TweenObject = TweenService:Create(Object, Info, Properties)
+    TweenObject:Play()
+    return TweenObject
 end
 
-local function getAvatar(UserId)
-    local Success, Content = pcall(function()
-        return Players:GetUserThumbnailAsync(
-            UserId,
+local function GetTheme(Object)
+    return Object.OTC._Themes[Object.Theme]
+        or Object.OTC._Themes.Default
+end
+
+function Window.Create(Settings, OTC)
+    Settings = Settings or {}
+
+    local ThemeName = Settings.Theme
+        or OTC.CurrentTheme
+        or "Default"
+
+    if not OTC._Themes[ThemeName] then
+        ThemeName = "Default"
+    end
+
+    local Object = {}
+
+    Object.OTC = OTC
+    Object.Theme = ThemeName
+    Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
+    Object.Tabs = {}
+    Object.SelectedTab = nil
+    Object.Minimized = false
+    Object.Closed = false
+    Object.UnloadConfirmation = nil
+
+    local Theme = GetTheme(Object)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "OTC_Hub"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.IgnoreGuiInset = true
+
+    pcall(function()
+        ScreenGui.Parent = CoreGui
+    end)
+
+    if not ScreenGui.Parent then
+        ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    end
+
+    Object.ScreenGui = ScreenGui
+
+    local Main = Instance.new("Frame")
+    Main.Name = "Main"
+    Main.Size = UDim2.new(0, 560, 0, 380)
+    Main.Position = UDim2.new(0.5, -280, 0.5, -190)
+    Main.BackgroundColor3 = Theme.Background
+    Main.BorderSizePixel = 0
+    Main.Parent = ScreenGui
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 10)
+    MainCorner.Parent = Main
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = Theme.Border
+    MainStroke.Thickness = 1
+    MainStroke.Parent = Main
+
+    Object.Main = Main
+    Object.MainStroke = MainStroke
+
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 60)
+    TopBar.BackgroundColor3 = Theme.Secondary
+    TopBar.BorderSizePixel = 0
+    TopBar.Parent = Main
+
+    local TopCorner = Instance.new("UICorner")
+    TopCorner.CornerRadius = UDim.new(0, 10)
+    TopCorner.Parent = TopBar
+
+    local BottomFix = Instance.new("Frame")
+    BottomFix.Size = UDim2.new(1, 0, 0, 12)
+    BottomFix.Position = UDim2.new(0, 0, 1, -12)
+    BottomFix.BackgroundColor3 = Theme.Secondary
+    BottomFix.BorderSizePixel = 0
+    BottomFix.Parent = TopBar
+
+    local Logo = Instance.new("ImageLabel")
+    Logo.Name = "Logo"
+    Logo.Size = UDim2.new(0, 38, 0, 38)
+    Logo.Position = UDim2.new(0, 12, 0.5, -19)
+    Logo.BackgroundTransparency = 1
+    Logo.Image = "rbxassetid://116094782851554"
+    Logo.ScaleType = Enum.ScaleType.Fit
+    Logo.Parent = TopBar
+
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 58, 0, 9)
+    Title.Size = UDim2.new(0, 300, 0, 24)
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = Settings.Name or "OTC Hub"
+    Title.TextColor3 = Theme.Text
+    Title.TextSize = 18
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TopBar
+
+    local Subtitle = Instance.new("TextLabel")
+    Subtitle.Name = "Subtitle"
+    Subtitle.BackgroundTransparency = 1
+    Subtitle.Position = UDim2.new(0, 58, 0, 32)
+    Subtitle.Size = UDim2.new(0, 300, 0, 18)
+    Subtitle.Font = Enum.Font.Gotham
+    Subtitle.Text = Settings.Subtitle or "by Aerlro"
+    Subtitle.TextColor3 = Theme.SubText
+    Subtitle.TextSize = 12
+    Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    Subtitle.Parent = TopBar
+
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Name = "Minimize"
+    MinimizeButton.Size = UDim2.new(0, 34, 0, 34)
+    MinimizeButton.Position = UDim2.new(1, -78, 0.5, -17)
+    MinimizeButton.BackgroundColor3 = Theme.Element
+    MinimizeButton.BorderSizePixel = 0
+    MinimizeButton.AutoButtonColor = false
+    MinimizeButton.Text = "—"
+    MinimizeButton.TextColor3 = Theme.Text
+    MinimizeButton.TextSize = 18
+    MinimizeButton.Font = Enum.Font.GothamBold
+    MinimizeButton.Parent = TopBar
+
+    local MinimizeCorner = Instance.new("UICorner")
+    MinimizeCorner.CornerRadius = UDim.new(0, 7)
+    MinimizeCorner.Parent = MinimizeButton
+
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Name = "Close"
+    CloseButton.Size = UDim2.new(0, 34, 0, 34)
+    CloseButton.Position = UDim2.new(1, -40, 0.5, -17)
+    CloseButton.BackgroundColor3 = Theme.Element
+    CloseButton.BorderSizePixel = 0
+    CloseButton.AutoButtonColor = false
+    CloseButton.Text = "×"
+    CloseButton.TextColor3 = Theme.Text
+    CloseButton.TextSize = 22
+    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.Parent = TopBar
+
+    local CloseCorner = Instance.new("UICorner")
+    CloseCorner.CornerRadius = UDim.new(0, 7)
+    CloseCorner.Parent = CloseButton
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Name = "Sidebar"
+    Sidebar.Size = UDim2.new(0, 150, 1, -60)
+    Sidebar.Position = UDim2.new(0, 0, 0, 60)
+    Sidebar.BackgroundColor3 = Theme.Secondary
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = Main
+
+    local SidebarCorner = Instance.new("UICorner")
+    SidebarCorner.CornerRadius = UDim.new(0, 10)
+    SidebarCorner.Parent = Sidebar
+
+    local SidebarFix = Instance.new("Frame")
+    SidebarFix.Size = UDim2.new(0, 12, 1, 0)
+    SidebarFix.Position = UDim2.new(1, -12, 0, 0)
+    SidebarFix.BackgroundColor3 = Theme.Secondary
+    SidebarFix.BorderSizePixel = 0
+    SidebarFix.Parent = Sidebar
+
+    local Separator = Instance.new("Frame")
+    Separator.Name = "Separator"
+    Separator.Size = UDim2.new(0, 1, 1, -60)
+    Separator.Position = UDim2.new(0, 150, 0, 60)
+    Separator.BackgroundColor3 = Theme.Border
+    Separator.BorderSizePixel = 0
+    Separator.Parent = Main
+
+    local Content = Instance.new("Frame")
+    Content.Name = "Content"
+    Content.Size = UDim2.new(1, -151, 1, -60)
+    Content.Position = UDim2.new(0, 151, 0, 60)
+    Content.BackgroundColor3 = Theme.Background
+    Content.BorderSizePixel = 0
+    Content.Parent = Main
+
+    local TabsContainer = Instance.new("ScrollingFrame")
+    TabsContainer.Name = "Tabs"
+    TabsContainer.Size = UDim2.new(1, -12, 1, -82)
+    TabsContainer.Position = UDim2.new(0, 6, 0, 8)
+    TabsContainer.BackgroundTransparency = 1
+    TabsContainer.BorderSizePixel = 0
+    TabsContainer.ScrollBarThickness = 2
+    TabsContainer.ScrollBarImageColor3 = Theme.Border
+    TabsContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabsContainer.Parent = Sidebar
+
+    local TabsLayout = Instance.new("UIListLayout")
+    TabsLayout.Padding = UDim.new(0, 5)
+    TabsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabsLayout.Parent = TabsContainer
+
+    TabsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        TabsContainer.CanvasSize = UDim2.new(
+            0,
+            0,
+            0,
+            TabsLayout.AbsoluteContentSize.Y + 8
+        )
+    end)
+
+    local UserCard = Instance.new("Frame")
+    UserCard.Name = "UserCard"
+    UserCard.Size = UDim2.new(1, -12, 0, 60)
+    UserCard.Position = UDim2.new(0, 6, 1, -68)
+    UserCard.BackgroundColor3 = Theme.Element
+    UserCard.BorderSizePixel = 0
+    UserCard.Parent = Sidebar
+
+    local UserCorner = Instance.new("UICorner")
+    UserCorner.CornerRadius = UDim.new(0, 8)
+    UserCorner.Parent = UserCard
+
+    local UserSeparator = Instance.new("Frame")
+    UserSeparator.Size = UDim2.new(1, -16, 0, 1)
+    UserSeparator.Position = UDim2.new(0, 8, 0, 8)
+    UserSeparator.BackgroundColor3 = Theme.Border
+    UserSeparator.BorderSizePixel = 0
+    UserSeparator.Parent = UserCard
+
+    local UserAvatar = Instance.new("ImageLabel")
+    UserAvatar.Name = "Avatar"
+    UserAvatar.Size = UDim2.new(0, 36, 0, 36)
+    UserAvatar.Position = UDim2.new(0, 8, 0.5, -12)
+    UserAvatar.BackgroundTransparency = 1
+    UserAvatar.Parent = UserCard
+
+    local AvatarCorner = Instance.new("UICorner")
+    AvatarCorner.CornerRadius = UDim.new(1, 0)
+    AvatarCorner.Parent = UserAvatar
+
+    local UserDisplay = Instance.new("TextLabel")
+    UserDisplay.Name = "DisplayName"
+    UserDisplay.BackgroundTransparency = 1
+    UserDisplay.Position = UDim2.new(0, 52, 0, 17)
+    UserDisplay.Size = UDim2.new(1, -60, 0, 18)
+    UserDisplay.Font = Enum.Font.GothamSemibold
+    UserDisplay.Text = LocalPlayer.DisplayName
+    UserDisplay.TextColor3 = Theme.Text
+    UserDisplay.TextSize = 12
+    UserDisplay.TextXAlignment = Enum.TextXAlignment.Left
+    UserDisplay.TextTruncate = Enum.TextTruncate.AtEnd
+    UserDisplay.Parent = UserCard
+
+    local UserName = Instance.new("TextLabel")
+    UserName.Name = "Username"
+    UserName.BackgroundTransparency = 1
+    UserName.Position = UDim2.new(0, 52, 0, 35)
+    UserName.Size = UDim2.new(1, -60, 0, 16)
+    UserName.Font = Enum.Font.Gotham
+    UserName.Text = "@" .. LocalPlayer.Name
+    UserName.TextColor3 = Theme.SubText
+    UserName.TextSize = 10
+    UserName.TextXAlignment = Enum.TextXAlignment.Left
+    UserName.TextTruncate = Enum.TextTruncate.AtEnd
+    UserName.Parent = UserCard
+
+    pcall(function()
+        UserAvatar.Image = Players:GetUserThumbnailAsync(
+            LocalPlayer.UserId,
             Enum.ThumbnailType.HeadShot,
             Enum.ThumbnailSize.Size100x100
         )
     end)
 
-    if Success then
-        return Content
-    end
+    local MiniButton = Instance.new("ImageButton")
+    MiniButton.Name = "MiniButton"
+    MiniButton.Size = UDim2.new(0, 70, 0, 70)
+    MiniButton.Position = UDim2.new(0.5, -35, 0.5, -35)
+    MiniButton.BackgroundColor3 = Theme.Background
+    MiniButton.BorderSizePixel = 0
+    MiniButton.Visible = false
+    MiniButton.AutoButtonColor = false
+    MiniButton.Image = "rbxassetid://116094782851554"
+    MiniButton.ScaleType = Enum.ScaleType.Fit
+    MiniButton.Parent = ScreenGui
 
-    return ""
-end
+    local MiniCorner = Instance.new("UICorner")
+    MiniCorner.CornerRadius = UDim.new(1, 0)
+    MiniCorner.Parent = MiniButton
 
-function Window.Create(Settings, OTC)
+    local MiniStroke = Instance.new("UIStroke")
+    MiniStroke.Color = Theme.Border
+    MiniStroke.Thickness = 2
+    MiniStroke.Parent = MiniButton
 
-    Settings = Settings or {}
-
-    local ThemeName =
-        Settings.Theme
-        or OTC.CurrentTheme
-        or "Default"
-
-    if not OTC._Themes[ThemeName] then
-        warn(
-            "[OTC Hub] Theme does not exist:",
-            ThemeName,
-            "| Using Default"
-        )
-
-        ThemeName = "Default"
-    end
-
-    local Theme =
-        OTC._Themes[ThemeName]
-
-    local Animation =
-        OTC._AnimationModule
-
-    local Object = {}
-
-    Object.OTC = OTC
-    Object.Settings = Settings
-
-    Object.Tabs = {}
-    Object.SelectedTab = nil
-
-    Object.Minimized = false
-    Object.Closed = false
-
-    Object.Theme = ThemeName
-
-    Object.ToggleKey =
-        Settings.ToggleKey
-        or Enum.KeyCode.RightControl
-
-    local ScreenGui = create("ScreenGui", {
-        Name = "OTC_Hub",
-        Parent = game:GetService("CoreGui"),
-        ResetOnSpawn = false,
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    })
-
-    Object.ScreenGui = ScreenGui
-
-    local Main = create("Frame", {
-        Name = "Main",
-        Parent = ScreenGui,
-        BackgroundColor3 = Theme.Background,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0.5, -280, 0.5, -190),
-        Size = UDim2.fromOffset(560, 380),
-        ClipsDescendants = true,
-        Active = true,
-        ZIndex = 1
-    })
-
-    Object.Main = Main
-
-    create("UICorner", {
-        Parent = Main,
-        CornerRadius = UDim.new(0, 10)
-    })
-
-    local MainStroke = create("UIStroke", {
-        Parent = Main,
-        Color = Theme.Border,
-        Thickness = 1
-    })
-
-    local TopBar = create("Frame", {
-        Name = "TopBar",
-        Parent = Main,
-        BackgroundColor3 = Theme.Secondary,
-        BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 0, 60),
-        Active = true,
-        ZIndex = 5
-    })
-
-    create("UICorner", {
-        Parent = TopBar,
-        CornerRadius = UDim.new(0, 10)
-    })
-
-    local BottomFix = create("Frame", {
-        Name = "BottomFix",
-        Parent = TopBar,
-        BackgroundColor3 = Theme.Secondary,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -10),
-        Size = UDim2.new(1, 0, 0, 10),
-        ZIndex = 5
-    })
-
-    local DragArea = create("Frame", {
-        Name = "DragArea",
-        Parent = TopBar,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(0, 0),
-        Size = UDim2.new(1, -110, 1, 0),
-        Active = true,
-        ZIndex = 6
-    })
-
-    local Logo = create("ImageLabel", {
-        Name = "Logo",
-        Parent = TopBar,
-        BackgroundTransparency = 1,
-        Image = LOGO_URL,
-        ImageColor3 = Theme.Text,
-        Position = UDim2.fromOffset(15, 15),
-        Size = UDim2.fromOffset(30, 30),
-        ScaleType = Enum.ScaleType.Fit,
-        ZIndex = 7
-    })
-
-    local Title = create("TextLabel", {
-        Name = "Title",
-        Parent = TopBar,
-        BackgroundTransparency = 1,
-        Text = Settings.Name or Settings.Title or "OTC Hub",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 16,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Position = UDim2.fromOffset(55, 9),
-        Size = UDim2.new(1, -65, 0, 23),
-        ZIndex = 7
-    })
-
-    local Subtitle = create("TextLabel", {
-        Name = "Subtitle",
-        Parent = TopBar,
-        BackgroundTransparency = 1,
-        Text = Settings.Subtitle or "by Aerlro",
-        TextColor3 = Theme.SubText,
-        Font = Enum.Font.Gotham,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Position = UDim2.fromOffset(55, 32),
-        Size = UDim2.new(1, -65, 0, 18),
-        ZIndex = 7
-    })
-
-    local MinimizeButton = create("TextButton", {
-        Name = "Minimize",
-        Parent = TopBar,
-        BackgroundColor3 = Theme.Element,
-        BorderSizePixel = 0,
-        Text = "−",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 20,
-        Position = UDim2.new(1, -75, 0, 15),
-        Size = UDim2.fromOffset(30, 30),
-        AutoButtonColor = false,
-        ZIndex = 8
-    })
-
-    create("UICorner", {
-        Parent = MinimizeButton,
-        CornerRadius = UDim.new(0, 8)
-    })
-
-    local CloseButton = create("TextButton", {
-        Name = "Close",
-        Parent = TopBar,
-        BackgroundColor3 = Theme.Element,
-        BorderSizePixel = 0,
-        Text = "×",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 20,
-        Position = UDim2.new(1, -40, 0, 15),
-        Size = UDim2.fromOffset(30, 30),
-        AutoButtonColor = false,
-        ZIndex = 8
-    })
-
-    create("UICorner", {
-        Parent = CloseButton,
-        CornerRadius = UDim.new(0, 8)
-    })
-
-    local Body = create("Frame", {
-        Name = "Body",
-        Parent = Main,
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(0, 60),
-        Size = UDim2.new(1, 0, 1, -60),
-        ZIndex = 2
-    })
-
-    local Sidebar = create("Frame", {
-        Name = "Sidebar",
-        Parent = Body,
-        BackgroundColor3 = Theme.Secondary,
-        BorderSizePixel = 0,
-        Size = UDim2.new(0, 150, 1, 0),
-        ZIndex = 2
-    })
-
-    local SidebarSeparator = create("Frame", {
-        Name = "Separator",
-        Parent = Sidebar,
-        BackgroundColor3 = Theme.Border,
-        BorderSizePixel = 0,
-        Position = UDim2.new(1, -1, 0, 0),
-        Size = UDim2.new(0, 1, 1, 0),
-        ZIndex = 4
-    })
-
-    local USER_AREA_HEIGHT = 72
-
-    local TabsArea = create("Frame", {
-        Name = "TabsArea",
-        Parent = Sidebar,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(10, 15),
-        Size = UDim2.new(1, -20, 1, -(15 + USER_AREA_HEIGHT)),
-        ClipsDescendants = true,
-        ZIndex = 2
-    })
-
-    local TabContainer = create("ScrollingFrame", {
-        Name = "Tabs",
-        Parent = TabsArea,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(0, 0),
-        Size = UDim2.fromScale(1, 1),
-        CanvasSize = UDim2.new(0, 0, 0, 0),
-        AutomaticCanvasSize = Enum.AutomaticSize.Y,
-        ScrollBarThickness = 0,
-        ScrollingDirection = Enum.ScrollingDirection.Y,
-        ClipsDescendants = true,
-        ZIndex = 2
-    })
-
-    create("UIListLayout", {
-        Parent = TabContainer,
-        Padding = UDim.new(0, 5),
-        SortOrder = Enum.SortOrder.LayoutOrder
-    })
-
-    Object.TabContainer = TabContainer
-
-    local UserArea = create("Frame", {
-        Name = "UserArea",
-        Parent = Sidebar,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -USER_AREA_HEIGHT),
-        Size = UDim2.new(1, 0, 0, USER_AREA_HEIGHT),
-        ZIndex = 10
-    })
-
-    local UserSeparator = create("Frame", {
-        Name = "UserSeparator",
-        Parent = UserArea,
-        BackgroundColor3 = Theme.Border,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(10, 0),
-        Size = UDim2.new(1, -20, 0, 1),
-        ZIndex = 10
-    })
-
-    local UserCard = create("Frame", {
-        Name = "UserCard",
-        Parent = UserArea,
-        BackgroundColor3 = Theme.Element,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(10, 10),
-        Size = UDim2.new(1, -20, 0, 52),
-        ZIndex = 11
-    })
-
-    create("UICorner", {
-        Parent = UserCard,
-        CornerRadius = UDim.new(0, 8)
-    })
-
-    local Avatar = create("ImageLabel", {
-        Name = "Avatar",
-        Parent = UserCard,
-        BackgroundTransparency = 1,
-        Image = getAvatar(LocalPlayer.UserId),
-        Position = UDim2.fromOffset(8, 8),
-        Size = UDim2.fromOffset(36, 36),
-        ZIndex = 12
-    })
-
-    create("UICorner", {
-        Parent = Avatar,
-        CornerRadius = UDim.new(1, 0)
-    })
-
-    local DisplayName = create("TextLabel", {
-        Name = "DisplayName",
-        Parent = UserCard,
-        BackgroundTransparency = 1,
-        Text = LocalPlayer.DisplayName,
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 12,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Position = UDim2.fromOffset(52, 8),
-        Size = UDim2.new(1, -58, 0, 18),
-        TextTruncate = Enum.TextTruncate.AtEnd,
-        ZIndex = 12
-    })
-
-    local Username = create("TextLabel", {
-        Name = "Username",
-        Parent = UserCard,
-        BackgroundTransparency = 1,
-        Text = "@" .. LocalPlayer.Name,
-        TextColor3 = Theme.SubText,
-        Font = Enum.Font.Gotham,
-        TextSize = 10,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Position = UDim2.fromOffset(52, 27),
-        Size = UDim2.new(1, -58, 0, 16),
-        TextTruncate = Enum.TextTruncate.AtEnd,
-        ZIndex = 12
-    })
-
-    local Content = create("Frame", {
-        Name = "Content",
-        Parent = Body,
-        BackgroundColor3 = Theme.Background,
-        BorderSizePixel = 0,
-        Position = UDim2.fromOffset(150, 0),
-        Size = UDim2.new(1, -150, 1, 0),
-        ClipsDescendants = true,
-        ZIndex = 2
-    })
-
-    Object.Content = Content
-
-    local MiniButton = create("ImageButton", {
-        Name = "OTC_Minimized",
-        Parent = ScreenGui,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Image = LOGO_URL,
-        ImageColor3 = Theme.Text,
-        Position = UDim2.new(0, 20, 0.5, -25),
-        Size = UDim2.fromOffset(50, 50),
-        Visible = false,
-        AutoButtonColor = false,
-        Active = true,
-        ZIndex = 100
-    })
-
-    Object.MiniButton = MiniButton
+    Object.TopBar = TopBar
+    Object.BottomFix = BottomFix
+    Object.Logo = Logo
+    Object.Title = Title
+    Object.Subtitle = Subtitle
     Object.MinimizeButton = MinimizeButton
     Object.CloseButton = CloseButton
+    Object.Sidebar = Sidebar
+    Object.SidebarFix = SidebarFix
+    Object.Separator = Separator
+    Object.Content = Content
+    Object.TabsContainer = TabsContainer
+    Object.UserCard = UserCard
+    Object.UserSeparator = UserSeparator
+    Object.UserAvatar = UserAvatar
+    Object.UserDisplay = UserDisplay
+    Object.UserName = UserName
+    Object.MiniButton = MiniButton
+    Object.MiniStroke = MiniStroke
 
-    local OpenPosition = Main.Position
-    local OpenSize = Main.Size
-    local CurrentPosition = OpenPosition
+    local Dragging = false
+    local DragStart
+    local StartPosition
 
-    local MainScale =
-        Main:FindFirstChildOfClass("UIScale")
+    TopBar.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+            or Input.UserInputType == Enum.UserInputType.Touch then
 
-    if not MainScale then
-        MainScale = Instance.new("UIScale")
-        MainScale.Name = "AnimationScale"
-        MainScale.Scale = 1
-        MainScale.Parent = Main
-    end
+            Dragging = true
+            DragStart = Input.Position
+            StartPosition = Main.Position
 
-    local function Minimize()
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
 
-        if Object.Minimized
-            or Object.Closed then
+    UserInputService.InputChanged:Connect(function(Input)
+        if Dragging and (
+            Input.UserInputType == Enum.UserInputType.MouseMovement
+            or Input.UserInputType == Enum.UserInputType.Touch
+        ) then
+            local Delta = Input.Position - DragStart
+
+            Main.Position = UDim2.new(
+                StartPosition.X.Scale,
+                StartPosition.X.Offset + Delta.X,
+                StartPosition.Y.Scale,
+                StartPosition.Y.Offset + Delta.Y
+            )
+        end
+    end)
+
+    local MiniDragging = false
+    local MiniDragStart
+    local MiniStartPosition
+
+    MiniButton.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+            or Input.UserInputType == Enum.UserInputType.Touch then
+
+            MiniDragging = true
+            MiniDragStart = Input.Position
+            MiniStartPosition = MiniButton.Position
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    MiniDragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if MiniDragging and (
+            Input.UserInputType == Enum.UserInputType.MouseMovement
+            or Input.UserInputType == Enum.UserInputType.Touch
+        ) then
+            local Delta = Input.Position - MiniDragStart
+
+            MiniButton.Position = UDim2.new(
+                MiniStartPosition.X.Scale,
+                MiniStartPosition.X.Offset + Delta.X,
+                MiniStartPosition.Y.Scale,
+                MiniStartPosition.Y.Offset + Delta.Y
+            )
+        end
+    end)
+
+    local function CreateUnloadConfirmation()
+        if Object.UnloadConfirmation then
             return
         end
 
-        Object.Minimized = true
-        CurrentPosition = Main.Position
-        Main.Active = false
+        local CurrentTheme = Object:GetTheme()
 
-        local TargetPosition =
-            CurrentPosition
-            + UDim2.fromOffset(0, 35)
+        local Overlay = Instance.new("Frame")
+        Overlay.Name = "UnloadOverlay"
+        Overlay.Size = UDim2.new(1, 0, 1, 0)
+        Overlay.Position = UDim2.new(0, 0, 0, 0)
+        Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        Overlay.BackgroundTransparency = 0.45
+        Overlay.BorderSizePixel = 0
+        Overlay.ZIndex = 100
+        Overlay.Parent = ScreenGui
 
-        local PositionTween =
-            TweenService:Create(
-                Main,
-                TweenInfo.new(
-                    0.14,
-                    Enum.EasingStyle.Quint,
-                    Enum.EasingDirection.In
-                ),
-                {
-                    Position = TargetPosition
-                }
-            )
+        local Popup = Instance.new("Frame")
+        Popup.Name = "UnloadConfirmation"
+        Popup.Size = UDim2.new(0, 360, 0, 190)
+        Popup.Position = UDim2.new(0.5, -180, 0.5, -95)
+        Popup.BackgroundColor3 = CurrentTheme.Background
+        Popup.BorderSizePixel = 0
+        Popup.ZIndex = 101
+        Popup.Parent = Overlay
 
-        local ScaleTween =
-            TweenService:Create(
-                MainScale,
-                TweenInfo.new(
-                    0.14,
-                    Enum.EasingStyle.Quint,
-                    Enum.EasingDirection.In
-                ),
-                {
-                    Scale = 0.96
-                }
-            )
+        local PopupCorner = Instance.new("UICorner")
+        PopupCorner.CornerRadius = UDim.new(0, 10)
+        PopupCorner.Parent = Popup
 
-        PositionTween:Play()
-        ScaleTween:Play()
+        local PopupStroke = Instance.new("UIStroke")
+        PopupStroke.Color = CurrentTheme.Border
+        PopupStroke.Thickness = 1
+        PopupStroke.Parent = Popup
 
-        PositionTween.Completed:Once(
-            function()
+        local TitleLabel = Instance.new("TextLabel")
+        TitleLabel.BackgroundTransparency = 1
+        TitleLabel.Position = UDim2.new(0, 20, 0, 18)
+        TitleLabel.Size = UDim2.new(1, -40, 0, 30)
+        TitleLabel.Font = Enum.Font.GothamBold
+        TitleLabel.Text = "Unload OTC Hub?"
+        TitleLabel.TextColor3 = CurrentTheme.Text
+        TitleLabel.TextSize = 20
+        TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TitleLabel.ZIndex = 102
+        TitleLabel.Parent = Popup
 
-                if Object.Closed then
-                    return
-                end
+        local Description = Instance.new("TextLabel")
+        Description.BackgroundTransparency = 1
+        Description.Position = UDim2.new(0, 20, 0, 55)
+        Description.Size = UDim2.new(1, -40, 0, 45)
+        Description.Font = Enum.Font.Gotham
+        Description.Text = "Are you sure you want to unload OTC Hub?"
+        Description.TextColor3 = CurrentTheme.SubText
+        Description.TextSize = 14
+        Description.TextWrapped = true
+        Description.TextXAlignment = Enum.TextXAlignment.Left
+        Description.ZIndex = 102
+        Description.Parent = Popup
 
-                Main.Visible = false
-                Main.Position = CurrentPosition
-                Main.Size = OpenSize
-                MainScale.Scale = 1
+        local CancelButton = Instance.new("TextButton")
+        CancelButton.Name = "Cancel"
+        CancelButton.Size = UDim2.new(0, 145, 0, 42)
+        CancelButton.Position = UDim2.new(0, 20, 1, -62)
+        CancelButton.BackgroundColor3 = CurrentTheme.Element
+        CancelButton.BorderSizePixel = 0
+        CancelButton.AutoButtonColor = false
+        CancelButton.Font = Enum.Font.GothamSemibold
+        CancelButton.Text = "Cancel"
+        CancelButton.TextColor3 = CurrentTheme.Text
+        CancelButton.TextSize = 14
+        CancelButton.ZIndex = 102
+        CancelButton.Parent = Popup
 
-                MiniButton.Visible = true
-                MiniButton.ImageTransparency = 1
+        local CancelCorner = Instance.new("UICorner")
+        CancelCorner.CornerRadius = UDim.new(0, 7)
+        CancelCorner.Parent = CancelButton
 
-                local MiniScale =
-                    MiniButton:FindFirstChildOfClass(
-                        "UIScale"
-                    )
+        local UnloadButton = Instance.new("TextButton")
+        UnloadButton.Name = "Unload"
+        UnloadButton.Size = UDim2.new(0, 145, 0, 42)
+        UnloadButton.Position = UDim2.new(1, -165, 1, -62)
+        UnloadButton.BackgroundColor3 = CurrentTheme.Accent
+        UnloadButton.BorderSizePixel = 0
+        UnloadButton.AutoButtonColor = false
+        UnloadButton.Font = Enum.Font.GothamSemibold
+        UnloadButton.Text = "Unload"
+        UnloadButton.TextColor3 = CurrentTheme.Background
+        UnloadButton.TextSize = 14
+        UnloadButton.ZIndex = 102
+        UnloadButton.Parent = Popup
 
-                if not MiniScale then
-                    MiniScale = Instance.new("UIScale")
-                    MiniScale.Name = "AnimationScale"
-                    MiniScale.Parent = MiniButton
-                end
+        local UnloadCorner = Instance.new("UICorner")
+        UnloadCorner.CornerRadius = UDim.new(0, 7)
+        UnloadCorner.Parent = UnloadButton
 
-                MiniScale.Scale = 0.85
+        CancelButton.MouseEnter:Connect(function()
+            local Theme = Object:GetTheme()
+            CancelButton.BackgroundColor3 = Theme.Hover
+        end)
 
-                local MiniFadeTween =
-                    TweenService:Create(
-                        MiniButton,
-                        TweenInfo.new(
-                            0.09,
-                            Enum.EasingStyle.Quad,
-                            Enum.EasingDirection.Out
-                        ),
-                        {
-                            ImageTransparency = 0
-                        }
-                    )
+        CancelButton.MouseLeave:Connect(function()
+            local Theme = Object:GetTheme()
+            CancelButton.BackgroundColor3 = Theme.Element
+        end)
 
-                local MiniScaleTween =
-                    TweenService:Create(
-                        MiniScale,
-                        TweenInfo.new(
-                            0.12,
-                            Enum.EasingStyle.Back,
-                            Enum.EasingDirection.Out
-                        ),
-                        {
-                            Scale = 1
-                        }
-                    )
+        UnloadButton.MouseEnter:Connect(function()
+            local Theme = Object:GetTheme()
+            UnloadButton.BackgroundColor3 = Theme.AccentDark
+        end)
 
-                MiniFadeTween:Play()
-                MiniScaleTween:Play()
+        UnloadButton.MouseLeave:Connect(function()
+            local Theme = Object:GetTheme()
+            UnloadButton.BackgroundColor3 = Theme.Accent
+        end)
+
+        CancelButton.MouseButton1Click:Connect(function()
+            Overlay:Destroy()
+            Object.UnloadConfirmation = nil
+        end)
+
+        UnloadButton.MouseButton1Click:Connect(function()
+            if Object.Unload then
+                Object:Unload()
             end
-        )
-    end
+        end)
 
-    local function Restore()
-
-        if not Object.Minimized
-            or Object.Closed then
-            return
-        end
-
-        Object.Minimized = false
-        Main.Visible = true
-        Main.Active = true
-
-        Main.Position =
-            CurrentPosition
-            + UDim2.fromOffset(0, 35)
-
-        Main.Size = OpenSize
-        MainScale.Scale = 0.96
-
-        local MiniFadeTween =
-            TweenService:Create(
-                MiniButton,
-                TweenInfo.new(
-                    0.08,
-                    Enum.EasingStyle.Quad,
-                    Enum.EasingDirection.In
-                ),
-                {
-                    ImageTransparency = 1
-                }
-            )
-
-        MiniFadeTween:Play()
-
-        local PositionTween =
-            TweenService:Create(
-                Main,
-                TweenInfo.new(
-                    0.16,
-                    Enum.EasingStyle.Quint,
-                    Enum.EasingDirection.Out
-                ),
-                {
-                    Position = CurrentPosition
-                }
-            )
-
-        local ScaleTween =
-            TweenService:Create(
-                MainScale,
-                TweenInfo.new(
-                    0.16,
-                    Enum.EasingStyle.Quint,
-                    Enum.EasingDirection.Out
-                ),
-                {
-                    Scale = 1
-                }
-            )
-
-        PositionTween:Play()
-        ScaleTween:Play()
-
-        MiniFadeTween.Completed:Once(
-            function()
-
-                if not Object.Closed then
-                    MiniButton.Visible = false
-                    MiniButton.ImageTransparency = 0
-                end
-            end
-        )
+        Object.UnloadConfirmation = {
+            Overlay = Overlay,
+            Popup = Popup,
+            PopupStroke = PopupStroke,
+            Title = TitleLabel,
+            Description = Description,
+            CancelButton = CancelButton,
+            UnloadButton = UnloadButton
+        }
     end
 
     local function Unload()
-
         if Object.Closed then
             return
         end
 
         Object.Closed = true
 
-        local Scale =
-            Main:FindFirstChild(
-                "AnimationScale"
-            )
-
-        if Scale then
-            TweenService:Create(
-                Scale,
-                TweenInfo.new(
-                    0.14,
-                    Enum.EasingStyle.Quint,
-                    Enum.EasingDirection.In
-                ),
-                {
-                    Scale = 0.92
-                }
-            ):Play()
+        if Object.UnloadConfirmation then
+            Object.UnloadConfirmation.Overlay:Destroy()
+            Object.UnloadConfirmation = nil
         end
 
-        TweenService:Create(
-            Main,
-            TweenInfo.new(
-                0.14,
-                Enum.EasingStyle.Quint,
-                Enum.EasingDirection.In
-            ),
+        if OTC._Connections then
+            for _, Connection in pairs(OTC._Connections) do
+                pcall(function()
+                    Connection:Disconnect()
+                end)
+            end
+            table.clear(OTC._Connections)
+        end
+
+        if Object.ScreenGui then
+            Object.ScreenGui:Destroy()
+        end
+
+        for Index, WindowObject in pairs(OTC._Windows) do
+            if WindowObject == Object then
+                OTC._Windows[Index] = nil
+            end
+        end
+    end
+
+    Object.Unload = Unload
+
+    CloseButton.MouseButton1Click:Connect(function()
+        CreateUnloadConfirmation()
+    end)
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        Object:Toggle()
+    end)
+
+    MinimizeButton.MouseEnter:Connect(function()
+        Tween(
+            MinimizeButton,
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
-                Position =
-                    Main.Position
-                    + UDim2.fromOffset(0, 20)
+                Size = UDim2.new(0, 38, 0, 38),
+                Position = UDim2.new(1, -80, 0.5, -19)
             }
-        ):Play()
-
-        task.delay(
-            0.15,
-            function()
-
-                if ScreenGui then
-                    ScreenGui:Destroy()
-                end
-            end
         )
-    end
+    end)
 
-    local function CreateUnloadConfirmation()
-
-        if ScreenGui:FindFirstChild(
-            "UnloadConfirmation"
-        ) then
-            return
-        end
-
-        local Overlay = create("Frame", {
-            Name = "UnloadConfirmation",
-            Parent = ScreenGui,
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-            BackgroundTransparency = 0.45,
-            BorderSizePixel = 0,
-            Size = UDim2.fromScale(1, 1),
-            ZIndex = 200
-        })
-
-        local Popup = create("Frame", {
-            Name = "Popup",
-            Parent = Overlay,
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundColor3 = Theme.Background,
-            BorderSizePixel = 0,
-            Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.fromOffset(360, 175),
-            ZIndex = 201
-        })
-
-        create("UICorner", {
-            Parent = Popup,
-            CornerRadius = UDim.new(0, 10)
-        })
-
-        local PopupStroke = create("UIStroke", {
-            Parent = Popup,
-            Color = Theme.Border,
-            Thickness = 1
-        })
-
-        local PopupTitle = create("TextLabel", {
-            Name = "Title",
-            Parent = Popup,
-            BackgroundTransparency = 1,
-            Text = "Unload OTC Hub?",
-            TextColor3 = Theme.Text,
-            Font = Enum.Font.GothamBold,
-            TextSize = 18,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2.fromOffset(20, 18),
-            Size = UDim2.new(1, -40, 0, 28),
-            ZIndex = 202
-        })
-
-        local PopupText = create("TextLabel", {
-            Name = "Description",
-            Parent = Popup,
-            BackgroundTransparency = 1,
-            Text = "Are you sure you want to unload the UI?",
-            TextColor3 = Theme.SubText,
-            Font = Enum.Font.Gotham,
-            TextSize = 13,
-            TextWrapped = true,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Position = UDim2.fromOffset(20, 52),
-            Size = UDim2.new(1, -40, 0, 42),
-            ZIndex = 202
-        })
-
-        local CancelButton = create("TextButton", {
-            Name = "Cancel",
-            Parent = Popup,
-            BackgroundColor3 = Theme.Element,
-            BorderSizePixel = 0,
-            Text = "Cancel",
-            TextColor3 = Theme.Text,
-            Font = Enum.Font.GothamBold,
-            TextSize = 13,
-            Position = UDim2.new(1, -190, 1, -48),
-            Size = UDim2.fromOffset(80, 32),
-            AutoButtonColor = false,
-            ZIndex = 202
-        })
-
-        create("UICorner", {
-            Parent = CancelButton,
-            CornerRadius = UDim.new(0, 7)
-        })
-
-        local UnloadButton = create("TextButton", {
-            Name = "Unload",
-            Parent = Popup,
-            BackgroundColor3 = Theme.Text,
-            BorderSizePixel = 0,
-            Text = "Unload",
-            TextColor3 = Theme.Background,
-            Font = Enum.Font.GothamBold,
-            TextSize = 13,
-            Position = UDim2.new(1, -100, 1, -48),
-            Size = UDim2.fromOffset(80, 32),
-            AutoButtonColor = false,
-            ZIndex = 202
-        })
-
-        create("UICorner", {
-            Parent = UnloadButton,
-            CornerRadius = UDim.new(0, 7)
-        })
-
-        local PopupScale = Instance.new("UIScale")
-        PopupScale.Scale = 0.9
-        PopupScale.Parent = Popup
-
-        Overlay.BackgroundTransparency = 1
-
-        TweenService:Create(
-            Overlay,
-            TweenInfo.new(
-                0.12,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
+    MinimizeButton.MouseLeave:Connect(function()
+        Tween(
+            MinimizeButton,
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
-                BackgroundTransparency = 0.45
+                Size = UDim2.new(0, 34, 0, 34),
+                Position = UDim2.new(1, -78, 0.5, -17)
             }
-        ):Play()
+        )
+    end)
 
-        TweenService:Create(
-            PopupScale,
-            TweenInfo.new(
-                0.16,
-                Enum.EasingStyle.Back,
-                Enum.EasingDirection.Out
-            ),
+    CloseButton.MouseEnter:Connect(function()
+        Tween(
+            CloseButton,
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
             {
-                Scale = 1
+                Size = UDim2.new(0, 38, 0, 38),
+                Position = UDim2.new(1, -42, 0.5, -19)
             }
-        ):Play()
-
-        CancelButton.MouseEnter:Connect(
-            function()
-
-                local CurrentTheme =
-                    Object:GetTheme()
-
-                TweenService:Create(
-                    CancelButton,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.Out
-                    ),
-                    {
-                        BackgroundColor3 =
-                            CurrentTheme.Hover
-                    }
-                ):Play()
-            end
         )
+    end)
 
-        CancelButton.MouseLeave:Connect(
-            function()
-
-                local CurrentTheme =
-                    Object:GetTheme()
-
-                TweenService:Create(
-                    CancelButton,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.Out
-                    ),
-                    {
-                        BackgroundColor3 =
-                            CurrentTheme.Element
-                    }
-                ):Play()
-            end
+    CloseButton.MouseLeave:Connect(function()
+        Tween(
+            CloseButton,
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {
+                Size = UDim2.new(0, 34, 0, 34),
+                Position = UDim2.new(1, -40, 0.5, -17)
+            }
         )
-
-        UnloadButton.MouseEnter:Connect(
-            function()
-
-                local CurrentTheme =
-                    Object:GetTheme()
-
-                TweenService:Create(
-                    UnloadButton,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.Out
-                    ),
-                    {
-                        BackgroundColor3 =
-                            CurrentTheme.AccentDark
-                    }
-                ):Play()
-            end
-        )
-
-        UnloadButton.MouseLeave:Connect(
-            function()
-
-                local CurrentTheme =
-                    Object:GetTheme()
-
-                TweenService:Create(
-                    UnloadButton,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.Out
-                    ),
-                    {
-                        BackgroundColor3 =
-                            CurrentTheme.Text
-                    }
-                ):Play()
-            end
-        )
-
-        CancelButton.MouseButton1Click:Connect(
-            function()
-
-                TweenService:Create(
-                    PopupScale,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.In
-                    ),
-                    {
-                        Scale = 0.9
-                    }
-                ):Play()
-
-                TweenService:Create(
-                    Overlay,
-                    TweenInfo.new(
-                        0.1,
-                        Enum.EasingStyle.Quad,
-                        Enum.EasingDirection.In
-                    ),
-                    {
-                        BackgroundTransparency = 1
-                    }
-                ):Play()
-
-                task.delay(
-                    0.11,
-                    function()
-
-                        if Overlay then
-                            Overlay:Destroy()
-                        end
-                    end
-                )
-            end
-        )
-
-        UnloadButton.MouseButton1Click:Connect(
-            function()
-                Unload()
-            end
-        )
-    end
-
-    MinimizeButton.MouseButton1Click:Connect(
-        function()
-            Minimize()
-        end
-    )
-
-    CloseButton.MouseButton1Click:Connect(
-        function()
-
-            if Object.Closed then
-                return
-            end
-
-            CreateUnloadConfirmation()
-        end
-    )
-
-    MinimizeButton.MouseEnter:Connect(
-        function()
-
-            Animation:Scale(
-                MinimizeButton,
-                1.08,
-                0.12
-            )
-        end
-    )
-
-    MinimizeButton.MouseLeave:Connect(
-        function()
-
-            Animation:Scale(
-                MinimizeButton,
-                1,
-                0.12
-            )
-        end
-    )
-
-    CloseButton.MouseEnter:Connect(
-        function()
-
-            Animation:Scale(
-                CloseButton,
-                1.08,
-                0.12
-            )
-        end
-    )
-
-    CloseButton.MouseLeave:Connect(
-        function()
-
-            Animation:Scale(
-                CloseButton,
-                1,
-                0.12
-            )
-        end
-    )
-
-    local Dragging = false
-    local DragStart
-    local StartPosition
-    local DragInput
-
-    local function UpdateDrag(Input)
-
-        local Delta =
-            Input.Position
-            - DragStart
-
-        Main.Position =
-            UDim2.new(
-                StartPosition.X.Scale,
-                StartPosition.X.Offset + Delta.X,
-                StartPosition.Y.Scale,
-                StartPosition.Y.Offset + Delta.Y
-            )
-
-        CurrentPosition =
-            Main.Position
-    end
-
-    DragArea.InputBegan:Connect(
-        function(Input)
-
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseButton1
-
-                or Input.UserInputType ==
-                Enum.UserInputType.Touch then
-
-                Dragging = true
-                DragStart = Input.Position
-                StartPosition = Main.Position
-
-                Input.Changed:Connect(
-                    function()
-
-                        if Input.UserInputState ==
-                            Enum.UserInputState.End then
-
-                            Dragging = false
-                        end
-                    end
-                )
-            end
-        end
-    )
-
-    DragArea.InputChanged:Connect(
-        function(Input)
-
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseMovement
-
-                or Input.UserInputType ==
-                Enum.UserInputType.Touch then
-
-                DragInput = Input
-            end
-        end
-    )
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if Input == DragInput
-                and Dragging then
-
-                UpdateDrag(Input)
-            end
-        end
-    )
-
-    local MiniDragging = false
-    local MiniMoved = false
-
-    local MiniDragStart
-    local MiniStartPosition
-    local MiniDragInput
-
-    local DRAG_THRESHOLD = 8
-
-    local function UpdateMiniDrag(Input)
-
-        local Delta =
-            Input.Position
-            - MiniDragStart
-
-        if math.abs(Delta.X) >
-            DRAG_THRESHOLD
-
-            or math.abs(Delta.Y) >
-            DRAG_THRESHOLD then
-
-            MiniMoved = true
-        end
-
-        MiniButton.Position =
-            UDim2.new(
-                MiniStartPosition.X.Scale,
-                MiniStartPosition.X.Offset + Delta.X,
-                MiniStartPosition.Y.Scale,
-                MiniStartPosition.Y.Offset + Delta.Y
-            )
-    end
-
-    MiniButton.InputBegan:Connect(
-        function(Input)
-
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseButton1
-
-                or Input.UserInputType ==
-                Enum.UserInputType.Touch then
-
-                MiniDragging = true
-                MiniMoved = false
-
-                MiniDragStart =
-                    Input.Position
-
-                MiniStartPosition =
-                    MiniButton.Position
-
-                Input.Changed:Connect(
-                    function()
-
-                        if Input.UserInputState ==
-                            Enum.UserInputState.End then
-
-                            MiniDragging = false
-
-                            if not MiniMoved then
-                                Restore()
-                            end
-                        end
-                    end
-                )
-            end
-        end
-    )
-
-    MiniButton.InputChanged:Connect(
-        function(Input)
-
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseMovement
-
-                or Input.UserInputType ==
-                Enum.UserInputType.Touch then
-
-                MiniDragInput =
-                    Input
-            end
-        end
-    )
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if Input == MiniDragInput
-                and MiniDragging then
-
-                UpdateMiniDrag(Input)
-            end
-        end
-    )
-
-    function Object:AddTab(TabObject)
-
-        table.insert(
-            self.Tabs,
-            TabObject
-        )
-
-        if #self.Tabs == 1 then
-
-            self:SelectTab(
-                TabObject
-            )
-
-        else
-
-            TabObject:SetSelected(
-                false
-            )
-        end
-    end
-
-    function Object:SelectTab(TabObject)
-
-        for _, Tab in ipairs(
-            self.Tabs
-        ) do
-
-            Tab:SetSelected(
-                Tab == TabObject
-            )
-        end
-
-        self.SelectedTab =
-            TabObject
-    end
-
-    function Object:Minimize()
-        Minimize()
-    end
-
-    function Object:Restore()
-        Restore()
-    end
-
-    function Object:Toggle()
-
-        if self.Closed then
-            return
-        end
-
-        if self.Minimized then
-            Restore()
-        else
-            Minimize()
-        end
-    end
-
-    function Object:Destroy()
-
-        if self.Closed then
-            return
-        end
-
-        self.Closed = true
-
-        if self.ScreenGui then
-            self.ScreenGui:Destroy()
-        end
-    end
-
-    function Object:Unload()
-        Unload()
-    end
+    end)
+
+    MiniButton.MouseButton1Click:Connect(function()
+        Object:Toggle()
+    end)
 
     function Object:GetTheme()
-
         return self.OTC._Themes[self.Theme]
             or self.OTC._Themes.Default
     end
 
     function Object:SetTheme(Name)
-
-        if self.Closed then
-            return false
-        end
-
         if not self.OTC._Themes[Name] then
-
-            warn(
-                "[OTC Hub] Theme does not exist:",
-                Name
-            )
-
             return false
         end
 
-        self.Theme =
-            Name
-
+        self.Theme = Name
         self:RefreshTheme()
 
         return true
     end
 
-    function Object:RefreshTheme()
-
+    function Object:Toggle()
         if self.Closed then
             return
         end
 
-        local NewTheme =
-            self:GetTheme()
+        if self.Minimized then
+            self:Restore()
+        else
+            self:Minimize()
+        end
+    end
 
-        Main.BackgroundColor3 =
-            NewTheme.Background
-
-        MainStroke.Color =
-            NewTheme.Border
-
-        TopBar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        BottomFix.BackgroundColor3 =
-            NewTheme.Secondary
-
-        Logo.ImageColor3 =
-            NewTheme.Text
-
-        Title.TextColor3 =
-            NewTheme.Text
-
-        Subtitle.TextColor3 =
-            NewTheme.SubText
-
-        MinimizeButton.BackgroundColor3 =
-            NewTheme.Element
-
-        MinimizeButton.TextColor3 =
-            NewTheme.Text
-
-        CloseButton.BackgroundColor3 =
-            NewTheme.Element
-
-        CloseButton.TextColor3 =
-            NewTheme.Text
-
-        Sidebar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        SidebarSeparator.BackgroundColor3 =
-            NewTheme.Border
-
-        Content.BackgroundColor3 =
-            NewTheme.Background
-
-        UserCard.BackgroundColor3 =
-            NewTheme.Element
-
-        UserSeparator.BackgroundColor3 =
-            NewTheme.Border
-
-        DisplayName.TextColor3 =
-            NewTheme.Text
-
-        Username.TextColor3 =
-            NewTheme.SubText
-
-        MiniButton.ImageColor3 =
-            NewTheme.Text
-
-        local Confirmation =
-            ScreenGui:FindFirstChild(
-                "UnloadConfirmation"
-            )
-
-        if Confirmation then
-
-            local Popup =
-                Confirmation:FindFirstChild(
-                    "Popup"
-                )
-
-            if Popup then
-
-                Popup.BackgroundColor3 =
-                    NewTheme.Background
-
-                local PopupStrokeObject =
-                    Popup:FindFirstChildOfClass(
-                        "UIStroke"
-                    )
-
-                if PopupStrokeObject then
-
-                    PopupStrokeObject.Color =
-                        NewTheme.Border
-                end
-
-                local PopupTitle =
-                    Popup:FindFirstChild(
-                        "Title"
-                    )
-
-                local PopupText =
-                    Popup:FindFirstChild(
-                        "Description"
-                    )
-
-                local CancelButton =
-                    Popup:FindFirstChild(
-                        "Cancel"
-                    )
-
-                local UnloadButton =
-                    Popup:FindFirstChild(
-                        "Unload"
-                    )
-
-                if PopupTitle then
-
-                    PopupTitle.TextColor3 =
-                        NewTheme.Text
-                end
-
-                if PopupText then
-
-                    PopupText.TextColor3 =
-                        NewTheme.SubText
-                end
-
-                if CancelButton then
-
-                    CancelButton.BackgroundColor3 =
-                        NewTheme.Element
-
-                    CancelButton.TextColor3 =
-                        NewTheme.Text
-                end
-
-                if UnloadButton then
-
-                    UnloadButton.BackgroundColor3 =
-                        NewTheme.Text
-
-                    UnloadButton.TextColor3 =
-                        NewTheme.Background
-                end
-            end
+    function Object:Minimize()
+        if self.Minimized or self.Closed then
+            return
         end
 
-        for _, TabObject in ipairs(
-            self.Tabs
-        ) do
+        self.Minimized = true
 
-            if TabObject
-                and type(TabObject.RefreshTheme)
-                    == "function" then
+        Main.Visible = false
+        MiniButton.Visible = true
 
-                local Success, ErrorMessage =
-                    pcall(
-                        function()
-                            TabObject:RefreshTheme()
-                        end
-                    )
+        MiniButton.Size = UDim2.new(0, 0, 0, 0)
 
-                if not Success then
+        Tween(
+            MiniButton,
+            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {
+                Size = UDim2.new(0, 70, 0, 70)
+            }
+        )
+    end
 
-                    warn(
-                        "[OTC Hub] Failed to refresh tab theme:",
-                        ErrorMessage
-                    )
-                end
+    function Object:Restore()
+        if not self.Minimized or self.Closed then
+            return
+        end
+
+        self.Minimized = false
+
+        Tween(
+            MiniButton,
+            TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {
+                Size = UDim2.new(0, 0, 0, 0)
+            }
+        )
+
+        task.delay(0.15, function()
+            if self.Closed then
+                return
+            end
+
+            MiniButton.Visible = false
+            Main.Visible = true
+        end)
+    end
+
+    function Object:AddTab(TabObject)
+        table.insert(self.Tabs, TabObject)
+
+        TabObject.Button.Parent = TabsContainer
+
+        if not self.SelectedTab then
+            self:SelectTab(TabObject)
+        end
+    end
+
+    function Object:SelectTab(TabObject)
+        if self.SelectedTab == TabObject then
+            return
+        end
+
+        if self.SelectedTab and self.SelectedTab.Page then
+            self.SelectedTab.Page.Visible = false
+        end
+
+        self.SelectedTab = TabObject
+
+        if TabObject.Page then
+            TabObject.Page.Visible = true
+        end
+
+        for _, Tab in ipairs(self.Tabs) do
+            if Tab.SetSelected then
+                Tab:SetSelected(Tab == TabObject)
             end
         end
     end
 
-    Animation:Appear(
-        Main,
-        "Bottom",
-        20,
-        0.3
-    )
+    function Object:RefreshTheme()
+        local NewTheme = self:GetTheme()
 
-    Object.MainOpenPosition =
-        OpenPosition
+        Main.BackgroundColor3 = NewTheme.Background
+        MainStroke.Color = NewTheme.Border
 
-    Object.MainOpenSize =
-        OpenSize
+        TopBar.BackgroundColor3 = NewTheme.Secondary
+        BottomFix.BackgroundColor3 = NewTheme.Secondary
+
+        Logo.ImageColor3 = NewTheme.Text
+        Title.TextColor3 = NewTheme.Text
+        Subtitle.TextColor3 = NewTheme.SubText
+
+        MinimizeButton.BackgroundColor3 = NewTheme.Element
+        MinimizeButton.TextColor3 = NewTheme.Text
+
+        CloseButton.BackgroundColor3 = NewTheme.Element
+        CloseButton.TextColor3 = NewTheme.Text
+
+        Sidebar.BackgroundColor3 = NewTheme.Secondary
+        SidebarFix.BackgroundColor3 = NewTheme.Secondary
+
+        Separator.BackgroundColor3 = NewTheme.Border
+
+        Content.BackgroundColor3 = NewTheme.Background
+
+        TabsContainer.ScrollBarImageColor3 = NewTheme.Border
+
+        UserCard.BackgroundColor3 = NewTheme.Element
+        UserSeparator.BackgroundColor3 = NewTheme.Border
+
+        UserDisplay.TextColor3 = NewTheme.Text
+        UserName.TextColor3 = NewTheme.SubText
+
+        MiniButton.BackgroundColor3 = NewTheme.Background
+        MiniStroke.Color = NewTheme.Border
+
+        if self.UnloadConfirmation then
+            local Popup = self.UnloadConfirmation
+
+            Popup.Popup.BackgroundColor3 = NewTheme.Background
+            Popup.PopupStroke.Color = NewTheme.Border
+
+            Popup.Title.TextColor3 = NewTheme.Text
+            Popup.Description.TextColor3 = NewTheme.SubText
+
+            Popup.CancelButton.BackgroundColor3 = NewTheme.Element
+            Popup.CancelButton.TextColor3 = NewTheme.Text
+
+            Popup.UnloadButton.BackgroundColor3 = NewTheme.Accent
+            Popup.UnloadButton.TextColor3 = NewTheme.Background
+        end
+
+        for _, TabObject in ipairs(self.Tabs) do
+            if TabObject.RefreshTheme then
+                pcall(function()
+                    TabObject:RefreshTheme()
+                end)
+            end
+        end
+    end
+
+    OTC._Windows[Object] = Object
+
+    if OTC._InitializeInput then
+        OTC._InitializeInput()
+    end
+
+    if OTC._Animation and OTC._Animation.Appear then
+        pcall(function()
+            OTC._Animation:Appear(Main, "Bottom", 20, 0.3)
+        end)
+    end
 
     return Object
 end
