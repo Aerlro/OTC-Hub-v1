@@ -252,7 +252,7 @@ function Input.Create(Tab, OTC, Settings)
 
     end
 
-    TextBox.FocusGained:Connect(
+    TextBox.Focused:Connect(
         function()
 
             tween(
