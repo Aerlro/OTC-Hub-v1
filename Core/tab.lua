@@ -50,7 +50,7 @@ function Tab.Create(Window, OTC, Settings)
         Selected = false
     }
 
-    -- Sidebar button
+    --// Sidebar Button
     local Button = create("TextButton", {
         Name = TabObject.Name .. "_Button",
         Parent = Window.TabContainer,
@@ -74,7 +74,7 @@ function Tab.Create(Window, OTC, Settings)
         CornerRadius = UDim.new(0, 7)
     })
 
-    -- Icon
+    --// Icon
     local Icon = create("TextLabel", {
         Name = "Icon",
         Parent = Button,
@@ -95,7 +95,7 @@ function Tab.Create(Window, OTC, Settings)
         TextYAlignment = Enum.TextYAlignment.Center
     })
 
-    -- Name
+    --// Name
     local Name = create("TextLabel", {
         Name = "Name",
         Parent = Button,
@@ -116,7 +116,7 @@ function Tab.Create(Window, OTC, Settings)
         TextYAlignment = Enum.TextYAlignment.Center
     })
 
-    -- Selected indicator
+    --// Selected Indicator
     local Indicator = create("Frame", {
         Name = "Indicator",
         Parent = Button,
@@ -135,7 +135,7 @@ function Tab.Create(Window, OTC, Settings)
         CornerRadius = UDim.new(1, 0)
     })
 
-    -- Content page
+    --// Content Page
     local Page = create("ScrollingFrame", {
         Name = TabObject.Name .. "_Page",
         Parent = Window.Content,
@@ -154,7 +154,7 @@ function Tab.Create(Window, OTC, Settings)
         Visible = false
     })
 
-    local Padding = create("UIPadding", {
+    create("UIPadding", {
         Parent = Page,
 
         PaddingTop = UDim.new(0, 18),
@@ -176,6 +176,7 @@ function Tab.Create(Window, OTC, Settings)
     TabObject.IconLabel = Icon
     TabObject.NameLabel = Name
 
+    --// Select
     function TabObject:SetSelected(Value)
         self.Selected = Value
 
@@ -212,8 +213,9 @@ function Tab.Create(Window, OTC, Settings)
         end
     end
 
+    --// Hover
     Button.MouseEnter:Connect(function()
-        if not self.Selected then
+        if not TabObject.Selected then
             tween(Button, 0.15, {
                 BackgroundTransparency = 0.7
             })
@@ -229,7 +231,7 @@ function Tab.Create(Window, OTC, Settings)
     end)
 
     Button.MouseLeave:Connect(function()
-        if not self.Selected then
+        if not TabObject.Selected then
             tween(Button, 0.15, {
                 BackgroundTransparency = 1
             })
@@ -244,16 +246,18 @@ function Tab.Create(Window, OTC, Settings)
         end
     end)
 
+    --// Click
     Button.MouseButton1Click:Connect(function()
         Window:SelectTab(TabObject)
     end)
 
-    -- Add element
+    --// Add Element
     function TabObject:AddElement(Element)
         table.insert(self.Elements, Element)
+        return Element
     end
 
-    -- Section
+    --// Section
     function TabObject:CreateSection(Text)
         local Section = create("TextLabel", {
             Name = "Section",
@@ -279,7 +283,7 @@ function Tab.Create(Window, OTC, Settings)
         return Section
     end
 
-    -- Simple text
+    --// Text
     function TabObject:CreateText(Text)
         local Label = create("TextLabel", {
             Name = "Text",
@@ -307,10 +311,10 @@ function Tab.Create(Window, OTC, Settings)
         return Label
     end
 
-    -- Register tab
+    --// Register Tab
     Window:AddTab(TabObject)
 
-    -- First tab automatically selected
+    --// Select First Tab
     if #Window.Tabs == 1 then
         Window:SelectTab(TabObject)
     end
