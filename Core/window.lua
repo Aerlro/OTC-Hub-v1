@@ -13,6 +13,11 @@ local function Tween(Object, Info, Properties)
     return TweenObject
 end
 
+local function GetTheme(Object)
+    return Object.OTC._Themes[Object.OTC.CurrentTheme]
+        or Object.OTC._Themes.Default
+end
+
 function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
@@ -35,12 +40,8 @@ function Window.Create(Settings, OTC)
     Object.Closed = false
     Object.UnloadConfirmation = nil
 
-    local function GetCurrentTheme()
-        return OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes.Default
-    end
-
-    local Theme = GetCurrentTheme()
+    local Theme = OTC._Themes[ThemeName]
+        or OTC._Themes.Default
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "OTC_Hub"
@@ -98,20 +99,17 @@ function Window.Create(Settings, OTC)
 
     local Logo = Instance.new("ImageLabel")
     Logo.Name = "Logo"
-    Logo.Size = UDim2.new(0, 26, 0, 26)
-    Logo.Position = UDim2.new(0, 14, 0.5, -13)
+    Logo.Size = UDim2.new(0, 38, 0, 38)
+    Logo.Position = UDim2.new(0, 12, 0.5, -19)
     Logo.BackgroundTransparency = 1
-    Logo.BorderSizePixel = 0
     Logo.Image = "rbxassetid://116094782851554"
-    Logo.ImageTransparency = 0
-    Logo.ImageColor3 = Color3.fromRGB(255, 255, 255)
     Logo.ScaleType = Enum.ScaleType.Fit
     Logo.Parent = TopBar
 
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 52, 0, 9)
+    Title.Position = UDim2.new(0, 58, 0, 9)
     Title.Size = UDim2.new(0, 300, 0, 24)
     Title.Font = Enum.Font.GothamBold
     Title.Text = Settings.Name or "OTC Hub"
@@ -123,7 +121,7 @@ function Window.Create(Settings, OTC)
     local Subtitle = Instance.new("TextLabel")
     Subtitle.Name = "Subtitle"
     Subtitle.BackgroundTransparency = 1
-    Subtitle.Position = UDim2.new(0, 52, 0, 32)
+    Subtitle.Position = UDim2.new(0, 58, 0, 32)
     Subtitle.Size = UDim2.new(0, 300, 0, 18)
     Subtitle.Font = Enum.Font.Gotham
     Subtitle.Text = Settings.Subtitle or "by Aerlro"
@@ -520,22 +518,30 @@ function Window.Create(Settings, OTC)
         UnloadCorner.Parent = UnloadButton
 
         CancelButton.MouseEnter:Connect(function()
-            local Current = Object:GetTheme()
+            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
+                or Object.OTC._Themes.Default
+
             CancelButton.BackgroundColor3 = Current.Hover
         end)
 
         CancelButton.MouseLeave:Connect(function()
-            local Current = Object:GetTheme()
+            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
+                or Object.OTC._Themes.Default
+
             CancelButton.BackgroundColor3 = Current.Element
         end)
 
         UnloadButton.MouseEnter:Connect(function()
-            local Current = Object:GetTheme()
+            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
+                or Object.OTC._Themes.Default
+
             UnloadButton.BackgroundColor3 = Current.AccentDark
         end)
 
         UnloadButton.MouseLeave:Connect(function()
-            local Current = Object:GetTheme()
+            local Current = Object.OTC._Themes[Object.OTC.CurrentTheme]
+                or Object.OTC._Themes.Default
+
             UnloadButton.BackgroundColor3 = Current.Accent
         end)
 
@@ -559,6 +565,8 @@ function Window.Create(Settings, OTC)
             CancelButton = CancelButton,
             UnloadButton = UnloadButton
         }
+
+        Object:RefreshTheme()
     end
 
     local function Unload()
@@ -579,6 +587,7 @@ function Window.Create(Settings, OTC)
                     Connection:Disconnect()
                 end)
             end
+
             table.clear(OTC._Connections)
         end
 
@@ -606,7 +615,11 @@ function Window.Create(Settings, OTC)
     MinimizeButton.MouseEnter:Connect(function()
         Tween(
             MinimizeButton,
-            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.12,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 38, 0, 38),
                 Position = UDim2.new(1, -80, 0.5, -19)
@@ -617,7 +630,11 @@ function Window.Create(Settings, OTC)
     MinimizeButton.MouseLeave:Connect(function()
         Tween(
             MinimizeButton,
-            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.12,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 34, 0, 34),
                 Position = UDim2.new(1, -78, 0.5, -17)
@@ -628,7 +645,11 @@ function Window.Create(Settings, OTC)
     CloseButton.MouseEnter:Connect(function()
         Tween(
             CloseButton,
-            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.12,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 38, 0, 38),
                 Position = UDim2.new(1, -42, 0.5, -19)
@@ -639,7 +660,11 @@ function Window.Create(Settings, OTC)
     CloseButton.MouseLeave:Connect(function()
         Tween(
             CloseButton,
-            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.12,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 34, 0, 34),
                 Position = UDim2.new(1, -40, 0.5, -17)
@@ -672,12 +697,15 @@ function Window.Create(Settings, OTC)
 
         Main.Visible = false
         MiniButton.Visible = true
-
         MiniButton.Size = UDim2.new(0, 0, 0, 0)
 
         Tween(
             MiniButton,
-            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.2,
+                Enum.EasingStyle.Back,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 70, 0, 70)
             }
@@ -693,7 +721,11 @@ function Window.Create(Settings, OTC)
 
         Tween(
             MiniButton,
-            TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            TweenInfo.new(
+                0.15,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.In
+            ),
             {
                 Size = UDim2.new(0, 0, 0, 0)
             }
@@ -711,6 +743,7 @@ function Window.Create(Settings, OTC)
 
     function Object:AddTab(TabObject)
         table.insert(self.Tabs, TabObject)
+
         TabObject.Button.Parent = TabsContainer
 
         if not self.SelectedTab then
@@ -755,6 +788,7 @@ function Window.Create(Settings, OTC)
         TopBar.BackgroundColor3 = NewTheme.Secondary
         BottomFix.BackgroundColor3 = NewTheme.Secondary
 
+        Logo.ImageColor3 = NewTheme.Text
         Title.TextColor3 = NewTheme.Text
         Subtitle.TextColor3 = NewTheme.SubText
 
@@ -814,7 +848,12 @@ function Window.Create(Settings, OTC)
 
     if OTC._Animation and OTC._Animation.Appear then
         pcall(function()
-            OTC._Animation:Appear(Main, "Bottom", 20, 0.3)
+            OTC._Animation:Appear(
+                Main,
+                "Bottom",
+                20,
+                0.3
+            )
         end)
     end
 
