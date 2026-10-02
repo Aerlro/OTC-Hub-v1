@@ -72,35 +72,44 @@ function Slider.Create(Tab, OTC, Settings)
 
     local CurrentValue = clamp(Default)
 
-    local FrameHeight = Description and 78 or 64
+    local FrameHeight =
+        Description and 78 or 64
 
     local Frame = create("Frame", {
         Name = "Slider",
 
         Parent = Tab.Page,
 
-        BackgroundColor3 = Theme.Element,
+        BackgroundColor3 =
+            Theme.Element,
 
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 0, FrameHeight)
+        Size =
+            UDim2.new(
+                1,
+                0,
+                0,
+                FrameHeight
+            )
     })
 
     create("UICorner", {
         Parent = Frame,
 
-        CornerRadius = UDim.new(0, 8)
+        CornerRadius =
+            UDim.new(0, 8)
     })
 
     local Stroke = create("UIStroke", {
         Parent = Frame,
 
-        Color = Theme.Border,
+        Color =
+            Theme.Border,
 
         Thickness = 1
     })
 
-    -- Title
     local Title = create("TextLabel", {
         Name = "Title",
 
@@ -108,22 +117,35 @@ function Slider.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        Position = UDim2.fromOffset(15, 8),
+        Position =
+            UDim2.fromOffset(
+                15,
+                8
+            ),
 
-        Size = UDim2.new(1, -90, 0, 22),
+        Size =
+            UDim2.new(
+                1,
+                -90,
+                0,
+                22
+            ),
 
-        Font = Enum.Font.GothamMedium,
+        Font =
+            Enum.Font.GothamMedium,
 
-        Text = Name,
+        Text =
+            Name,
 
-        TextColor3 = Theme.Text,
+        TextColor3 =
+            Theme.Text,
 
         TextSize = 13,
 
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextXAlignment =
+            Enum.TextXAlignment.Left
     })
 
-    -- Value
     local ValueLabel = create("TextLabel", {
         Name = "Value",
 
@@ -131,142 +153,210 @@ function Slider.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        AnchorPoint = Vector2.new(1, 0),
+        AnchorPoint =
+            Vector2.new(
+                1,
+                0
+            ),
 
-        Position = UDim2.new(1, -15, 0, 8),
+        Position =
+            UDim2.new(
+                1,
+                -15,
+                0,
+                8
+            ),
 
-        Size = UDim2.fromOffset(65, 22),
+        Size =
+            UDim2.fromOffset(
+                65,
+                22
+            ),
 
-        Font = Enum.Font.GothamMedium,
+        Font =
+            Enum.Font.GothamMedium,
 
-        Text = tostring(CurrentValue),
+        Text =
+            tostring(CurrentValue),
 
-        TextColor3 = Theme.Accent,
+        TextColor3 =
+            Theme.Accent,
 
         TextSize = 12,
 
-        TextXAlignment = Enum.TextXAlignment.Right
+        TextXAlignment =
+            Enum.TextXAlignment.Right
     })
 
-    -- Description
+    local DescriptionLabel
+
     if Description then
 
-        create("TextLabel", {
+        DescriptionLabel = create("TextLabel", {
             Name = "Description",
 
             Parent = Frame,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(15, 29),
+            Position =
+                UDim2.fromOffset(
+                    15,
+                    29
+                ),
 
-            Size = UDim2.new(1, -30, 0, 18),
+            Size =
+                UDim2.new(
+                    1,
+                    -30,
+                    0,
+                    18
+                ),
 
-            Font = Enum.Font.Gotham,
+            Font =
+                Enum.Font.Gotham,
 
-            Text = Description,
+            Text =
+                Description,
 
-            TextColor3 = Theme.SubText,
+            TextColor3 =
+                Theme.SubText,
 
             TextSize = 10,
 
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment =
+                Enum.TextXAlignment.Left
         })
 
     end
 
-    -- Slider background
     local SliderBackground = create("Frame", {
         Name = "SliderBackground",
 
         Parent = Frame,
 
-        BackgroundColor3 = Theme.Background,
+        BackgroundColor3 =
+            Theme.Background,
 
         BorderSizePixel = 0,
 
-        Position = UDim2.new(
-            0,
-            15,
-            1,
-            -25
-        ),
+        Position =
+            UDim2.new(
+                0,
+                15,
+                1,
+                -25
+            ),
 
-        Size = UDim2.new(
-            1,
-            -30,
-            0,
-            6
-        )
+        Size =
+            UDim2.new(
+                1,
+                -30,
+                0,
+                6
+            )
     })
 
     create("UICorner", {
-        Parent = SliderBackground,
+        Parent =
+            SliderBackground,
 
-        CornerRadius = UDim.new(1, 0)
+        CornerRadius =
+            UDim.new(1, 0)
     })
 
-    -- Slider fill
     local Fill = create("Frame", {
         Name = "Fill",
 
-        Parent = SliderBackground,
+        Parent =
+            SliderBackground,
 
-        BackgroundColor3 = Theme.Accent,
+        BackgroundColor3 =
+            Theme.Accent,
 
         BorderSizePixel = 0,
 
-        Size = UDim2.new(0, 0, 1, 0)
+        Size =
+            UDim2.new(
+                0,
+                0,
+                1,
+                0
+            )
     })
 
     create("UICorner", {
         Parent = Fill,
 
-        CornerRadius = UDim.new(1, 0)
+        CornerRadius =
+            UDim.new(1, 0)
     })
 
-    -- Knob
     local Knob = create("Frame", {
         Name = "Knob",
 
-        Parent = SliderBackground,
+        Parent =
+            SliderBackground,
 
-        BackgroundColor3 = Theme.Text,
+        BackgroundColor3 =
+            Theme.Text,
 
         BorderSizePixel = 0,
 
-        AnchorPoint = Vector2.new(0.5, 0.5),
+        AnchorPoint =
+            Vector2.new(
+                0.5,
+                0.5
+            ),
 
-        Position = UDim2.new(0, 0, 0.5, 0),
+        Position =
+            UDim2.new(
+                0,
+                0,
+                0.5,
+                0
+            ),
 
-        Size = UDim2.fromOffset(12, 12)
+        Size =
+            UDim2.fromOffset(
+                12,
+                12
+            )
     })
 
     create("UICorner", {
         Parent = Knob,
 
-        CornerRadius = UDim.new(1, 0)
+        CornerRadius =
+            UDim.new(1, 0)
     })
 
     local KnobStroke = create("UIStroke", {
         Parent = Knob,
 
-        Color = Theme.Accent,
+        Color =
+            Theme.Accent,
 
         Thickness = 2
     })
 
-    -- Invisible interaction button
     local Interaction = create("TextButton", {
         Name = "Interaction",
 
-        Parent = SliderBackground,
+        Parent =
+            SliderBackground,
 
         BackgroundTransparency = 1,
 
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 1, 0),
+        Size =
+            UDim2.new(
+                1,
+                0,
+                1,
+                0
+            ),
 
         Text = "",
 
@@ -283,14 +373,17 @@ function Slider.Create(Tab, OTC, Settings)
         local AbsoluteSize =
             SliderBackground.AbsoluteSize.X
 
-        local Percent = math.clamp(
-            (X - AbsolutePosition) / AbsoluteSize,
-            0,
-            1
-        )
+        local Percent =
+            math.clamp(
+                (X - AbsolutePosition)
+                    / AbsoluteSize,
+                0,
+                1
+            )
 
         local Value =
-            Min + ((Max - Min) * Percent)
+            Min
+                + ((Max - Min) * Percent)
 
         return clamp(Value)
 
@@ -298,44 +391,61 @@ function Slider.Create(Tab, OTC, Settings)
 
     local function update(Value, RunCallback)
 
-        CurrentValue = clamp(Value)
+        CurrentValue =
+            clamp(Value)
 
         local Percent
 
         if Max == Min then
+
             Percent = 0
+
         else
+
             Percent =
                 (CurrentValue - Min)
                 / (Max - Min)
+
         end
 
         ValueLabel.Text =
             tostring(CurrentValue)
 
-        tween(Fill, 0.12, {
-            Size = UDim2.new(
-                Percent,
-                0,
-                1,
-                0
-            )
-        })
+        tween(
+            Fill,
+            0.12,
+            {
+                Size =
+                    UDim2.new(
+                        Percent,
+                        0,
+                        1,
+                        0
+                    )
+            }
+        )
 
-        tween(Knob, 0.12, {
-            Position = UDim2.new(
-                Percent,
-                0,
-                0.5,
-                0
-            )
-        })
+        tween(
+            Knob,
+            0.12,
+            {
+                Position =
+                    UDim2.new(
+                        Percent,
+                        0,
+                        0.5,
+                        0
+                    )
+            }
+        )
 
         if Flag then
+
             OTC:SetFlag(
                 Flag,
                 CurrentValue
             )
+
         end
 
         if RunCallback then
@@ -347,10 +457,12 @@ function Slider.Create(Tab, OTC, Settings)
                 )
 
             if not Success then
+
                 warn(
                     "[OTC Hub] Slider callback error:",
                     Error
                 )
+
             end
 
         end
@@ -364,10 +476,15 @@ function Slider.Create(Tab, OTC, Settings)
 
             local Value =
                 getValueFromPosition(
-                    UserInputService:GetMouseLocation().X
+                    UserInputService
+                        :GetMouseLocation()
+                        .X
                 )
 
-            update(Value, true)
+            update(
+                Value,
+                true
+            )
 
         end
     )
@@ -389,7 +506,10 @@ function Slider.Create(Tab, OTC, Settings)
                         Input.Position.X
                     )
 
-                update(Value, true)
+                update(
+                    Value,
+                    true
+                )
 
             end
 
@@ -411,17 +531,35 @@ function Slider.Create(Tab, OTC, Settings)
         end
     )
 
-    -- Hover
     Interaction.MouseEnter:Connect(
         function()
 
-            tween(Knob, 0.15, {
-                Size = UDim2.fromOffset(15, 15)
-            })
+            local CurrentTheme =
+                OTC._Themes[
+                    Tab.Window.Theme
+                ]
+                or OTC._Themes.Default
 
-            tween(Stroke, 0.15, {
-                Color = Theme.AccentDark
-            })
+            tween(
+                Knob,
+                0.15,
+                {
+                    Size =
+                        UDim2.fromOffset(
+                            15,
+                            15
+                        )
+                }
+            )
+
+            tween(
+                Stroke,
+                0.15,
+                {
+                    Color =
+                        CurrentTheme.AccentDark
+                }
+            )
 
         end
     )
@@ -431,27 +569,51 @@ function Slider.Create(Tab, OTC, Settings)
 
             if not Dragging then
 
-                tween(Knob, 0.15, {
-                    Size = UDim2.fromOffset(12, 12)
-                })
+                local CurrentTheme =
+                    OTC._Themes[
+                        Tab.Window.Theme
+                    ]
+                    or OTC._Themes.Default
 
-                tween(Stroke, 0.15, {
-                    Color = Theme.Border
-                })
+                tween(
+                    Knob,
+                    0.15,
+                    {
+                        Size =
+                            UDim2.fromOffset(
+                                12,
+                                12
+                            )
+                    }
+                )
+
+                tween(
+                    Stroke,
+                    0.15,
+                    {
+                        Color =
+                            CurrentTheme.Border
+                    }
+                )
 
             end
 
         end
     )
 
-    -- Initialize
-    update(CurrentValue, false)
+    update(
+        CurrentValue,
+        false
+    )
 
     local Object = {}
 
     function Object:SetValue(Value)
 
-        update(Value, true)
+        update(
+            Value,
+            true
+        )
 
     end
 
@@ -463,40 +625,97 @@ function Slider.Create(Tab, OTC, Settings)
 
     function Object:SetMin(Value)
 
-        Min = tonumber(Value) or Min
+        Min =
+            tonumber(Value)
+            or Min
 
         if Max < Min then
             Max = Min
         end
 
-        update(CurrentValue, false)
+        update(
+            CurrentValue,
+            false
+        )
 
     end
 
     function Object:SetMax(Value)
 
-        Max = tonumber(Value) or Max
+        Max =
+            tonumber(Value)
+            or Max
 
         if Max < Min then
             Min = Max
         end
 
-        update(CurrentValue, false)
+        update(
+            CurrentValue,
+            false
+        )
 
     end
 
     function Object:SetName(NewName)
 
-        Name = NewName
-        Title.Text = NewName
+        Name =
+            tostring(NewName)
+
+        Title.Text =
+            Name
 
     end
 
     function Object:SetCallback(NewCallback)
 
         if type(NewCallback) == "function" then
-            Callback = NewCallback
+
+            Callback =
+                NewCallback
+
         end
+
+    end
+
+    function Object:RefreshTheme()
+
+        local CurrentTheme =
+            OTC._Themes[
+                Tab.Window.Theme
+            ]
+            or OTC._Themes.Default
+
+        Frame.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Stroke.Color =
+            CurrentTheme.Border
+
+        Title.TextColor3 =
+            CurrentTheme.Text
+
+        ValueLabel.TextColor3 =
+            CurrentTheme.Accent
+
+        if DescriptionLabel then
+
+            DescriptionLabel.TextColor3 =
+                CurrentTheme.SubText
+
+        end
+
+        SliderBackground.BackgroundColor3 =
+            CurrentTheme.Background
+
+        Fill.BackgroundColor3 =
+            CurrentTheme.Accent
+
+        Knob.BackgroundColor3 =
+            CurrentTheme.Text
+
+        KnobStroke.Color =
+            CurrentTheme.Accent
 
     end
 
@@ -506,10 +725,15 @@ function Slider.Create(Tab, OTC, Settings)
 
     end
 
-    Object.Instance = Frame
-    Object.Interaction = Interaction
+    Object.Instance =
+        Frame
 
-    Tab:AddElement(Object)
+    Object.Interaction =
+        Interaction
+
+    Tab:AddElement(
+        Object
+    )
 
     return Object
 end
