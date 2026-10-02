@@ -152,9 +152,7 @@ function OTC:Tween(
 
     local Info = TweenInfo.new(
         Time or 0.25,
-
         Style or Enum.EasingStyle.Quint,
-
         Direction or Enum.EasingDirection.Out
     )
 
@@ -293,6 +291,21 @@ end
 --// Create Window
 function OTC:CreateWindow(Settings)
     Settings = Settings or {}
+
+    --// Window Theme
+    if Settings.Theme then
+        if not self._Themes[Settings.Theme] then
+            warn(
+                "[OTC Hub] Theme does not exist:",
+                Settings.Theme,
+                "| Using Default"
+            )
+
+            Settings.Theme = "Default"
+        end
+    else
+        Settings.Theme = self.CurrentTheme
+    end
 
     local Window = WindowModule.Create(
         Settings,
