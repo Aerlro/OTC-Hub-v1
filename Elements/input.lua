@@ -1,9 +1,3 @@
---[[
-    OTC Hub v1
-    Input Element
-    by Aerlro
-]]
-
 local Input = {}
 
 local TweenService = game:GetService("TweenService")
@@ -45,20 +39,27 @@ function Input.Create(Tab, OTC, Settings)
     local Placeholder = Settings.Placeholder or "Enter text..."
     local CurrentValue = tostring(Settings.CurrentValue or "")
     local Flag = Settings.Flag
-    local ClearTextOnFocus = Settings.ClearTextOnFocus == true
-    local Numeric = Settings.Numeric == true
-    local MaxLength = tonumber(Settings.MaxLength)
+    local ClearTextOnFocus =
+        Settings.ClearTextOnFocus == true
+    local Numeric =
+        Settings.Numeric == true
+    local MaxLength =
+        tonumber(Settings.MaxLength)
 
-    local Callback = Settings.Callback or function() end
+    local Callback =
+        Settings.Callback
+        or function() end
 
-    local FrameHeight = Description and 82 or 68
+    local FrameHeight =
+        Description and 82 or 68
 
     local Frame = create("Frame", {
         Name = "Input",
 
         Parent = Tab.Page,
 
-        BackgroundColor3 = Theme.Element,
+        BackgroundColor3 =
+            Theme.Element,
 
         BorderSizePixel = 0,
 
@@ -73,7 +74,8 @@ function Input.Create(Tab, OTC, Settings)
     create("UICorner", {
         Parent = Frame,
 
-        CornerRadius = UDim.new(0, 8)
+        CornerRadius =
+            UDim.new(0, 8)
     })
 
     local Stroke = create("UIStroke", {
@@ -84,7 +86,6 @@ function Input.Create(Tab, OTC, Settings)
         Thickness = 1
     })
 
-    -- Title
     local Title = create("TextLabel", {
         Name = "Title",
 
@@ -92,99 +93,114 @@ function Input.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        Position = UDim2.fromOffset(
-            15,
-            8
-        ),
+        Position =
+            UDim2.fromOffset(
+                15,
+                8
+            ),
 
-        Size = UDim2.new(
-            1,
-            -30,
-            0,
-            20
-        ),
+        Size =
+            UDim2.new(
+                1,
+                -30,
+                0,
+                20
+            ),
 
-        Font = Enum.Font.GothamMedium,
+        Font =
+            Enum.Font.GothamMedium,
 
         Text = Name,
 
-        TextColor3 = Theme.Text,
+        TextColor3 =
+            Theme.Text,
 
         TextSize = 13,
 
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextXAlignment =
+            Enum.TextXAlignment.Left
     })
 
-    -- Description
+    local DescriptionLabel
+
     if Description then
 
-        create("TextLabel", {
+        DescriptionLabel = create("TextLabel", {
             Name = "Description",
 
             Parent = Frame,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(
-                15,
-                28
-            ),
+            Position =
+                UDim2.fromOffset(
+                    15,
+                    28
+                ),
 
-            Size = UDim2.new(
-                1,
-                -30,
-                0,
-                18
-            ),
+            Size =
+                UDim2.new(
+                    1,
+                    -30,
+                    0,
+                    18
+                ),
 
-            Font = Enum.Font.Gotham,
+            Font =
+                Enum.Font.Gotham,
 
             Text = Description,
 
-            TextColor3 = Theme.SubText,
+            TextColor3 =
+                Theme.SubText,
 
             TextSize = 10,
 
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment =
+                Enum.TextXAlignment.Left
         })
 
     end
 
-    -- Input container
     local InputFrame = create("Frame", {
         Name = "InputFrame",
 
         Parent = Frame,
 
-        BackgroundColor3 = Theme.Background,
+        BackgroundColor3 =
+            Theme.Background,
 
         BorderSizePixel = 0,
 
-        Position = UDim2.new(
-            0,
-            15,
-            1,
-            -40
-        ),
+        Position =
+            UDim2.new(
+                0,
+                15,
+                1,
+                -40
+            ),
 
-        Size = UDim2.new(
-            1,
-            -30,
-            0,
-            32
-        )
+        Size =
+            UDim2.new(
+                1,
+                -30,
+                0,
+                32
+            )
     })
 
     create("UICorner", {
         Parent = InputFrame,
 
-        CornerRadius = UDim.new(0, 6)
+        CornerRadius =
+            UDim.new(0, 6)
     })
 
     local InputStroke = create("UIStroke", {
         Parent = InputFrame,
 
-        Color = Theme.Border,
+        Color =
+            Theme.Border,
 
         Thickness = 1
     })
@@ -196,35 +212,45 @@ function Input.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        ClearTextOnFocus = ClearTextOnFocus,
+        ClearTextOnFocus =
+            ClearTextOnFocus,
 
-        Position = UDim2.fromOffset(
-            10,
-            0
-        ),
+        Position =
+            UDim2.fromOffset(
+                10,
+                0
+            ),
 
-        Size = UDim2.new(
-            1,
-            -20,
-            1,
-            0
-        ),
+        Size =
+            UDim2.new(
+                1,
+                -20,
+                1,
+                0
+            ),
 
-        Font = Enum.Font.Gotham,
+        Font =
+            Enum.Font.Gotham,
 
-        PlaceholderText = Placeholder,
+        PlaceholderText =
+            Placeholder,
 
-        PlaceholderColor3 = Theme.SubText,
+        PlaceholderColor3 =
+            Theme.SubText,
 
-        Text = CurrentValue,
+        Text =
+            CurrentValue,
 
-        TextColor3 = Theme.Text,
+        TextColor3 =
+            Theme.Text,
 
         TextSize = 11,
 
-        TextXAlignment = Enum.TextXAlignment.Left,
+        TextXAlignment =
+            Enum.TextXAlignment.Left,
 
-        TextYAlignment = Enum.TextYAlignment.Center
+        TextYAlignment =
+            Enum.TextYAlignment.Center
     })
 
     local function sanitize(Text)
@@ -252,94 +278,110 @@ function Input.Create(Tab, OTC, Settings)
 
     end
 
-    TextBox.Focused:Connect(
-        function()
+    TextBox.Focused:Connect(function()
 
-            tween(
-                InputStroke,
-                0.15,
-                {
-                    Color = Theme.Accent
-                }
+        tween(
+            InputStroke,
+            0.15,
+            {
+                Color =
+                    OTC._Themes[
+                        Tab.Window.Theme
+                    ].Accent
+            }
+        )
+
+    end)
+
+    TextBox.FocusLost:Connect(function()
+
+        local CurrentTheme =
+            OTC._Themes[
+                Tab.Window.Theme
+            ]
+            or OTC._Themes.Default
+
+        tween(
+            InputStroke,
+            0.15,
+            {
+                Color =
+                    CurrentTheme.Border
+            }
+        )
+
+        local Text =
+            sanitize(
+                TextBox.Text
+            )
+
+        TextBox.Text =
+            Text
+
+        CurrentValue =
+            Text
+
+        if Flag then
+
+            OTC:SetFlag(
+                Flag,
+                CurrentValue
             )
 
         end
-    )
 
-    TextBox.FocusLost:Connect(
-        function()
-
-            tween(
-                InputStroke,
-                0.15,
-                {
-                    Color = Theme.Border
-                }
+        local Success, Error =
+            pcall(
+                Callback,
+                CurrentValue
             )
 
-            local Text =
-                sanitize(
-                    TextBox.Text
-                )
+        if not Success then
 
-            TextBox.Text = Text
-            CurrentValue = Text
-
-            if Flag then
-
-                OTC:SetFlag(
-                    Flag,
-                    CurrentValue
-                )
-
-            end
-
-            local Success, Error =
-                pcall(
-                    Callback,
-                    CurrentValue
-                )
-
-            if not Success then
-
-                warn(
-                    "[OTC Hub] Input callback error:",
-                    Error
-                )
-
-            end
+            warn(
+                "[OTC Hub] Input callback error:",
+                Error
+            )
 
         end
-    )
+
+    end)
 
     TextBox:GetPropertyChangedSignal(
         "Text"
-    ):Connect(
-        function()
+    ):Connect(function()
 
-            local Text =
-                sanitize(
-                    TextBox.Text
-                )
+        local Text =
+            sanitize(
+                TextBox.Text
+            )
 
-            if Text ~= TextBox.Text then
-                TextBox.Text = Text
-            end
+        if Text ~= TextBox.Text then
+
+            TextBox.Text =
+                Text
 
         end
-    )
 
-    -- Hover
+    end)
+
     InputFrame.MouseEnter:Connect(
         function()
 
             if not TextBox:IsFocused() then
 
+                local CurrentTheme =
+                    OTC._Themes[
+                        Tab.Window.Theme
+                    ]
+                    or OTC._Themes.Default
+
                 tween(
                     InputStroke,
                     0.15,
                     {
-                        Color = Theme.AccentDark
+                        Color =
+                            CurrentTheme.AccentDark
                     }
                 )
 
@@ -353,11 +395,18 @@ function Input.Create(Tab, OTC, Settings)
 
             if not TextBox:IsFocused() then
 
+                local CurrentTheme =
+                    OTC._Themes[
+                        Tab.Window.Theme
+                    ]
+                    or OTC._Themes.Default
+
                 tween(
                     InputStroke,
                     0.15,
                     {
-                        Color = Theme.Border
+                        Color =
+                            CurrentTheme.Border
                     }
                 )
 
@@ -412,14 +461,19 @@ function Input.Create(Tab, OTC, Settings)
     function Object:SetName(NewName)
 
         Name = NewName
-        Title.Text = NewName
+
+        Title.Text =
+            NewName
 
     end
 
     function Object:SetCallback(NewCallback)
 
         if type(NewCallback) == "function" then
-            Callback = NewCallback
+
+            Callback =
+                NewCallback
+
         end
 
     end
@@ -433,6 +487,7 @@ function Input.Create(Tab, OTC, Settings)
     function Object:Clear()
 
         CurrentValue = ""
+
         TextBox.Text = ""
 
         if Flag then
@@ -443,6 +498,42 @@ function Input.Create(Tab, OTC, Settings)
             )
 
         end
+
+    end
+
+    function Object:RefreshTheme()
+
+        local CurrentTheme =
+            OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes.Default
+
+        Frame.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Stroke.Color =
+            CurrentTheme.Border
+
+        Title.TextColor3 =
+            CurrentTheme.Text
+
+        if DescriptionLabel then
+
+            DescriptionLabel.TextColor3 =
+                CurrentTheme.SubText
+
+        end
+
+        InputFrame.BackgroundColor3 =
+            CurrentTheme.Background
+
+        InputStroke.Color =
+            CurrentTheme.Border
+
+        TextBox.TextColor3 =
+            CurrentTheme.Text
+
+        TextBox.PlaceholderColor3 =
+            CurrentTheme.SubText
 
     end
 
