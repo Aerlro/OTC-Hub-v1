@@ -375,7 +375,7 @@ function Window.Create(Settings, OTC)
     local MiniButton = create("ImageButton", {
         Name = "OTC_Minimized",
         Parent = ScreenGui,
-        BackgroundColor3 = Theme.Element,
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Image = LOGO_URL,
         ImageColor3 = Theme.Text,
@@ -385,17 +385,6 @@ function Window.Create(Settings, OTC)
         AutoButtonColor = false,
         Active = true,
         ZIndex = 100
-    })
-
-    create("UICorner", {
-        Parent = MiniButton,
-        CornerRadius = UDim.new(0, 12)
-    })
-
-    local MiniStroke = create("UIStroke", {
-        Parent = MiniButton,
-        Color = Theme.Border,
-        Thickness = 1
     })
 
     Object.MiniButton = MiniButton
@@ -801,9 +790,7 @@ function Window.Create(Settings, OTC)
         MinimizeButton.TextColor3 = NewTheme.Text
         CloseButton.BackgroundColor3 = NewTheme.Element
         CloseButton.TextColor3 = NewTheme.Text
-        MiniButton.BackgroundColor3 = NewTheme.Element
         MiniButton.ImageColor3 = NewTheme.Text
-        MiniStroke.Color = NewTheme.Border
     end
 
     Animation:Appear(
