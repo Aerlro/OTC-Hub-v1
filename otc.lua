@@ -225,6 +225,10 @@ local NotificationModule = LoadModule(
     "Core/notification.lua"
 )
 
+local LucideModule = LoadModule(
+    "Core/lucide.lua"
+)
+
 --// Load Element Modules
 local ButtonModule = LoadModule(
     "Elements/button.lua"
@@ -252,7 +256,8 @@ OTC._Modules = {
     Toggle = ToggleModule,
     Slider = SliderModule,
     Dropdown = DropdownModule,
-    Input = InputModule
+    Input = InputModule,
+    OTC._Lucide = LucideModule
 }
 
 --// Notification
