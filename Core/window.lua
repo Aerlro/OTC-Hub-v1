@@ -13,11 +13,6 @@ local function Tween(Object, Info, Properties)
     return TweenObject
 end
 
-local function GetTheme(Object)
-    return Object.OTC._Themes[Object.Theme]
-        or Object.OTC._Themes.Default
-end
-
 function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
@@ -40,7 +35,12 @@ function Window.Create(Settings, OTC)
     Object.Closed = false
     Object.UnloadConfirmation = nil
 
-    local Theme = GetTheme(Object)
+    local function GetCurrentTheme()
+        return OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes.Default
+    end
+
+    local Theme = GetCurrentTheme()
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "OTC_Hub"
@@ -328,6 +328,24 @@ function Window.Create(Settings, OTC)
     Object.MiniButton = MiniButton
     Object.MiniStroke = MiniStroke
 
+    function Object:GetTheme()
+        return self.OTC._Themes[self.OTC.CurrentTheme]
+            or self.OTC._Themes.Default
+    end
+
+    function Object:SetTheme(Name)
+        if not self.OTC._Themes[Name] then
+            return false
+        end
+
+        self.OTC.CurrentTheme = Name
+        self.Theme = Name
+
+        self:RefreshTheme()
+
+        return true
+    end
+
     local Dragging = false
     local DragStart
     local StartPosition
@@ -405,7 +423,9 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        local CurrentTheme = Object:GetTheme()
+        local CurrentTheme =
+            Object.OTC._Themes[Object.OTC.CurrentTheme]
+            or Object.OTC._Themes.Default
 
         local Overlay = Instance.new("Frame")
         Overlay.Name = "UnloadOverlay"
@@ -497,23 +517,23 @@ function Window.Create(Settings, OTC)
         UnloadCorner.Parent = UnloadButton
 
         CancelButton.MouseEnter:Connect(function()
-            local Theme = Object:GetTheme()
-            CancelButton.BackgroundColor3 = Theme.Hover
+            local Current = Object:GetTheme()
+            CancelButton.BackgroundColor3 = Current.Hover
         end)
 
         CancelButton.MouseLeave:Connect(function()
-            local Theme = Object:GetTheme()
-            CancelButton.BackgroundColor3 = Theme.Element
+            local Current = Object:GetTheme()
+            CancelButton.BackgroundColor3 = Current.Element
         end)
 
         UnloadButton.MouseEnter:Connect(function()
-            local Theme = Object:GetTheme()
-            UnloadButton.BackgroundColor3 = Theme.AccentDark
+            local Current = Object:GetTheme()
+            UnloadButton.BackgroundColor3 = Current.AccentDark
         end)
 
         UnloadButton.MouseLeave:Connect(function()
-            local Theme = Object:GetTheme()
-            UnloadButton.BackgroundColor3 = Theme.Accent
+            local Current = Object:GetTheme()
+            UnloadButton.BackgroundColor3 = Current.Accent
         end)
 
         CancelButton.MouseButton1Click:Connect(function()
@@ -628,22 +648,6 @@ function Window.Create(Settings, OTC)
         Object:Toggle()
     end)
 
-    function Object:GetTheme()
-        return self.OTC._Themes[self.Theme]
-            or self.OTC._Themes.Default
-    end
-
-    function Object:SetTheme(Name)
-        if not self.OTC._Themes[Name] then
-            return false
-        end
-
-        self.Theme = Name
-        self:RefreshTheme()
-
-        return true
-    end
-
     function Object:Toggle()
         if self.Closed then
             return
@@ -735,7 +739,13 @@ function Window.Create(Settings, OTC)
     end
 
     function Object:RefreshTheme()
-        local NewTheme = self:GetTheme()
+        local ThemeName = self.OTC.CurrentTheme
+
+        local NewTheme =
+            self.OTC._Themes[ThemeName]
+            or self.OTC._Themes.Default
+
+        self.Theme = ThemeName
 
         Main.BackgroundColor3 = NewTheme.Background
         MainStroke.Color = NewTheme.Border
@@ -757,7 +767,6 @@ function Window.Create(Settings, OTC)
         SidebarFix.BackgroundColor3 = NewTheme.Secondary
 
         Separator.BackgroundColor3 = NewTheme.Border
-
         Content.BackgroundColor3 = NewTheme.Background
 
         TabsContainer.ScrollBarImageColor3 = NewTheme.Border
