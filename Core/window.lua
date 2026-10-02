@@ -79,7 +79,6 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
 
-        --// Prevent elements escaping during animation
         ClipsDescendants = true,
 
         Size = UDim2.fromOffset(
@@ -302,6 +301,7 @@ function Window.Create(Settings, OTC)
     })
 
     --// Tabs
+    --// Only tabs are inside this container.
     local TabContainer = create("ScrollingFrame", {
         Name = "Tabs",
         Parent = Sidebar,
@@ -319,7 +319,7 @@ function Window.Create(Settings, OTC)
             1,
             -20,
             1,
-            -25
+            -82
         ),
 
         CanvasSize = UDim2.new(),
@@ -327,7 +327,10 @@ function Window.Create(Settings, OTC)
         AutomaticCanvasSize =
             Enum.AutomaticSize.Y,
 
-        ScrollBarThickness = 0
+        ScrollBarThickness = 0,
+
+        ScrollingDirection =
+            Enum.ScrollingDirection.Y
     })
 
     create("UIListLayout", {
@@ -341,6 +344,207 @@ function Window.Create(Settings, OTC)
         SortOrder =
             Enum.SortOrder.LayoutOrder
     })
+
+    --// User Card
+    --// This is OUTSIDE TabContainer.
+    local UserCard = create("Frame", {
+        Name = "UserCard",
+
+        Parent = Sidebar,
+
+        BackgroundColor3 =
+            Theme.Element,
+
+        BackgroundTransparency = 0,
+
+        BorderSizePixel = 0,
+
+        Position = UDim2.new(
+            0,
+            10,
+            1,
+            -62
+        ),
+
+        Size = UDim2.new(
+            1,
+            -20,
+            0,
+            52
+        ),
+
+        ZIndex = 20
+    })
+
+    create("UICorner", {
+        Parent = UserCard,
+
+        CornerRadius =
+            UDim.new(
+                0,
+                7
+            )
+    })
+
+    create("UIStroke", {
+        Parent = UserCard,
+
+        Color = Theme.Border,
+
+        Thickness = 1
+    })
+
+    --// User Avatar
+    local UserAvatar = create("ImageLabel", {
+        Name = "Avatar",
+
+        Parent = UserCard,
+
+        BackgroundColor3 =
+            Theme.Secondary,
+
+        BackgroundTransparency = 0,
+
+        BorderSizePixel = 0,
+
+        Position = UDim2.fromOffset(
+            7,
+            7
+        ),
+
+        Size = UDim2.fromOffset(
+            38,
+            38
+        ),
+
+        Image = "",
+
+        ScaleType =
+            Enum.ScaleType.Crop,
+
+        ZIndex = 21
+    })
+
+    create("UICorner", {
+        Parent = UserAvatar,
+
+        CornerRadius =
+            UDim.new(
+                1,
+                0
+            )
+    })
+
+    --// Display Name
+    local UserDisplayName = create("TextLabel", {
+        Name = "DisplayName",
+
+        Parent = UserCard,
+
+        BackgroundTransparency = 1,
+
+        Position = UDim2.fromOffset(
+            53,
+            6
+        ),
+
+        Size = UDim2.new(
+            1,
+            -60,
+            0,
+            20
+        ),
+
+        Font =
+            Enum.Font.GothamMedium,
+
+        Text =
+            LocalPlayer.DisplayName,
+
+        TextColor3 =
+            Theme.Text,
+
+        TextSize = 13,
+
+        TextXAlignment =
+            Enum.TextXAlignment.Left,
+
+        TextYAlignment =
+            Enum.TextYAlignment.Center,
+
+        TextTruncate =
+            Enum.TextTruncate.AtEnd,
+
+        ZIndex = 21
+    })
+
+    --// Username
+    local UserUsername = create("TextLabel", {
+        Name = "Username",
+
+        Parent = UserCard,
+
+        BackgroundTransparency = 1,
+
+        Position = UDim2.fromOffset(
+            53,
+            26
+        ),
+
+        Size = UDim2.new(
+            1,
+            -60,
+            0,
+            17
+        ),
+
+        Font =
+            Enum.Font.Gotham,
+
+        Text =
+            "@"
+            .. LocalPlayer.Name,
+
+        TextColor3 =
+            Theme.SubText,
+
+        TextSize = 11,
+
+        TextXAlignment =
+            Enum.TextXAlignment.Left,
+
+        TextYAlignment =
+            Enum.TextYAlignment.Center,
+
+        TextTruncate =
+            Enum.TextTruncate.AtEnd,
+
+        ZIndex = 21
+    })
+
+    --// Get Roblox Avatar
+    task.spawn(function()
+
+        local Success, Image =
+            pcall(function()
+
+                return Players:GetUserThumbnailAsync(
+                    LocalPlayer.UserId,
+
+                    Enum.ThumbnailType.HeadShot,
+
+                    Enum.ThumbnailSize.Size100x100
+                )
+
+            end)
+
+        if Success
+            and Image
+            and UserAvatar.Parent then
+
+            UserAvatar.Image = Image
+        end
+    end)
 
     --// Content
     local Content = create("Frame", {
@@ -366,8 +570,6 @@ function Window.Create(Settings, OTC)
     })
 
     --// Minimized Logo Button
-    --// Completely transparent background.
-    --// No UICorner / UIStroke.
     local MinimizedButton = create("ImageButton", {
         Name = "OTC_MinimizedButton",
 
@@ -451,6 +653,14 @@ function Window.Create(Settings, OTC)
         Sidebar = Sidebar,
 
         TabContainer = TabContainer,
+
+        UserCard = UserCard,
+
+        UserAvatar = UserAvatar,
+
+        UserDisplayName = UserDisplayName,
+
+        UserUsername = UserUsername,
 
         Content = Content,
 
@@ -550,11 +760,9 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = true
 
-        --// Save position
         local StartPosition =
             Main.Position
 
-        --// Calculate center
         local CenterX =
             StartPosition.X.Offset
             + WINDOW_WIDTH / 2
@@ -563,7 +771,6 @@ function Window.Create(Settings, OTC)
             StartPosition.Y.Offset
             + WINDOW_HEIGHT / 2
 
-        --// Show logo
         MinimizedButton.Visible = true
 
         MinimizedButton.Size =
@@ -578,7 +785,6 @@ function Window.Create(Settings, OTC)
         MinimizedButton.ImageTransparency =
             1
 
-        --// Shrink main window
         tween(
             Main,
             0.3,
@@ -600,7 +806,6 @@ function Window.Create(Settings, OTC)
             }
         )
 
-        --// Show logo
         tween(
             MinimizedButton,
             0.3,
@@ -620,7 +825,6 @@ function Window.Create(Settings, OTC)
 
                 Main.Visible = false
 
-                --// Reset main
                 Main.Size =
                     UDim2.fromOffset(
                         WINDOW_WIDTH,
@@ -632,7 +836,6 @@ function Window.Create(Settings, OTC)
 
                 Main.BackgroundTransparency =
                     0
-
             end
         )
     end
@@ -646,7 +849,6 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = false
 
-        --// Save position
         local TargetPosition =
             Main.Position
 
@@ -658,7 +860,6 @@ function Window.Create(Settings, OTC)
             TargetPosition.Y.Offset
             + WINDOW_HEIGHT / 2
 
-        --// Hide logo
         tween(
             MinimizedButton,
             0.2,
@@ -672,7 +873,6 @@ function Window.Create(Settings, OTC)
             }
         )
 
-        --// Prepare Main
         Main.Visible = true
 
         Main.Size =
@@ -692,7 +892,6 @@ function Window.Create(Settings, OTC)
 
         Main.BackgroundTransparency = 1
 
-        --// Restore Main
         tween(
             Main,
             0.3,
@@ -726,7 +925,6 @@ function Window.Create(Settings, OTC)
 
                 MinimizedButton.ImageTransparency =
                     0
-
             end
         )
     end
@@ -760,6 +958,18 @@ function Window.Create(Settings, OTC)
 
         Content.BackgroundColor3 =
             NewTheme.Background
+
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserAvatar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        UserDisplayName.TextColor3 =
+            NewTheme.Text
+
+        UserUsername.TextColor3 =
+            NewTheme.SubText
 
         Logo.TextColor3 =
             NewTheme.Text
