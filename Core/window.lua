@@ -37,12 +37,14 @@ function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
     local Theme = OTC:GetTheme()
-
     local Object = {}
 
     Object.OTC = OTC
     Object.Settings = Settings
     Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
+
+    Object.Tabs = {}
+    Object.SelectedTab = nil
 
     --==================================================
     -- SCREEN GUI
@@ -243,7 +245,6 @@ function Window.Create(Settings, OTC)
 
     Object.UserArea = UserArea
 
-    -- Separator
     local UserSeparator = create("Frame", {
         Name = "UserSeparator",
         Parent = UserArea,
@@ -277,10 +278,6 @@ function Window.Create(Settings, OTC)
 
     Object.UserCard = UserCard
 
-    --==================================================
-    -- USER AVATAR
-    --==================================================
-
     local UserAvatar = create("ImageLabel", {
         Name = "Avatar",
         Parent = UserCard,
@@ -299,10 +296,6 @@ function Window.Create(Settings, OTC)
 
     Object.UserAvatar = UserAvatar
 
-    --==================================================
-    -- DISPLAY NAME
-    --==================================================
-
     local UserDisplayName = create("TextLabel", {
         Name = "DisplayName",
         Parent = UserCard,
@@ -319,10 +312,6 @@ function Window.Create(Settings, OTC)
     })
 
     Object.UserDisplayName = UserDisplayName
-
-    --==================================================
-    -- USERNAME
-    --==================================================
 
     local UserUsername = create("TextLabel", {
         Name = "Username",
@@ -359,7 +348,71 @@ function Window.Create(Settings, OTC)
     Object.Content = Content
 
     --==================================================
-    -- DRAGGING
+    -- TAB MANAGEMENT
+    --==================================================
+
+    function Object:AddTab(TabObject)
+        if not TabObject then
+            return
+        end
+
+        table.insert(self.Tabs, TabObject)
+
+        if not self.SelectedTab then
+            self:SelectTab(TabObject)
+        else
+            if TabObject.Page then
+                TabObject.Page.Visible = false
+            end
+        end
+    end
+
+    function Object:SelectTab(TabObject)
+        if not TabObject then
+            return
+        end
+
+        if self.SelectedTab and self.SelectedTab ~= TabObject then
+            local OldTab = self.SelectedTab
+
+            if OldTab.Page then
+                OldTab.Page.Visible = false
+            end
+
+            if OldTab.Button then
+                OldTab.Button.BackgroundColor3 = OTC:GetTheme().Element
+            end
+        end
+
+        self.SelectedTab = TabObject
+
+        if TabObject.Page then
+            TabObject.Page.Visible = true
+        end
+
+        if TabObject.Button then
+            TabObject.Button.BackgroundColor3 = OTC:GetTheme().Hover
+        end
+    end
+
+    function Object:CreateTab(TabSettings)
+        TabSettings = TabSettings or {}
+
+        local TabModule = self.OTC._TabModule
+
+        if not TabModule then
+            error("[OTC Hub] Tab module is not loaded")
+        end
+
+        return TabModule.Create(
+            self,
+            self.OTC,
+            TabSettings
+        )
+    end
+
+    --==================================================
+    -- DRAGGING MAIN WINDOW
     --==================================================
 
     local Dragging = false
@@ -402,22 +455,15 @@ function Window.Create(Settings, OTC)
     end)
 
     --==================================================
-    -- MINIMIZE
+    -- MINIMIZED BUTTON
     --==================================================
-
-    local Minimized = false
 
     local MiniButton = create("ImageButton", {
         Name = "OTC_Minimized",
         Parent = ScreenGui,
         BackgroundColor3 = Theme.Element,
         BorderSizePixel = 0,
-        Position = UDim2.new(
-            Main.Position.X.Scale,
-            Main.Position.X.Offset,
-            Main.Position.Y.Scale,
-            Main.Position.Y.Offset
-        ),
+        Position = Main.Position,
         Size = UDim2.fromOffset(45, 45),
         Image = LOGO_URL,
         ScaleType = Enum.ScaleType.Fit,
@@ -434,20 +480,13 @@ function Window.Create(Settings, OTC)
     Object.MinimizedButton = MiniButton
 
     MinimizeButton.MouseButton1Click:Connect(function()
-        Minimized = true
         Main.Visible = false
         MiniButton.Visible = true
 
-        MiniButton.Position = UDim2.new(
-            Main.Position.X.Scale,
-            Main.Position.X.Offset,
-            Main.Position.Y.Scale,
-            Main.Position.Y.Offset
-        )
+        MiniButton.Position = Main.Position
     end)
 
     MiniButton.MouseButton1Click:Connect(function()
-        Minimized = false
         Main.Visible = true
         MiniButton.Visible = false
     end)
@@ -521,10 +560,6 @@ function Window.Create(Settings, OTC)
 
         UserSeparator.BackgroundColor3 = NewTheme.Border
     end
-
-    --==================================================
-    -- RETURN
-    --==================================================
 
     return Object
 end
