@@ -78,6 +78,7 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
 
+        --// Important for minimize animation
         ClipsDescendants = true,
 
         Size = UDim2.fromOffset(
@@ -390,16 +391,23 @@ function Window.Create(Settings, OTC)
         )
     })
 
-    create("UIStroke", {
+    --// Minimized Logo Stroke
+    local MinimizedStroke = create("UIStroke", {
         Parent = MinimizedButton,
 
         Color = Theme.Border,
 
-        Thickness = 1
+        Thickness = 1,
+
+        Transparency = 0
     })
 
     --// Logo Hover
     MinimizedButton.MouseEnter:Connect(function()
+
+        if not MinimizedButton.Visible then
+            return
+        end
 
         tween(
             MinimizedButton,
@@ -414,6 +422,10 @@ function Window.Create(Settings, OTC)
     end)
 
     MinimizedButton.MouseLeave:Connect(function()
+
+        if not MinimizedButton.Visible then
+            return
+        end
 
         tween(
             MinimizedButton,
@@ -532,9 +544,11 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = true
 
-        --// Save current position
-        local StartPosition = Main.Position
+        --// Save original position
+        local StartPosition =
+            Main.Position
 
+        --// Calculate center
         local CenterX =
             StartPosition.X.Offset
             + WINDOW_WIDTH / 2
@@ -554,6 +568,8 @@ function Window.Create(Settings, OTC)
 
         MinimizedButton.BackgroundTransparency = 1
         MinimizedButton.ImageTransparency = 1
+
+        MinimizedStroke.Transparency = 1
 
         --// Shrink Main
         tween(
@@ -588,7 +604,17 @@ function Window.Create(Settings, OTC)
                 ),
 
                 BackgroundTransparency = 0,
+
                 ImageTransparency = 0
+            }
+        )
+
+        --// Show Logo Stroke
+        tween(
+            MinimizedStroke,
+            0.3,
+            {
+                Transparency = 0
             }
         )
 
@@ -623,7 +649,7 @@ function Window.Create(Settings, OTC)
 
         self.Minimized = false
 
-        --// Save position
+        --// Save original position
         local TargetPosition =
             Main.Position
 
@@ -635,7 +661,7 @@ function Window.Create(Settings, OTC)
             TargetPosition.Y.Offset
             + WINDOW_HEIGHT / 2
 
-        --// Hide logo
+        --// Hide Logo
         tween(
             MinimizedButton,
             0.2,
@@ -646,7 +672,17 @@ function Window.Create(Settings, OTC)
                 ),
 
                 BackgroundTransparency = 1,
+
                 ImageTransparency = 1
+            }
+        )
+
+        --// Hide Logo Stroke
+        tween(
+            MinimizedStroke,
+            0.2,
+            {
+                Transparency = 1
             }
         )
 
@@ -670,7 +706,7 @@ function Window.Create(Settings, OTC)
 
         Main.BackgroundTransparency = 1
 
-        --// Restore animation
+        --// Restore Main
         tween(
             Main,
             0.3,
@@ -699,7 +735,10 @@ function Window.Create(Settings, OTC)
                     )
 
                 MinimizedButton.BackgroundTransparency = 0
+
                 MinimizedButton.ImageTransparency = 0
+
+                MinimizedStroke.Transparency = 0
 
             end
         )
@@ -749,6 +788,9 @@ function Window.Create(Settings, OTC)
 
         MinimizedButton.BackgroundColor3 =
             NewTheme.Secondary
+
+        MinimizedStroke.Color =
+            NewTheme.Border
     end
 
     --// Drag Main Window
