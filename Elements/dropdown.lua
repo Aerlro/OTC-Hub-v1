@@ -1,15 +1,7 @@
---[[
-    OTC Hub v1
-    Dropdown Element
-    by Aerlro
-]]
-
 local Dropdown = {}
 
---// Create Instance
-local function create(Class, Properties)
-
-    local Object = Instance.new(Class)
+local function Create(ClassName, Properties)
+    local Object = Instance.new(ClassName)
 
     for Property, Value in pairs(Properties or {}) do
         Object[Property] = Value
@@ -18,1379 +10,932 @@ local function create(Class, Properties)
     return Object
 end
 
---// Create
-function Dropdown.Create(
-    TabObject,
-    OTC,
-    Settings
-)
+local function NormalizeOptions(Options)
+    local Result = {}
 
+    if type(Options) ~= "table" then
+        return Result
+    end
+
+    for _, Value in ipairs(Options) do
+        table.insert(Result, tostring(Value))
+    end
+
+    return Result
+end
+
+function Dropdown.Create(TabObject, OTC, Settings)
     Settings = Settings or {}
+
+    local Name = Settings.Name or "Dropdown"
+    local Options = NormalizeOptions(Settings.Options or {})
+    local MultiSelect = Settings.MultiSelect == true
+    local Callback = Settings.Callback or function() end
 
     local Theme = OTC:GetTheme()
 
-    local Parent = TabObject.Page
+    ----------------------------------------------------------------
+    -- MAIN ELEMENT
+    ----------------------------------------------------------------
 
-    local Options = Settings.Options or {}
+    local Frame = Create("Frame", {
+        Name = "Dropdown",
+        Parent = TabObject.Page,
+        Size = UDim2.new(1, 0, 0, 48),
+        BackgroundColor3 = Theme.Element,
+        BorderSizePixel = 0,
+        ClipsDescendants = false,
+        ZIndex = 10
+    })
 
-    local MultiSelect =
-        Settings.MultiSelect == true
+    Create("UICorner", {
+        Parent = Frame,
+        CornerRadius = UDim.new(0, 6)
+    })
 
-    local CurrentOption =
-        Settings.CurrentOption
+    Create("UIStroke", {
+        Parent = Frame,
+        Color = Theme.Border,
+        Thickness = 1,
+        Transparency = 0
+    })
 
-    --------------------------------------------------
-    -- CURRENT VALUE
-    --------------------------------------------------
+    ----------------------------------------------------------------
+    -- NAME
+    ----------------------------------------------------------------
 
-    if MultiSelect then
+    local NameLabel = Create("TextLabel", {
+        Name = "Name",
+        Parent = Frame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 14, 0, 0),
+        Size = UDim2.new(0.5, -14, 1, 0),
+        Font = Enum.Font.GothamMedium,
+        Text = Name,
+        TextColor3 = Theme.Text,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 11
+    })
 
-        if type(CurrentOption) ~= "table" then
-            CurrentOption = {}
-        end
+    ----------------------------------------------------------------
+    -- VALUE
+    ----------------------------------------------------------------
 
-    else
+    local ValueLabel = Create("TextLabel", {
+        Name = "Value",
+        Parent = Frame,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0, 0),
+        Size = UDim2.new(0.5, -38, 1, 0),
+        Font = Enum.Font.Gotham,
+        Text = "",
+        TextColor3 = Theme.SubText,
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Right,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        ZIndex = 11
+    })
 
-        if type(CurrentOption) == "table" then
-            CurrentOption = CurrentOption[1]
-        end
+    ----------------------------------------------------------------
+    -- ARROW
+    ----------------------------------------------------------------
 
-        CurrentOption =
-            CurrentOption
-            or Options[1]
+    local Arrow = Create("TextLabel", {
+        Name = "Arrow",
+        Parent = Frame,
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(1, 0.5),
+        Position = UDim2.new(1, -12, 0.5, 0),
+        Size = UDim2.new(0, 18, 0, 18),
+        Font = Enum.Font.GothamBold,
+        Text = "⌄",
+        TextColor3 = Theme.SubText,
+        TextSize = 16,
+        ZIndex = 11
+    })
 
+    ----------------------------------------------------------------
+    -- BUTTON
+    ----------------------------------------------------------------
+
+    local Button = Create("TextButton", {
+        Name = "Button",
+        Parent = Frame,
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        Text = "",
+        AutoButtonColor = false,
+        ZIndex = 12
+    })
+
+    ----------------------------------------------------------------
+    -- FLOATING OVERLAY
+    --
+    -- IMPORTANT:
+    -- DropdownFrame NU mai este copilul lui Frame.
+    -- Este pus direct în ScreenGui pentru a nu fi afectat
+    -- de UIListLayout / ScrollingFrame / ClipsDescendants.
+    ----------------------------------------------------------------
+
+    local ScreenGui = TabObject.Window and TabObject.Window.ScreenGui
+
+    if not ScreenGui then
+        ScreenGui = OTC.Window and OTC.Window.ScreenGui
     end
 
+    if not ScreenGui then
+        error("[OTC Hub] Could not find ScreenGui for dropdown overlay")
+    end
+
+    local Overlay = ScreenGui:FindFirstChild("OTC_DropdownOverlay")
+
+    if not Overlay then
+        Overlay = Create("Frame", {
+            Name = "OTC_DropdownOverlay",
+            Parent = ScreenGui,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Position = UDim2.fromOffset(0, 0),
+            Size = UDim2.fromScale(1, 1),
+            ZIndex = 1000,
+            ClipsDescendants = false
+        })
+    end
+
+    ----------------------------------------------------------------
+    -- DROPDOWN FRAME
+    ----------------------------------------------------------------
+
+    local DropdownFrame = Create("Frame", {
+        Name = "DropdownFrame",
+        Parent = Overlay,
+        BackgroundColor3 = Theme.Secondary,
+        BorderSizePixel = 0,
+        Size = UDim2.fromOffset(260, 220),
+        Position = UDim2.fromOffset(0, 0),
+        Visible = false,
+        ClipsDescendants = false,
+        ZIndex = 1001
+    })
+
+    Create("UICorner", {
+        Parent = DropdownFrame,
+        CornerRadius = UDim.new(0, 7)
+    })
+
+    Create("UIStroke", {
+        Parent = DropdownFrame,
+        Color = Theme.Border,
+        Thickness = 1
+    })
+
+    ----------------------------------------------------------------
+    -- SEARCH
+    ----------------------------------------------------------------
+
+    local SearchFrame = Create("Frame", {
+        Name = "SearchFrame",
+        Parent = DropdownFrame,
+        BackgroundColor3 = Theme.Element,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(7, 7),
+        Size = UDim2.new(1, -14, 0, 36),
+        ZIndex = 1002
+    })
+
+    Create("UICorner", {
+        Parent = SearchFrame,
+        CornerRadius = UDim.new(0, 5)
+    })
+
+    local SearchIcon = Create("TextLabel", {
+        Name = "Icon",
+        Parent = SearchFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(8, 0),
+        Size = UDim2.fromOffset(24, 36),
+        Font = Enum.Font.Gotham,
+        Text = "⌕",
+        TextColor3 = Theme.SubText,
+        TextSize = 18,
+        ZIndex = 1003
+    })
+
+    -- Lucide search icon
+    if OTC._Lucide then
+        local LucideIcon = OTC._Lucide:GetIcon("search")
+
+        if LucideIcon then
+            SearchIcon.Text = ""
+
+            local Image = Create("ImageLabel", {
+                Name = "LucideIcon",
+                Parent = SearchFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.fromOffset(9, 9),
+                Size = UDim2.fromOffset(18, 18),
+                Image = LucideIcon.Url,
+                ImageColor3 = Theme.SubText,
+                ImageRectSize = LucideIcon.ImageRectSize,
+                ImageRectOffset = LucideIcon.ImageRectOffset,
+                ZIndex = 1003
+            })
+        end
+    end
+
+    local SearchBox = Create("TextBox", {
+        Name = "SearchBox",
+        Parent = SearchFrame,
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(34, 0),
+        Size = UDim2.new(1, -42, 1, 0),
+        Font = Enum.Font.Gotham,
+        PlaceholderText = "Search...",
+        PlaceholderColor3 = Theme.SubText,
+        Text = "",
+        TextColor3 = Theme.Text,
+        TextSize = 13,
+        ClearTextOnFocus = false,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 1003
+    })
+
+    ----------------------------------------------------------------
+    -- OPTIONS LIST
+    ----------------------------------------------------------------
+
+    local OptionsList = Create("ScrollingFrame", {
+        Name = "Options",
+        Parent = DropdownFrame,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(7, 50),
+        Size = UDim2.new(1, -14, 1, -57),
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        ScrollBarThickness = 3,
+        ScrollBarImageColor3 = Theme.SubText,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
+        ZIndex = 1002
+    })
+
+    local OptionsLayout = Create("UIListLayout", {
+        Parent = OptionsList,
+        Padding = UDim.new(0, 4),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    })
+
+    Create("UIPadding", {
+        Parent = OptionsList,
+        PaddingBottom = UDim.new(0, 4)
+    })
+
+    ----------------------------------------------------------------
+    -- STATE
+    ----------------------------------------------------------------
+
+    local Selected = {}
+
+    if MultiSelect then
+        if type(Settings.CurrentOption) == "table" then
+            for _, Value in ipairs(Settings.CurrentOption) do
+                Selected[tostring(Value)] = true
+            end
+        end
+    else
+        if Settings.CurrentOption ~= nil then
+            Selected[tostring(Settings.CurrentOption)] = true
+        elseif #Options > 0 then
+            Selected[Options[1]] = true
+        end
+    end
+
+    local OptionObjects = {}
     local Object = {}
 
-    local Opened = false
-
-    --------------------------------------------------
-    -- MAIN FRAME
-    --------------------------------------------------
-
-    local Frame = create(
-        "Frame",
-        {
-            Name = "Dropdown",
-
-            Parent = Parent,
-
-            BackgroundTransparency = 1,
-
-            BorderSizePixel = 0,
-
-            Size =
-                UDim2.new(
-                    1,
-                    0,
-                    0,
-                    48
-                ),
-
-            ClipsDescendants = false,
-
-            ZIndex = 10
-        }
-    )
-
-    --------------------------------------------------
-    -- BUTTON
-    --------------------------------------------------
-
-    local Button = create(
-        "TextButton",
-        {
-            Name = "Button",
-
-            Parent = Frame,
-
-            BackgroundColor3 =
-                Theme.Element,
-
-            BorderSizePixel = 0,
-
-            Size =
-                UDim2.new(
-                    1,
-                    0,
-                    0,
-                    48
-                ),
-
-            Text = "",
-
-            AutoButtonColor = false,
-
-            ZIndex = 11
-        }
-    )
-
-    create(
-        "UICorner",
-        {
-            Parent = Button,
-
-            CornerRadius =
-                UDim.new(
-                    0,
-                    8
-                )
-        }
-    )
-
-    --------------------------------------------------
-    -- NAME
-    --------------------------------------------------
-
-    local NameLabel = create(
-        "TextLabel",
-        {
-            Name = "Name",
-
-            Parent = Button,
-
-            BackgroundTransparency = 1,
-
-            Position =
-                UDim2.fromOffset(
-                    14,
-                    5
-                ),
-
-            Size =
-                UDim2.new(
-                    1,
-                    -50,
-                    0,
-                    18
-                ),
-
-            Font =
-                Enum.Font.GothamMedium,
-
-            Text =
-                Settings.Name
-                or "Dropdown",
-
-            TextColor3 =
-                Theme.Text,
-
-            TextSize = 13,
-
-            TextXAlignment =
-                Enum.TextXAlignment.Left,
-
-            ZIndex = 12
-        }
-    )
-
-    --------------------------------------------------
-    -- VALUE
-    --------------------------------------------------
-
-    local ValueLabel = create(
-        "TextLabel",
-        {
-            Name = "Value",
-
-            Parent = Button,
-
-            BackgroundTransparency = 1,
-
-            Position =
-                UDim2.fromOffset(
-                    14,
-                    24
-                ),
-
-            Size =
-                UDim2.new(
-                    1,
-                    -50,
-                    0,
-                    16
-                ),
-
-            Font =
-                Enum.Font.Gotham,
-
-            TextColor3 =
-                Theme.SubText,
-
-            TextSize = 11,
-
-            TextXAlignment =
-                Enum.TextXAlignment.Left,
-
-            TextTruncate =
-                Enum.TextTruncate.AtEnd,
-
-            ZIndex = 12
-        }
-    )
-
-    --------------------------------------------------
-    -- ARROW
-    --------------------------------------------------
-
-    local Arrow = create(
-        "TextLabel",
-        {
-            Name = "Arrow",
-
-            Parent = Button,
-
-            BackgroundTransparency = 1,
-
-            AnchorPoint =
-                Vector2.new(
-                    1,
-                    0.5
-                ),
-
-            Position =
-                UDim2.new(
-                    1,
-                    -14,
-                    0.5,
-                    0
-                ),
-
-            Size =
-                UDim2.fromOffset(
-                    20,
-                    20
-                ),
-
-            Font =
-                Enum.Font.GothamBold,
-
-            Text = "⌄",
-
-            TextColor3 =
-                Theme.SubText,
-
-            TextSize = 16,
-
-            ZIndex = 12
-        }
-    )
-
-    --------------------------------------------------
-    -- DROPDOWN
-    --------------------------------------------------
-
-    local DropdownFrame = create(
-        "Frame",
-        {
-            Name = "DropdownFrame",
-
-            Parent = Frame,
-
-            BackgroundColor3 =
-                Theme.Secondary,
-
-            BorderSizePixel = 0,
-
-            Position =
-                UDim2.new(
-                    0,
-                    0,
-                    0,
-                    53
-                ),
-
-            Size =
-                UDim2.new(
-                    1,
-                    0,
-                    0,
-                    0
-                ),
-
-            Visible = false,
-
-            ClipsDescendants = true,
-
-            ZIndex = 100
-        }
-    )
-
-    create(
-        "UICorner",
-        {
-            Parent = DropdownFrame,
-
-            CornerRadius =
-                UDim.new(
-                    0,
-                    8
-                )
-        }
-    )
-
-    create(
-        "UIStroke",
-        {
-            Parent = DropdownFrame,
-
-            Color =
-                Theme.Border,
-
-            Thickness = 1
-        }
-    )
-
-    --------------------------------------------------
-    -- SEARCH FRAME
-    --------------------------------------------------
-
-    local SearchFrame = create(
-        "Frame",
-        {
-            Name = "Search",
-
-            Parent = DropdownFrame,
-
-            BackgroundColor3 =
-                Theme.Element,
-
-            BorderSizePixel = 0,
-
-            Position =
-                UDim2.fromOffset(
-                    7,
-                    7
-                ),
-
-            Size =
-                UDim2.new(
-                    1,
-                    -14,
-                    0,
-                    36
-                ),
-
-            ZIndex = 101
-        }
-    )
-
-    create(
-        "UICorner",
-        {
-            Parent = SearchFrame,
-
-            CornerRadius =
-                UDim.new(
-                    0,
-                    7
-                )
-        }
-    )
-
-    --------------------------------------------------
-    -- SEARCH ICON
-    --------------------------------------------------
-
-    local SearchIcon
-
-    if OTC._Lucide
-        and OTC._Lucide.Available then
-
-        local IconData =
-            OTC._Lucide:GetIcon(
-                "search"
-            )
-
-        if IconData then
-
-            SearchIcon = create(
-                "ImageLabel",
+    local Open = false
+    local RenderConnection = nil
+
+    ----------------------------------------------------------------
+    -- VALUE TEXT
+    ----------------------------------------------------------------
+
+    local function UpdateValueText()
+        if MultiSelect then
+            local Values = {}
+
+            for _, Option in ipairs(Options) do
+                if Selected[Option] then
+                    table.insert(Values, Option)
+                end
+            end
+
+            if #Values == 0 then
+                ValueLabel.Text = "None"
+            else
+                ValueLabel.Text = table.concat(Values, ", ")
+            end
+        else
+            local Current = nil
+
+            for _, Option in ipairs(Options) do
+                if Selected[Option] then
+                    Current = Option
+                    break
+                end
+            end
+
+            ValueLabel.Text = Current or "None"
+        end
+    end
+
+    ----------------------------------------------------------------
+    -- CALLBACK
+    ----------------------------------------------------------------
+
+    local function FireCallback()
+        if MultiSelect then
+            local Values = {}
+
+            for _, Option in ipairs(Options) do
+                if Selected[Option] then
+                    table.insert(Values, Option)
+                end
+            end
+
+            task.spawn(function()
+                pcall(Callback, Values)
+            end)
+        else
+            local Current = nil
+
+            for _, Option in ipairs(Options) do
+                if Selected[Option] then
+                    Current = Option
+                    break
+                end
+            end
+
+            task.spawn(function()
+                pcall(Callback, Current)
+            end)
+        end
+    end
+
+    ----------------------------------------------------------------
+    -- UPDATE POSITION
+    ----------------------------------------------------------------
+
+    local function UpdatePosition()
+        if not DropdownFrame.Visible then
+            return
+        end
+
+        local ButtonPosition = Button.AbsolutePosition
+        local ButtonSize = Button.AbsoluteSize
+
+        local Camera = workspace.CurrentCamera
+
+        if not Camera then
+            return
+        end
+
+        local Viewport = Camera.ViewportSize
+
+        local DropdownSize = DropdownFrame.AbsoluteSize
+
+        local X = ButtonPosition.X
+        local Y = ButtonPosition.Y + ButtonSize.Y + 5
+
+        -- Nu lăsa dropdown-ul să iasă în dreapta ecranului
+        if X + DropdownSize.X > Viewport.X - 8 then
+            X = Viewport.X - DropdownSize.X - 8
+        end
+
+        if X < 8 then
+            X = 8
+        end
+
+        -- Dacă nu încape jos, îl deschidem în sus
+        if Y + DropdownSize.Y > Viewport.Y - 8 then
+            Y = ButtonPosition.Y - DropdownSize.Y - 5
+        end
+
+        if Y < 8 then
+            Y = 8
+        end
+
+        DropdownFrame.Position = UDim2.fromOffset(
+            math.floor(X),
+            math.floor(Y)
+        )
+    end
+
+    ----------------------------------------------------------------
+    -- UPDATE HEIGHT
+    ----------------------------------------------------------------
+
+    local function UpdateSize()
+        local Count = 0
+
+        for _, OptionObject in pairs(OptionObjects) do
+            if OptionObject.Visible then
+                Count += 1
+            end
+        end
+
+        local Height = 50 + math.min(
+            math.max(Count, 1) * 34 + 4,
+            210
+        )
+
+        DropdownFrame.Size = UDim2.fromOffset(
+            260,
+            Height
+        )
+
+        task.defer(UpdatePosition)
+    end
+
+    ----------------------------------------------------------------
+    -- CLOSE
+    ----------------------------------------------------------------
+
+    function Object:Close()
+        if not Open then
+            return
+        end
+
+        Open = false
+
+        if RenderConnection then
+            RenderConnection:Disconnect()
+            RenderConnection = nil
+        end
+
+        if OTC._OpenDropdown == Object then
+            OTC._OpenDropdown = nil
+        end
+
+        if OTC.Tween then
+            OTC:Tween(
+                DropdownFrame,
+                0.12,
                 {
-                    Name = "Icon",
-
-                    Parent =
-                        SearchFrame,
-
-                    BackgroundTransparency = 1,
-
-                    Position =
-                        UDim2.fromOffset(
-                            10,
-                            8
-                        ),
-
-                    Size =
-                        UDim2.fromOffset(
-                            20,
-                            20
-                        ),
-
-                    Image =
-                        IconData.Url,
-
-                    ImageRectSize =
-                        IconData.ImageRectSize,
-
-                    ImageRectOffset =
-                        IconData.ImageRectOffset,
-
-                    ImageColor3 =
-                        Theme.SubText,
-
-                    ScaleType =
-                        Enum.ScaleType.Fit,
-
-                    ZIndex = 103
+                    BackgroundTransparency = 1
                 }
             )
 
+            task.delay(0.12, function()
+                if not Open then
+                    DropdownFrame.Visible = false
+                    DropdownFrame.BackgroundTransparency = 0
+                end
+            end)
+        else
+            DropdownFrame.Visible = false
+        end
+
+        if OTC.Tween then
+            OTC:Tween(
+                Arrow,
+                0.12,
+                {
+                    Rotation = 0
+                }
+            )
+        else
+            Arrow.Rotation = 0
         end
     end
 
-    --------------------------------------------------
-    -- FALLBACK SEARCH ICON
-    --------------------------------------------------
+    ----------------------------------------------------------------
+    -- OPEN
+    ----------------------------------------------------------------
 
-    if not SearchIcon then
+    function Object:Open()
+        if Open then
+            return
+        end
 
-        SearchIcon = create(
-            "TextLabel",
-            {
-                Name = "Icon",
+        -- Închide orice alt dropdown OTC
+        if OTC._OpenDropdown and OTC._OpenDropdown ~= Object then
+            pcall(function()
+                OTC._OpenDropdown:Close()
+            end)
+        end
 
-                Parent =
-                    SearchFrame,
+        OTC._OpenDropdown = Object
 
-                BackgroundTransparency = 1,
+        Open = true
 
-                Position =
-                    UDim2.fromOffset(
-                        10,
-                        8
-                    ),
+        DropdownFrame.Visible = true
+        DropdownFrame.BackgroundTransparency = 1
 
-                Size =
-                    UDim2.fromOffset(
-                        20,
-                        20
-                    ),
+        UpdateSize()
+        UpdatePosition()
 
-                Font =
-                    Enum.Font.GothamBold,
-
-                Text = "⌕",
-
-                TextColor3 =
-                    Theme.SubText,
-
-                TextSize = 18,
-
-                ZIndex = 103
-            }
-        )
-
-    end
-
-    --------------------------------------------------
-    -- SEARCH BOX
-    --------------------------------------------------
-
-    local SearchBox = create(
-        "TextBox",
-        {
-            Name = "SearchBox",
-
-            Parent =
-                SearchFrame,
-
-            BackgroundTransparency = 1,
-
-            Position =
-                UDim2.fromOffset(
-                    36,
-                    0
-                ),
-
-            Size =
-                UDim2.new(
-                    1,
-                    -42,
-                    1,
-                    0
-                ),
-
-            Font =
-                Enum.Font.Gotham,
-
-            Text = "",
-
-            PlaceholderText =
-                "Search...",
-
-            TextColor3 =
-                Theme.Text,
-
-            PlaceholderColor3 =
-                Theme.SubText,
-
-            TextSize = 12,
-
-            TextXAlignment =
-                Enum.TextXAlignment.Left,
-
-            ClearTextOnFocus = false,
-
-            ZIndex = 103
-        }
-    )
-
-    --------------------------------------------------
-    -- OPTIONS LIST
-    --------------------------------------------------
-
-    local OptionsList = create(
-        "ScrollingFrame",
-        {
-            Name = "Options",
-
-            Parent =
+        if OTC.Tween then
+            OTC:Tween(
                 DropdownFrame,
+                0.16,
+                {
+                    BackgroundTransparency = 0
+                }
+            )
 
-            BackgroundTransparency = 1,
+            OTC:Tween(
+                Arrow,
+                0.16,
+                {
+                    Rotation = 180
+                }
+            )
+        else
+            DropdownFrame.BackgroundTransparency = 0
+            Arrow.Rotation = 180
+        end
 
-            BorderSizePixel = 0,
+        ----------------------------------------------------------------
+        -- Keep dropdown attached to button while scrolling
+        ----------------------------------------------------------------
 
-            Position =
-                UDim2.fromOffset(
-                    7,
-                    50
-                ),
+        local RunService = game:GetService("RunService")
 
-            Size =
-                UDim2.new(
-                    1,
-                    -14,
-                    1,
-                    -57
-                ),
-
-            CanvasSize =
-                UDim2.fromOffset(
-                    0,
-                    0
-                ),
-
-            AutomaticCanvasSize =
-                Enum.AutomaticSize.Y,
-
-            ScrollBarThickness = 3,
-
-            ScrollBarImageColor3 =
-                Theme.Border,
-
-            ZIndex = 101
-        }
-    )
-
-    create(
-        "UIListLayout",
-        {
-            Parent =
-                OptionsList,
-
-            SortOrder =
-                Enum.SortOrder.LayoutOrder,
-
-            Padding =
-                UDim.new(
-                    0,
-                    4
-                )
-        }
-    )
-
-    --------------------------------------------------
-    -- UPDATE VALUE
-    --------------------------------------------------
-
-    local function updateValue()
-
-        if MultiSelect then
-
-            if #CurrentOption == 0 then
-
-                ValueLabel.Text =
-                    "None"
-
+        RenderConnection = RunService.RenderStepped:Connect(function()
+            if not Open then
                 return
             end
 
-            local Values = {}
-
-            for _, Value in ipairs(
-                CurrentOption
-            ) do
-
-                table.insert(
-                    Values,
-                    tostring(Value)
-                )
-
+            if not Button.Parent or not Frame.Parent then
+                Object:Close()
+                return
             end
 
-            ValueLabel.Text =
-                table.concat(
-                    Values,
-                    ", "
-                )
-
-        else
-
-            if CurrentOption == nil
-                or CurrentOption == "" then
-
-                ValueLabel.Text =
-                    "None"
-
-            else
-
-                ValueLabel.Text =
-                    tostring(
-                        CurrentOption
-                    )
-
-            end
-
-        end
+            UpdatePosition()
+        end)
     end
 
-    updateValue()
-
-    --------------------------------------------------
-    -- IS SELECTED
-    --------------------------------------------------
-
-    local function isSelected(Value)
-
-        if not MultiSelect then
-            return CurrentOption == Value
-        end
-
-        for _, Selected in ipairs(
-            CurrentOption
-        ) do
-
-            if Selected == Value then
-                return true
-            end
-
-        end
-
-        return false
-    end
-
-    --------------------------------------------------
-    -- REMOVE VALUE
-    --------------------------------------------------
-
-    local function removeValue(Value)
-
-        for Index, Selected in ipairs(
-            CurrentOption
-        ) do
-
-            if Selected == Value then
-
-                table.remove(
-                    CurrentOption,
-                    Index
-                )
-
-                break
-            end
-
-        end
-    end
-
-    --------------------------------------------------
-    -- CALLBACK
-    --------------------------------------------------
-
-    local function fireCallback(Value)
-
-        if type(
-            Settings.Callback
-        ) == "function" then
-
-            task.spawn(
-                function()
-
-                    pcall(
-                        Settings.Callback,
-                        Value
-                    )
-
-                end
-            )
-
-        end
-    end
-
-    --------------------------------------------------
-    -- OPTION OBJECTS
-    --------------------------------------------------
-
-    local OptionObjects = {}
-
-    --------------------------------------------------
+    ----------------------------------------------------------------
     -- CREATE OPTION
-    --------------------------------------------------
+    ----------------------------------------------------------------
 
-    local function createOption(
-        Value,
-        Order
-    )
+    local function CreateOption(Option)
+        local OptionButton = Create("TextButton", {
+            Name = "Option",
+            Parent = OptionsList,
+            BackgroundColor3 = Theme.Element,
+            BorderSizePixel = 0,
+            Size = UDim2.new(1, -2, 0, 30),
+            Font = Enum.Font.Gotham,
+            Text = "",
+            AutoButtonColor = false,
+            ZIndex = 1003
+        })
 
-        local OptionButton = create(
-            "TextButton",
-            {
-                Name = "Option",
+        Create("UICorner", {
+            Parent = OptionButton,
+            CornerRadius = UDim.new(0, 5)
+        })
 
-                Parent =
-                    OptionsList,
+        local OptionLabel = Create("TextLabel", {
+            Name = "Label",
+            Parent = OptionButton,
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(10, 0),
+            Size = UDim2.new(1, -40, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = Option,
+            TextColor3 = Theme.Text,
+            TextSize = 13,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 1004
+        })
 
-                BackgroundColor3 =
-                    Theme.Element,
+        local Check = Create("TextLabel", {
+            Name = "Check",
+            Parent = OptionButton,
+            BackgroundTransparency = 1,
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.new(1, -9, 0.5, 0),
+            Size = UDim2.fromOffset(20, 20),
+            Font = Enum.Font.GothamBold,
+            Text = "",
+            TextColor3 = Theme.Text,
+            TextSize = 15,
+            ZIndex = 1004
+        })
 
-                BorderSizePixel = 0,
+        local OptionObject = {
+            Button = OptionButton,
+            Label = OptionLabel,
+            Check = Check,
+            Name = Option
+        }
 
-                Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        34
-                    ),
+        OptionObjects[Option] = OptionObject
 
-                Text = "",
+        local function Refresh()
+            local IsSelected = Selected[Option] == true
 
-                AutoButtonColor = false,
-
-                LayoutOrder = Order,
-
-                ZIndex = 103
-            }
-        )
-
-        create(
-            "UICorner",
-            {
-                Parent =
-                    OptionButton,
-
-                CornerRadius =
-                    UDim.new(
-                        0,
-                        6
-                    )
-            }
-        )
-
-        create(
-            "TextLabel",
-            {
-                Name = "Text",
-
-                Parent =
-                    OptionButton,
-
-                BackgroundTransparency = 1,
-
-                Position =
-                    UDim2.fromOffset(
-                        10,
-                        0
-                    ),
-
-                Size =
-                    UDim2.new(
-                        1,
-                        -40,
-                        1,
-                        0
-                    ),
-
-                Font =
-                    Enum.Font.Gotham,
-
-                Text =
-                    tostring(Value),
-
-                TextColor3 =
-                    Theme.Text,
-
-                TextSize = 12,
-
-                TextXAlignment =
-                    Enum.TextXAlignment.Left,
-
-                ZIndex = 104
-            }
-        )
-
-        local Check = create(
-            "TextLabel",
-            {
-                Name = "Check",
-
-                Parent =
-                    OptionButton,
-
-                BackgroundTransparency = 1,
-
-                AnchorPoint =
-                    Vector2.new(
-                        1,
-                        0.5
-                    ),
-
-                Position =
-                    UDim2.new(
-                        1,
-                        -10,
-                        0.5,
-                        0
-                    ),
-
-                Size =
-                    UDim2.fromOffset(
-                        20,
-                        20
-                    ),
-
-                Font =
-                    Enum.Font.GothamBold,
-
-                Text = "",
-
-                TextColor3 =
-                    Theme.Accent,
-
-                TextSize = 14,
-
-                ZIndex = 104
-            }
-        )
-
-        local function updateCheck()
-
-            if isSelected(Value) then
+            if IsSelected then
                 Check.Text = "✓"
             else
                 Check.Text = ""
             end
 
+            if IsSelected then
+                OptionButton.BackgroundColor3 = Theme.Hover
+            else
+                OptionButton.BackgroundColor3 = Theme.Element
+            end
         end
 
-        updateCheck()
-
-        OptionButton.MouseEnter:Connect(
-            function()
-
+        OptionButton.MouseEnter:Connect(function()
+            if OTC.Tween then
                 OTC:Tween(
                     OptionButton,
-                    0.1,
+                    0.08,
                     {
-                        BackgroundColor3 =
-                            Theme.Hover
+                        BackgroundColor3 = Theme.Hover
                     }
                 )
-
+            else
+                OptionButton.BackgroundColor3 = Theme.Hover
             end
-        )
+        end)
 
-        OptionButton.MouseLeave:Connect(
-            function()
-
-                OTC:Tween(
-                    OptionButton,
-                    0.1,
-                    {
-                        BackgroundColor3 =
-                            Theme.Element
-                    }
-                )
-
+        OptionButton.MouseLeave:Connect(function()
+            if Selected[Option] then
+                OptionButton.BackgroundColor3 = Theme.Hover
+            else
+                OptionButton.BackgroundColor3 = Theme.Element
             end
-        )
+        end)
 
-        OptionButton.MouseButton1Click:Connect(
-            function()
+        OptionButton.MouseButton1Click:Connect(function()
+            if MultiSelect then
+                Selected[Option] = not Selected[Option]
 
-                if MultiSelect then
-
-                    if isSelected(Value) then
-
-                        removeValue(
-                            Value
-                        )
-
-                    else
-
-                        table.insert(
-                            CurrentOption,
-                            Value
-                        )
-
-                    end
-
-                    updateCheck()
-
-                    updateValue()
-
-                    fireCallback(
-                        CurrentOption
-                    )
-
-                else
-
-                    CurrentOption =
-                        Value
-
-                    updateValue()
-
-                    fireCallback(
-                        Value
-                    )
-
-                    Object:Close()
-
+                Refresh()
+                UpdateValueText()
+                FireCallback()
+            else
+                for _, Existing in ipairs(Options) do
+                    Selected[Existing] = false
                 end
 
-            end
-        )
+                Selected[Option] = true
 
-        return OptionButton
+                for _, ExistingObject in pairs(OptionObjects) do
+                    local IsSelected = Selected[ExistingObject.Name] == true
+
+                    ExistingObject.Check.Text = IsSelected and "✓" or ""
+
+                    if IsSelected then
+                        ExistingObject.Button.BackgroundColor3 = Theme.Hover
+                    else
+                        ExistingObject.Button.BackgroundColor3 = Theme.Element
+                    end
+                end
+
+                UpdateValueText()
+                FireCallback()
+
+                Object:Close()
+            end
+        end)
+
+        Refresh()
+
+        return OptionObject
     end
 
-    --------------------------------------------------
-    -- REBUILD
-    --------------------------------------------------
+    ----------------------------------------------------------------
+    -- BUILD OPTIONS
+    ----------------------------------------------------------------
 
-    local function rebuildOptions(
-        SearchText
-    )
-
-        for _, Option in ipairs(
-            OptionObjects
-        ) do
-
-            if Option
-                and Option.Parent then
-
-                Option:Destroy()
-
+    local function RebuildOptions()
+        for _, Child in ipairs(OptionsList:GetChildren()) do
+            if Child:IsA("TextButton") then
+                Child:Destroy()
             end
-
         end
 
-        table.clear(
-            OptionObjects
-        )
+        OptionObjects = {}
 
-        SearchText =
-            tostring(
-                SearchText or ""
-            ):lower()
+        local SearchText = string.lower(SearchBox.Text or "")
 
-        for Index, Value in ipairs(
-            Options
-        ) do
-
-            local Text =
-                tostring(Value)
-
+        for _, Option in ipairs(Options) do
             if SearchText == ""
-                or Text:lower():find(
+                or string.find(
+                    string.lower(Option),
                     SearchText,
                     1,
                     true
-                ) then
-
-                table.insert(
-                    OptionObjects,
-
-                    createOption(
-                        Value,
-                        Index
-                    )
                 )
-
+            then
+                CreateOption(Option)
             end
-
         end
 
+        UpdateValueText()
+        UpdateSize()
     end
 
-    rebuildOptions("")
-
-    --------------------------------------------------
-    -- HEIGHT
-    --------------------------------------------------
-
-    local function getHeight()
-
-        local Count =
-            #OptionObjects
-
-        local SearchHeight = 50
-
-        local OptionHeight = 38
-
-        local ListHeight =
-            math.min(
-                math.max(
-                    Count * OptionHeight,
-                    38
-                ),
-                220
-            )
-
-        return
-            SearchHeight
-            + ListHeight
-            + 7
-
-    end
-
-    --------------------------------------------------
-    -- OPEN
-    --------------------------------------------------
-
-    function Object:Open()
-
-        if Opened then
-            return
-        end
-
-        Opened = true
-
-        DropdownFrame.Visible = true
-
-        DropdownFrame.Size =
-            UDim2.new(
-                1,
-                0,
-                0,
-                0
-            )
-
-        OTC:Tween(
-            DropdownFrame,
-            0.16,
-            {
-                Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        getHeight()
-                    )
-            }
-        )
-
-        OTC:Tween(
-            Arrow,
-            0.16,
-            {
-                Rotation = 180
-            }
-        )
-
-    end
-
-    --------------------------------------------------
-    -- CLOSE
-    --------------------------------------------------
-
-    function Object:Close()
-
-        if not Opened then
-            return
-        end
-
-        Opened = false
-
-        OTC:Tween(
-            DropdownFrame,
-            0.14,
-            {
-                Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        0
-                    )
-            }
-        )
-
-        OTC:Tween(
-            Arrow,
-            0.14,
-            {
-                Rotation = 0
-            }
-        )
-
-        task.delay(
-            0.15,
-            function()
-
-                if not Opened then
-                    DropdownFrame.Visible = false
-                end
-
-            end
-        )
-
-    end
-
-    --------------------------------------------------
-    -- BUTTON CLICK
-    --------------------------------------------------
-
-    Button.MouseButton1Click:Connect(
-        function()
-
-            if Opened then
-                Object:Close()
-            else
-                Object:Open()
-            end
-
-        end
-    )
-
-    --------------------------------------------------
+    ----------------------------------------------------------------
     -- SEARCH
-    --------------------------------------------------
+    ----------------------------------------------------------------
 
-    SearchBox:GetPropertyChangedSignal(
-        "Text"
-    ):Connect(
-        function()
+    SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        RebuildOptions()
+    end)
 
-            rebuildOptions(
-                SearchBox.Text
+    ----------------------------------------------------------------
+    -- MAIN BUTTON
+    ----------------------------------------------------------------
+
+    Button.MouseEnter:Connect(function()
+        if OTC.Tween then
+            OTC:Tween(
+                Frame,
+                0.08,
+                {
+                    BackgroundColor3 = Theme.Hover
+                }
             )
-
-            if Opened then
-
-                OTC:Tween(
-                    DropdownFrame,
-                    0.1,
-                    {
-                        Size =
-                            UDim2.new(
-                                1,
-                                0,
-                                0,
-                                getHeight()
-                            )
-                    }
-                )
-
-            end
-
+        else
+            Frame.BackgroundColor3 = Theme.Hover
         end
-    )
+    end)
 
-    --------------------------------------------------
-    -- SET VALUE
-    --------------------------------------------------
+    Button.MouseLeave:Connect(function()
+        if OTC.Tween then
+            OTC:Tween(
+                Frame,
+                0.08,
+                {
+                    BackgroundColor3 = Theme.Element
+                }
+            )
+        else
+            Frame.BackgroundColor3 = Theme.Element
+        end
+    end)
+
+    Button.MouseButton1Click:Connect(function()
+        if Open then
+            Object:Close()
+        else
+            Object:Open()
+        end
+    end)
+
+    ----------------------------------------------------------------
+    -- PUBLIC METHODS
+    ----------------------------------------------------------------
 
     function Object:SetValue(Value)
-
         if MultiSelect then
-
-            if type(Value) == "table" then
-                CurrentOption = Value
-            else
-                CurrentOption = {
-                    Value
-                }
+            if type(Value) ~= "table" then
+                return
             end
 
+            Selected = {}
+
+            for _, Item in ipairs(Value) do
+                Selected[tostring(Item)] = true
+            end
         else
+            Value = tostring(Value)
 
-            CurrentOption = Value
+            Selected = {}
 
+            if table.find(Options, Value) then
+                Selected[Value] = true
+            end
         end
 
-        updateValue()
-
-        rebuildOptions(
-            SearchBox.Text
-        )
-
+        RebuildOptions()
+        FireCallback()
     end
-
-    --------------------------------------------------
-    -- GET VALUE
-    --------------------------------------------------
 
     function Object:GetValue()
+        if MultiSelect then
+            local Values = {}
 
-        return CurrentOption
-
-    end
-
-    --------------------------------------------------
-    -- SET OPTIONS
-    --------------------------------------------------
-
-    function Object:SetOptions(
-        NewOptions
-    )
-
-        Options =
-            NewOptions or {}
-
-        rebuildOptions(
-            SearchBox.Text
-        )
-
-    end
-
-    --------------------------------------------------
-    -- ADD OPTION
-    --------------------------------------------------
-
-    function Object:AddOption(Value)
-
-        table.insert(
-            Options,
-            Value
-        )
-
-        rebuildOptions(
-            SearchBox.Text
-        )
-
-    end
-
-    --------------------------------------------------
-    -- REMOVE OPTION
-    --------------------------------------------------
-
-    function Object:RemoveOption(
-        Value
-    )
-
-        for Index, Option in ipairs(
-            Options
-        ) do
-
-            if Option == Value then
-
-                table.remove(
-                    Options,
-                    Index
-                )
-
-                break
+            for _, Option in ipairs(Options) do
+                if Selected[Option] then
+                    table.insert(Values, Option)
+                end
             end
 
+            return Values
         end
 
-        rebuildOptions(
-            SearchBox.Text
-        )
+        for _, Option in ipairs(Options) do
+            if Selected[Option] then
+                return Option
+            end
+        end
 
+        return nil
     end
 
-    --------------------------------------------------
-    -- SET NAME
-    --------------------------------------------------
+    function Object:SetOptions(NewOptions)
+        Options = NormalizeOptions(NewOptions)
 
-    function Object:SetName(Name)
+        local NewSelected = {}
 
-        NameLabel.Text =
-            tostring(Name)
+        for _, Option in ipairs(Options) do
+            if Selected[Option] then
+                NewSelected[Option] = true
+            end
+        end
 
+        Selected = NewSelected
+
+        if not MultiSelect and not next(Selected) and #Options > 0 then
+            Selected[Options[1]] = true
+        end
+
+        RebuildOptions()
     end
 
-    --------------------------------------------------
-    -- SET CALLBACK
-    --------------------------------------------------
+    function Object:AddOption(Option)
+        Option = tostring(Option)
 
-    function Object:SetCallback(
-        Callback
-    )
+        if table.find(Options, Option) then
+            return
+        end
 
-        Settings.Callback =
-            Callback
+        table.insert(Options, Option)
 
+        RebuildOptions()
     end
 
-    --------------------------------------------------
-    -- CLEAR SEARCH
-    --------------------------------------------------
+    function Object:RemoveOption(Option)
+        Option = tostring(Option)
+
+        local Index = table.find(Options, Option)
+
+        if Index then
+            table.remove(Options, Index)
+        end
+
+        Selected[Option] = nil
+
+        RebuildOptions()
+    end
+
+    function Object:SetName(NewName)
+        Name = tostring(NewName)
+        NameLabel.Text = Name
+    end
+
+    function Object:SetCallback(NewCallback)
+        if type(NewCallback) == "function" then
+            Callback = NewCallback
+        end
+    end
 
     function Object:ClearSearch()
-
         SearchBox.Text = ""
-
     end
 
-    --------------------------------------------------
-    -- DESTROY
-    --------------------------------------------------
-
     function Object:Destroy()
+        Object:Close()
 
         if Frame then
             Frame:Destroy()
         end
-
     end
 
-    --------------------------------------------------
-    -- REFERENCES
-    --------------------------------------------------
+    ----------------------------------------------------------------
+    -- PUBLIC REFERENCES
+    ----------------------------------------------------------------
 
-    Object.Frame =
-        Frame
+    Object.Frame = Frame
+    Object.Button = Button
+    Object.DropdownFrame = DropdownFrame
+    Object.SearchBox = SearchBox
+    Object.OptionsList = OptionsList
+    Object.MultiSelect = MultiSelect
 
-    Object.Button =
-        Button
-
-    Object.DropdownFrame =
-        DropdownFrame
-
-    Object.SearchBox =
-        SearchBox
-
-    Object.OptionsList =
-        OptionsList
-
-    Object.MultiSelect =
-        MultiSelect
-
-    --------------------------------------------------
-    -- REGISTER ELEMENT
-    --------------------------------------------------
+    ----------------------------------------------------------------
+    -- ADD TO TAB
+    ----------------------------------------------------------------
 
     if TabObject.AddElement then
-
-        TabObject:AddElement(
-            Frame
-        )
-
+        TabObject:AddElement(Frame)
     end
+
+    ----------------------------------------------------------------
+    -- INITIAL BUILD
+    ----------------------------------------------------------------
+
+    RebuildOptions()
 
     return Object
 end
