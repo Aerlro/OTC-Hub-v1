@@ -82,41 +82,46 @@ local function LoadModule(Path)
     return Result
 end
 
---// Default Theme
-OTC._Themes.Default = {
-    Background = Color3.fromRGB(10, 10, 10),
-    Secondary = Color3.fromRGB(15, 15, 15),
-    Element = Color3.fromRGB(20, 20, 20),
+--// Load Core Modules
+local TabModule = LoadModule(
+    "Core/tab.lua"
+)
 
-    Hover = Color3.fromRGB(30, 30, 30),
-    Border = Color3.fromRGB(40, 40, 40),
+local WindowModule = LoadModule(
+    "Core/window.lua"
+)
 
-    Text = Color3.fromRGB(255, 255, 255),
-    SubText = Color3.fromRGB(160, 160, 160),
+local ThemeModule = LoadModule(
+    "Core/theme.lua"
+)
 
-    Accent = Color3.fromRGB(255, 255, 255),
-    AccentDark = Color3.fromRGB(180, 180, 180)
-}
+local AnimationModule = LoadModule(
+    "Core/animation.lua"
+)
 
+local NotificationModule = LoadModule(
+    "Core/notification.lua"
+)
+
+local LucideModule = LoadModule(
+    "Core/lucide.lua"
+)
+
+--// Use Theme System
+OTC._Themes = ThemeModule.BuiltIn
 OTC.CurrentTheme = "Default"
 
 --// Theme Functions
 function OTC:GetTheme()
     return self._Themes[self.CurrentTheme]
+        or self._Themes.Default
 end
 
-function OTC:RegisterTheme(Name, Theme)
-    assert(
-        type(Name) == "string",
-        "Theme name must be a string"
+function OTC:RegisterTheme(Name, ThemeData)
+    return ThemeModule:Register(
+        Name,
+        ThemeData
     )
-
-    assert(
-        type(Theme) == "table",
-        "Theme must be a table"
-    )
-
-    self._Themes[Name] = Theme
 end
 
 function OTC:SetTheme(Name)
@@ -126,16 +131,24 @@ function OTC:SetTheme(Name)
             Name
         )
 
-        return
+        return false
     end
 
     self.CurrentTheme = Name
 
     for _, Window in pairs(self._Windows) do
-        if Window.RefreshTheme then
+        if Window.SetTheme then
+            Window:SetTheme(Name)
+        elseif Window.RefreshTheme then
             Window:RefreshTheme()
         end
     end
+
+    return true
+end
+
+function OTC:GetThemes()
+    return ThemeModule:List()
 end
 
 --// Tween
@@ -202,30 +215,12 @@ function OTC:DisconnectAll()
     )
 end
 
---// Load Core Modules
-local TabModule = LoadModule(
-    "Core/tab.lua"
-)
-
-local WindowModule = LoadModule(
-    "Core/window.lua"
-)
-
-local ThemeModule = LoadModule(
-    "Core/theme.lua"
-)
-
-local AnimationModule = LoadModule(
-    "Core/animation.lua"
-)
-
-local NotificationModule = LoadModule(
-    "Core/notification.lua"
-)
-
-local LucideModule = LoadModule(
-    "Core/lucide.lua"
-)
+--// Register Core Modules
+OTC._TabModule = TabModule
+OTC._WindowModule = WindowModule
+OTC._ThemeModule = ThemeModule
+OTC._AnimationModule = AnimationModule
+OTC._NotificationModule = NotificationModule
 
 --// Load Element Modules
 local ButtonModule = LoadModule(
@@ -247,13 +242,6 @@ local DropdownModule = LoadModule(
 local InputModule = LoadModule(
     "Elements/input.lua"
 )
-
---// Register Core Modules
-OTC._TabModule = TabModule
-OTC._WindowModule = WindowModule
-OTC._ThemeModule = ThemeModule
-OTC._AnimationModule = AnimationModule
-OTC._NotificationModule = NotificationModule
 
 --// Register Element Modules
 OTC._Modules = {
@@ -358,7 +346,6 @@ function OTC:InitializeInput()
                 for _, Window in pairs(
                     self._Windows
                 ) do
-
                     if Input.KeyCode
                         == Window.ToggleKey then
 
