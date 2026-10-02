@@ -37,7 +37,20 @@ end
 function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
-    local Theme = OTC:GetTheme()
+    --// Window Theme
+    local ThemeName = Settings.Theme or OTC.CurrentTheme or "Default"
+
+    if not OTC._Themes[ThemeName] then
+        warn(
+            "[OTC Hub] Theme does not exist:",
+            ThemeName,
+            "| Using Default"
+        )
+
+        ThemeName = "Default"
+    end
+
+    local Theme = OTC._Themes[ThemeName]
     local Animation = OTC._AnimationModule
 
     local Object = {}
@@ -48,7 +61,14 @@ function Window.Create(Settings, OTC)
     Object.SelectedTab = nil
     Object.Minimized = false
     Object.Closed = false
-    Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
+
+    --// Theme
+    Object.Theme = ThemeName
+
+    --// Toggle
+    Object.ToggleKey =
+        Settings.ToggleKey
+        or Enum.KeyCode.RightControl
 
     local ScreenGui = create("ScreenGui", {
         Name = "OTC_Hub",
@@ -632,7 +652,7 @@ function Window.Create(Settings, OTC)
             CornerRadius = UDim.new(0, 10)
         })
 
-        create("UIStroke", {
+        local PopupStroke = create("UIStroke", {
             Parent = Popup,
             Color = Theme.Border,
             Thickness = 1
@@ -715,7 +735,11 @@ function Window.Create(Settings, OTC)
 
         TweenService:Create(
             Overlay,
-            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.12,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
             {
                 BackgroundTransparency = 0.45
             }
@@ -723,7 +747,11 @@ function Window.Create(Settings, OTC)
 
         TweenService:Create(
             PopupScale,
-            TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.16,
+                Enum.EasingStyle.Back,
+                Enum.EasingDirection.Out
+            ),
             {
                 Scale = 1
             }
@@ -732,7 +760,11 @@ function Window.Create(Settings, OTC)
         CancelButton.MouseEnter:Connect(function()
             TweenService:Create(
                 CancelButton,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
                 {
                     BackgroundColor3 = Theme.Hover
                 }
@@ -742,7 +774,11 @@ function Window.Create(Settings, OTC)
         CancelButton.MouseLeave:Connect(function()
             TweenService:Create(
                 CancelButton,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
                 {
                     BackgroundColor3 = Theme.Element
                 }
@@ -752,7 +788,11 @@ function Window.Create(Settings, OTC)
         UnloadButton.MouseEnter:Connect(function()
             TweenService:Create(
                 UnloadButton,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
                 {
                     BackgroundColor3 = Theme.AccentDark
                 }
@@ -762,7 +802,11 @@ function Window.Create(Settings, OTC)
         UnloadButton.MouseLeave:Connect(function()
             TweenService:Create(
                 UnloadButton,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
                 {
                     BackgroundColor3 = Theme.Text
                 }
@@ -772,7 +816,11 @@ function Window.Create(Settings, OTC)
         CancelButton.MouseButton1Click:Connect(function()
             TweenService:Create(
                 PopupScale,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.In
+                ),
                 {
                     Scale = 0.9
                 }
@@ -780,7 +828,11 @@ function Window.Create(Settings, OTC)
 
             TweenService:Create(
                 Overlay,
-                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                TweenInfo.new(
+                    0.1,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.In
+                ),
                 {
                     BackgroundTransparency = 1
                 }
@@ -997,26 +1049,92 @@ function Window.Create(Settings, OTC)
         Unload()
     end
 
+    --// Refresh Theme
     function Object:RefreshTheme()
-        local NewTheme = self.OTC:GetTheme()
+        local NewTheme = self.OTC._Themes[self.Theme]
 
+        if not NewTheme then
+            NewTheme = self.OTC._Themes.Default
+        end
+
+        -- Main
         Main.BackgroundColor3 = NewTheme.Background
         MainStroke.Color = NewTheme.Border
+
+        -- TopBar
         TopBar.BackgroundColor3 = NewTheme.Secondary
         BottomFix.BackgroundColor3 = NewTheme.Secondary
-        Sidebar.BackgroundColor3 = NewTheme.Secondary
-        SidebarSeparator.BackgroundColor3 = NewTheme.Border
-        Content.BackgroundColor3 = NewTheme.Background
-        UserCard.BackgroundColor3 = NewTheme.Element
-        UserSeparator.BackgroundColor3 = NewTheme.Border
+
+        -- Header
         Logo.ImageColor3 = NewTheme.Text
         Title.TextColor3 = NewTheme.Text
         Subtitle.TextColor3 = NewTheme.SubText
+
+        -- Buttons
         MinimizeButton.BackgroundColor3 = NewTheme.Element
         MinimizeButton.TextColor3 = NewTheme.Text
+
         CloseButton.BackgroundColor3 = NewTheme.Element
         CloseButton.TextColor3 = NewTheme.Text
+
+        -- Sidebar
+        Sidebar.BackgroundColor3 = NewTheme.Secondary
+        SidebarSeparator.BackgroundColor3 = NewTheme.Border
+
+        -- Content
+        Content.BackgroundColor3 = NewTheme.Background
+
+        -- User
+        UserCard.BackgroundColor3 = NewTheme.Element
+        UserSeparator.BackgroundColor3 = NewTheme.Border
+        DisplayName.TextColor3 = NewTheme.Text
+        Username.TextColor3 = NewTheme.SubText
+
+        -- Minimized
         MiniButton.ImageColor3 = NewTheme.Text
+
+        -- Confirmation popup
+        local Confirmation = ScreenGui:FindFirstChild("UnloadConfirmation")
+
+        if Confirmation then
+            local Popup = Confirmation:FindFirstChild("Popup")
+
+            if Popup then
+                Popup.BackgroundColor3 = NewTheme.Background
+
+                local Stroke = Popup:FindFirstChildOfClass("UIStroke")
+
+                if Stroke then
+                    Stroke.Color = NewTheme.Border
+                end
+
+                local PopupTitle = Popup:FindFirstChild("Title")
+                local PopupText = Popup:FindFirstChild("Description")
+                local CancelButton = Popup:FindFirstChild("Cancel")
+                local UnloadButton = Popup:FindFirstChild("Unload")
+
+                if PopupTitle then
+                    PopupTitle.TextColor3 = NewTheme.Text
+                end
+
+                if PopupText then
+                    PopupText.TextColor3 = NewTheme.SubText
+                end
+
+                if CancelButton then
+                    CancelButton.BackgroundColor3 = NewTheme.Element
+                    CancelButton.TextColor3 = NewTheme.Text
+                end
+
+                if UnloadButton then
+                    UnloadButton.BackgroundColor3 = NewTheme.Text
+                    UnloadButton.TextColor3 = NewTheme.Background
+                end
+            end
+        end
+
+        -- Save active theme
+        self.Theme = self.Theme
     end
 
     Animation:Appear(
