@@ -78,6 +78,8 @@ function Window.Create(Settings, OTC)
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
 
+        ClipsDescendants = true,
+
         Size = UDim2.fromOffset(
             WINDOW_WIDTH,
             WINDOW_HEIGHT
