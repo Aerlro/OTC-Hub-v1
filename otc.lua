@@ -250,14 +250,21 @@ local InputModule = LoadModule(
     "Elements/input.lua"
 )
 
---// Register Modules
+--// Register Core Modules
+OTC._TabModule = TabModule
+OTC._WindowModule = WindowModule
+OTC._ThemeModule = ThemeModule
+OTC._AnimationModule = AnimationModule
+OTC._NotificationModule = NotificationModule
+
+--// Register Element Modules
 OTC._Modules = {
     Button = ButtonModule,
     Toggle = ToggleModule,
     Slider = SliderModule,
     Dropdown = DropdownModule,
     Input = InputModule,
-}    
+}
 
 --// Register Lucide
 OTC._Lucide = LucideModule
