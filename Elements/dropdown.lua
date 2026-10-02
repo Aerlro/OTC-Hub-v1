@@ -70,6 +70,7 @@ function Dropdown.Create(Tab, OTC, Settings)
 
     local FrameHeight = Description and 62 or 48
 
+    --// Main dropdown frame
     local Frame = create("Frame", {
         Name = "Dropdown",
 
@@ -86,12 +87,13 @@ function Dropdown.Create(Tab, OTC, Settings)
             FrameHeight
         ),
 
-        ClipsDescendants = false
+        ClipsDescendants = false,
+
+        ZIndex = 5
     })
 
     create("UICorner", {
         Parent = Frame,
-
         CornerRadius = UDim.new(0, 8)
     })
 
@@ -103,6 +105,7 @@ function Dropdown.Create(Tab, OTC, Settings)
         Thickness = 1
     })
 
+    --// Button
     local Button = create("TextButton", {
         Name = "Button",
 
@@ -112,13 +115,21 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 1, 0),
+        Size = UDim2.new(
+            1,
+            0,
+            1,
+            0
+        ),
 
         AutoButtonColor = false,
 
-        Text = ""
+        Text = "",
+
+        ZIndex = 6
     })
 
+    --// Title
     local Title = create("TextLabel", {
         Name = "Title",
 
@@ -146,9 +157,12 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         TextSize = 13,
 
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextXAlignment = Enum.TextXAlignment.Left,
+
+        ZIndex = 7
     })
 
+    --// Description
     local DescriptionLabel
 
     if Description then
@@ -182,11 +196,14 @@ function Dropdown.Create(Tab, OTC, Settings)
 
             TextWrapped = true,
 
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
+
+            ZIndex = 7
         })
 
     end
 
+    --// Selected
     local SelectedText = create("TextLabel", {
         Name = "Selected",
 
@@ -194,7 +211,10 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        AnchorPoint = Vector2.new(1, 0.5),
+        AnchorPoint = Vector2.new(
+            1,
+            0.5
+        ),
 
         Position = UDim2.new(
             1,
@@ -220,9 +240,12 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         TextXAlignment = Enum.TextXAlignment.Right,
 
-        TextYAlignment = Enum.TextYAlignment.Center
+        TextYAlignment = Enum.TextYAlignment.Center,
+
+        ZIndex = 7
     })
 
+    --// Arrow
     local Arrow = create("TextLabel", {
         Name = "Arrow",
 
@@ -230,7 +253,10 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        AnchorPoint = Vector2.new(1, 0.5),
+        AnchorPoint = Vector2.new(
+            1,
+            0.5
+        ),
 
         Position = UDim2.new(
             1,
@@ -254,29 +280,41 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         TextXAlignment = Enum.TextXAlignment.Center,
 
-        TextYAlignment = Enum.TextYAlignment.Center
+        TextYAlignment = Enum.TextYAlignment.Center,
+
+        ZIndex = 7
     })
 
-    -- Dropdown container
+    --==================================================
+    -- DROPDOWN POPUP
+    --==================================================
+
+    local Window = Tab.Window
+
+    local PopupParent
+
+    if Window and Window.ScreenGui then
+        PopupParent = Window.ScreenGui
+    else
+        PopupParent = Tab.Page
+    end
+
     local DropdownFrame = create("Frame", {
+
         Name = "Options",
 
-        Parent = Frame,
+        Parent = PopupParent,
 
         BackgroundColor3 = Theme.Secondary,
 
         BorderSizePixel = 0,
 
-        Position = UDim2.new(
+        Position = UDim2.fromOffset(
             0,
-            0,
-            1,
-            7
+            0
         ),
 
-        Size = UDim2.new(
-            1,
-            0,
+        Size = UDim2.fromOffset(
             0,
             0
         ),
@@ -285,13 +323,16 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         Visible = false,
 
-        ZIndex = 20
+        ZIndex = 200
     })
 
     create("UICorner", {
         Parent = DropdownFrame,
 
-        CornerRadius = UDim.new(0, 8)
+        CornerRadius = UDim.new(
+            0,
+            8
+        )
     })
 
     create("UIStroke", {
@@ -302,7 +343,9 @@ function Dropdown.Create(Tab, OTC, Settings)
         Thickness = 1
     })
 
+    --// Options List
     local OptionsList = create("ScrollingFrame", {
+
         Name = "List",
 
         Parent = DropdownFrame,
@@ -331,22 +374,27 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         ScrollBarImageColor3 = Theme.Accent,
 
-        ZIndex = 21
+        ZIndex = 201
     })
 
     create("UIListLayout", {
         Parent = OptionsList,
 
-        Padding = UDim.new(0, 3),
+        Padding = UDim.new(
+            0,
+            3
+        ),
 
         SortOrder = Enum.SortOrder.LayoutOrder
     })
 
+    --// Search
     local SearchBox
 
     if Settings.Search == true then
 
         SearchBox = create("TextBox", {
+
             Name = "Search",
 
             Parent = DropdownFrame,
@@ -381,33 +429,53 @@ function Dropdown.Create(Tab, OTC, Settings)
 
             ClearTextOnFocus = false,
 
-            ZIndex = 22
+            ZIndex = 202
         })
 
         create("UICorner", {
             Parent = SearchBox,
 
-            CornerRadius = UDim.new(0, 6)
+            CornerRadius = UDim.new(
+                0,
+                6
+            )
         })
 
-        OptionsList.Position = UDim2.fromOffset(8, 45)
-        OptionsList.Size = UDim2.new(1, -16, 1, -53)
+        OptionsList.Position = UDim2.fromOffset(
+            8,
+            45
+        )
+
+        OptionsList.Size = UDim2.new(
+            1,
+            -16,
+            1,
+            -53
+        )
 
     end
 
     local OptionButtons = {}
+
+    --==================================================
+    -- SELECTED TEXT
+    --==================================================
 
     local function getSelectedText()
 
         local Values = {}
 
         for Option in pairs(Selected) do
+
             if Selected[Option] then
+
                 table.insert(
                     Values,
                     tostring(Option)
                 )
+
             end
+
         end
 
         table.sort(Values)
@@ -417,7 +485,8 @@ function Dropdown.Create(Tab, OTC, Settings)
         end
 
         if #Values > 3 then
-            return tostring(#Values) .. " selected"
+            return tostring(#Values)
+                .. " selected"
         end
 
         return table.concat(
@@ -434,6 +503,10 @@ function Dropdown.Create(Tab, OTC, Settings)
 
     end
 
+    --==================================================
+    -- CALLBACK
+    --==================================================
+
     local function callback()
 
         local Value
@@ -445,10 +518,12 @@ function Dropdown.Create(Tab, OTC, Settings)
             for Option in pairs(Selected) do
 
                 if Selected[Option] then
+
                     table.insert(
                         Value,
                         Option
                     )
+
                 end
 
             end
@@ -458,8 +533,11 @@ function Dropdown.Create(Tab, OTC, Settings)
             for Option in pairs(Selected) do
 
                 if Selected[Option] then
+
                     Value = Option
+
                     break
+
                 end
 
             end
@@ -467,10 +545,12 @@ function Dropdown.Create(Tab, OTC, Settings)
         end
 
         if Flag then
+
             OTC:SetFlag(
                 Flag,
                 Value
             )
+
         end
 
         local Success, Error =
@@ -480,13 +560,19 @@ function Dropdown.Create(Tab, OTC, Settings)
             )
 
         if not Success then
+
             warn(
                 "[OTC Hub] Dropdown callback error:",
                 Error
             )
+
         end
 
     end
+
+    --==================================================
+    -- SELECT OPTION
+    --==================================================
 
     local function selectOption(Option)
 
@@ -525,16 +611,12 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         if not MultiSelect then
 
-            DropdownFrame.Visible = false
-
             tween(
                 DropdownFrame,
                 0.2,
                 {
-                    Size = UDim2.new(
-                        1,
-                        0,
-                        0,
+                    Size = UDim2.fromOffset(
+                        DropdownFrame.AbsoluteSize.X,
                         0
                     )
                 }
@@ -548,9 +630,35 @@ function Dropdown.Create(Tab, OTC, Settings)
                 }
             )
 
+            tween(
+                Stroke,
+                0.2,
+                {
+                    Color = Theme.Border
+                }
+            )
+
+            task.delay(
+                0.2,
+                function()
+
+                    if not Open then
+
+                        DropdownFrame.Visible =
+                            false
+
+                    end
+
+                end
+            )
+
         end
 
     end
+
+    --==================================================
+    -- CREATE OPTION
+    --==================================================
 
     local function createOption(Option)
 
@@ -589,7 +697,7 @@ function Dropdown.Create(Tab, OTC, Settings)
                     TextXAlignment =
                         Enum.TextXAlignment.Left,
 
-                    ZIndex = 23
+                    ZIndex = 203
                 }
             )
 
@@ -597,14 +705,20 @@ function Dropdown.Create(Tab, OTC, Settings)
             Parent = OptionButton,
 
             CornerRadius =
-                UDim.new(0, 6)
+                UDim.new(
+                    0,
+                    6
+                )
         })
 
         create("UIPadding", {
             Parent = OptionButton,
 
             PaddingLeft =
-                UDim.new(0, 10)
+                UDim.new(
+                    0,
+                    10
+                )
         })
 
         OptionButtons[Option] =
@@ -660,6 +774,10 @@ function Dropdown.Create(Tab, OTC, Settings)
         createOption(Option)
     end
 
+    --==================================================
+    -- SEARCH
+    --==================================================
+
     if SearchBox then
 
         SearchBox:GetPropertyChangedSignal(
@@ -697,6 +815,10 @@ function Dropdown.Create(Tab, OTC, Settings)
 
     end
 
+    --==================================================
+    -- HEIGHT
+    --==================================================
+
     local function calculateHeight()
 
         local Count = 0
@@ -726,19 +848,132 @@ function Dropdown.Create(Tab, OTC, Settings)
 
     end
 
+    --==================================================
+    -- POSITION POPUP
+    --==================================================
+
+    local function updatePopupPosition()
+
+        if not DropdownFrame then
+            return
+        end
+
+        if not Window
+            or not Window.ScreenGui then
+
+            return
+        end
+
+        local AbsolutePosition =
+            Frame.AbsolutePosition
+
+        local AbsoluteSize =
+            Frame.AbsoluteSize
+
+        local ViewportSize =
+            workspace.CurrentCamera
+            and workspace.CurrentCamera.ViewportSize
+
+        if not ViewportSize then
+            return
+        end
+
+        local PopupHeight =
+            calculateHeight()
+
+        local PopupWidth =
+            AbsoluteSize.X
+
+        local X =
+            AbsolutePosition.X
+
+        local BelowY =
+            AbsolutePosition.Y
+            + AbsoluteSize.Y
+            + 7
+
+        local AboveY =
+            AbsolutePosition.Y
+            - PopupHeight
+            - 7
+
+        local Y = BelowY
+
+        --// If there isn't enough space below,
+        --// open above the dropdown.
+        if BelowY + PopupHeight
+            > ViewportSize.Y
+        then
+
+            Y = AboveY
+
+        end
+
+        --// Keep inside screen horizontally
+        if X + PopupWidth
+            > ViewportSize.X
+        then
+
+            X =
+                ViewportSize.X
+                - PopupWidth
+                - 5
+
+        end
+
+        if X < 5 then
+            X = 5
+        end
+
+        if Y < 5 then
+            Y = 5
+        end
+
+        DropdownFrame.Position =
+            UDim2.fromOffset(
+                X,
+                Y
+            )
+
+        DropdownFrame.Size =
+            UDim2.fromOffset(
+                PopupWidth,
+                0
+            )
+
+    end
+
+    --==================================================
+    -- OPEN / CLOSE
+    --==================================================
+
     local function setOpen(Value)
 
         Open = Value
 
         if Open then
 
+            --// Make sure the correct tab is visible
+            if Tab.Page then
+                Tab.Page.Visible = true
+            end
+
+            local Height =
+                calculateHeight()
+
+            local AbsoluteSize =
+                Frame.AbsoluteSize
+
+            local PopupWidth =
+                AbsoluteSize.X
+
+            updatePopupPosition()
+
             DropdownFrame.Visible = true
 
             DropdownFrame.Size =
-                UDim2.new(
-                    1,
-                    0,
-                    0,
+                UDim2.fromOffset(
+                    PopupWidth,
                     0
                 )
 
@@ -746,11 +981,9 @@ function Dropdown.Create(Tab, OTC, Settings)
                 DropdownFrame,
                 0.25,
                 {
-                    Size = UDim2.new(
-                        1,
-                        0,
-                        0,
-                        calculateHeight()
+                    Size = UDim2.fromOffset(
+                        PopupWidth,
+                        Height
                     )
                 }
             )
@@ -777,10 +1010,8 @@ function Dropdown.Create(Tab, OTC, Settings)
                 DropdownFrame,
                 0.2,
                 {
-                    Size = UDim2.new(
-                        1,
-                        0,
-                        0,
+                    Size = UDim2.fromOffset(
+                        DropdownFrame.AbsoluteSize.X,
                         0
                     )
                 }
@@ -807,8 +1038,10 @@ function Dropdown.Create(Tab, OTC, Settings)
                 function()
 
                     if not Open then
+
                         DropdownFrame.Visible =
                             false
+
                     end
 
                 end
@@ -817,6 +1050,10 @@ function Dropdown.Create(Tab, OTC, Settings)
         end
 
     end
+
+    --==================================================
+    -- BUTTON
+    --==================================================
 
     Button.MouseButton1Click:Connect(
         function()
@@ -862,7 +1099,128 @@ function Dropdown.Create(Tab, OTC, Settings)
         end
     )
 
+    --==================================================
+    -- CLOSE WHEN CLICKING OUTSIDE
+    --==================================================
+
+    UserInputService.InputBegan:Connect(
+        function(Input, GameProcessed)
+
+            if not Open then
+                return
+            end
+
+            if GameProcessed then
+                return
+            end
+
+            if Input.UserInputType
+                ~= Enum.UserInputType.MouseButton1
+                and Input.UserInputType
+                ~= Enum.UserInputType.Touch then
+
+                return
+            end
+
+            local Position =
+                Input.Position
+
+            local FramePosition =
+                Frame.AbsolutePosition
+
+            local FrameSize =
+                Frame.AbsoluteSize
+
+            local PopupPosition =
+                DropdownFrame.AbsolutePosition
+
+            local PopupSize =
+                DropdownFrame.AbsoluteSize
+
+            local InFrame =
+                Position.X >= FramePosition.X
+                and Position.X <=
+                    FramePosition.X
+                    + FrameSize.X
+                and Position.Y >= FramePosition.Y
+                and Position.Y <=
+                    FramePosition.Y
+                    + FrameSize.Y
+
+            local InPopup =
+                Position.X >= PopupPosition.X
+                and Position.X <=
+                    PopupPosition.X
+                    + PopupSize.X
+                and Position.Y >= PopupPosition.Y
+                and Position.Y <=
+                    PopupPosition.Y
+                    + PopupSize.Y
+
+            if not InFrame and not InPopup then
+                setOpen(false)
+            end
+
+        end
+    )
+
+    --==================================================
+    -- UPDATE POSITION WHEN SCROLLING
+    --==================================================
+
+    if Tab.Page then
+
+        Tab.Page:GetPropertyChangedSignal(
+            "CanvasPosition"
+        ):Connect(
+            function()
+
+                if Open then
+                    updatePopupPosition()
+                end
+
+            end
+        )
+
+    end
+
+    --==================================================
+    -- UPDATE POSITION WHEN FRAME MOVES
+    --==================================================
+
+    Frame:GetPropertyChangedSignal(
+        "AbsolutePosition"
+    ):Connect(
+        function()
+
+            if Open then
+                updatePopupPosition()
+            end
+
+        end
+    )
+
+    Frame:GetPropertyChangedSignal(
+        "AbsoluteSize"
+    ):Connect(
+        function()
+
+            if Open then
+                updatePopupPosition()
+            end
+
+        end
+    )
+
+    --==================================================
+    -- INITIAL
+    --==================================================
+
     updateSelectedText()
+
+    --==================================================
+    -- OBJECT
+    --==================================================
 
     local Object = {}
 
@@ -882,7 +1240,9 @@ function Dropdown.Create(Tab, OTC, Settings)
 
         else
 
-            Selected[Value] = true
+            if Value ~= nil then
+                Selected[Value] = true
+            end
 
         end
 
@@ -901,10 +1261,12 @@ function Dropdown.Create(Tab, OTC, Settings)
             for Option in pairs(Selected) do
 
                 if Selected[Option] then
+
                     table.insert(
                         Values,
                         Option
                     )
+
                 end
 
             end
@@ -978,6 +1340,7 @@ function Dropdown.Create(Tab, OTC, Settings)
         if OptionButtons[Option] then
 
             OptionButtons[Option]:Destroy()
+
             OptionButtons[Option] = nil
 
         end
@@ -1003,6 +1366,7 @@ function Dropdown.Create(Tab, OTC, Settings)
     function Object:SetName(NewName)
 
         Name = NewName
+
         Title.Text = NewName
 
     end
@@ -1017,12 +1381,20 @@ function Dropdown.Create(Tab, OTC, Settings)
 
     function Object:Destroy()
 
-        Frame:Destroy()
+        if DropdownFrame then
+            DropdownFrame:Destroy()
+        end
+
+        if Frame then
+            Frame:Destroy()
+        end
 
     end
 
     Object.Instance = Frame
+
     Object.Button = Button
+
     Object.Options = DropdownFrame
 
     Tab:AddElement(Object)
