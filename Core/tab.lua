@@ -6,360 +6,979 @@
 
 local Tab = {}
 
-local TweenService = game:GetService("TweenService")
+local TweenService =
+    game:GetService("TweenService")
 
-local function tween(Object, Time, Properties)
+local function tween(
+    Object,
+    Time,
+    Properties
+)
+
     local Info = TweenInfo.new(
         Time or 0.2,
         Enum.EasingStyle.Quint,
         Enum.EasingDirection.Out
     )
 
-    local Animation = TweenService:Create(
-        Object,
-        Info,
-        Properties
-    )
+    local Animation =
+        TweenService:Create(
+            Object,
+            Info,
+            Properties
+        )
 
     Animation:Play()
 
     return Animation
 end
 
-local function create(Class, Properties)
-    local Object = Instance.new(Class)
+local function create(
+    Class,
+    Properties
+)
 
-    for Property, Value in pairs(Properties or {}) do
+    local Object =
+        Instance.new(Class)
+
+    for Property, Value in pairs(
+        Properties or {}
+    ) do
+
         Object[Property] = Value
     end
 
     return Object
 end
 
-function Tab.Create(Window, OTC, Settings)
+--// Detect Roblox Asset
+local function isAsset(
+    Icon
+)
+
+    if type(Icon) ~= "string" then
+        return false
+    end
+
+    return Icon:match(
+        "^rbxassetid://"
+    )
+    or Icon:match(
+        "^rbxasset://"
+    )
+    or Icon:match(
+        "^https?://"
+    )
+end
+
+--// Detect emoji / unicode
+local function isEmoji(
+    Icon
+)
+
+    if type(Icon) ~= "string"
+        or Icon == "" then
+
+        return false
+    end
+
+    if isAsset(Icon) then
+        return false
+    end
+
+    -- Lucide names normally only
+    -- contain letters, numbers and -
+    if Icon:match(
+        "^[%w%-_]+$"
+    ) then
+
+        return false
+    end
+
+    return true
+end
+
+--// Create Icon
+local function createIcon(
+    Button,
+    OTC,
+    IconValue,
+    Theme
+)
+
+    --// No icon
+    if not IconValue then
+
+        return create(
+            "TextLabel",
+            {
+                Name = "Icon",
+
+                Parent = Button,
+
+                BackgroundTransparency = 1,
+
+                Position =
+                    UDim2.fromOffset(
+                        10,
+                        0
+                    ),
+
+                Size =
+                    UDim2.fromOffset(
+                        25,
+                        38
+                    ),
+
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = "•",
+
+                TextColor3 =
+                    Theme.SubText,
+
+                TextSize = 15,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Center,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center
+            }
+        )
+    end
+
+    --// Roblox Asset
+    if isAsset(IconValue) then
+
+        local Icon =
+            create(
+                "ImageLabel",
+                {
+                    Name = "Icon",
+
+                    Parent = Button,
+
+                    BackgroundTransparency = 1,
+
+                    Position =
+                        UDim2.fromOffset(
+                            12,
+                            9
+                        ),
+
+                    Size =
+                        UDim2.fromOffset(
+                            20,
+                            20
+                        ),
+
+                    Image = IconValue,
+
+                    ImageColor3 =
+                        Theme.SubText,
+
+                    ScaleType =
+                        Enum.ScaleType.Fit
+                }
+            )
+
+        return Icon
+    end
+
+    --// Emoji
+    if isEmoji(IconValue) then
+
+        return create(
+            "TextLabel",
+            {
+                Name = "Icon",
+
+                Parent = Button,
+
+                BackgroundTransparency = 1,
+
+                Position =
+                    UDim2.fromOffset(
+                        10,
+                        0
+                    ),
+
+                Size =
+                    UDim2.fromOffset(
+                        25,
+                        38
+                    ),
+
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = IconValue,
+
+                TextColor3 =
+                    Theme.SubText,
+
+                TextSize = 15,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Center,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center
+            }
+        )
+    end
+
+    --// Lucide
+    local Lucide =
+        OTC._Lucide
+
+    if not Lucide then
+
+        warn(
+            "[OTC Hub] Lucide module not loaded"
+        )
+
+        return create(
+            "TextLabel",
+            {
+                Name = "Icon",
+
+                Parent = Button,
+
+                BackgroundTransparency = 1,
+
+                Position =
+                    UDim2.fromOffset(
+                        10,
+                        0
+                    ),
+
+                Size =
+                    UDim2.fromOffset(
+                        25,
+                        38
+                    ),
+
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = "•",
+
+                TextColor3 =
+                    Theme.SubText,
+
+                TextSize = 15,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Center,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center
+            }
+        )
+    end
+
+    local Icon =
+        Lucide.Create(
+            Button,
+            IconValue,
+            20,
+            {
+                Name = "Icon",
+
+                Position =
+                    UDim2.fromOffset(
+                        12,
+                        9
+                    ),
+
+                Size =
+                    UDim2.fromOffset(
+                        20,
+                        20
+                    ),
+
+                ImageColor3 =
+                    Theme.SubText
+            }
+        )
+
+    --// Invalid Lucide icon
+    if not Icon then
+
+        Icon = create(
+            "TextLabel",
+            {
+                Name = "Icon",
+
+                Parent = Button,
+
+                BackgroundTransparency = 1,
+
+                Position =
+                    UDim2.fromOffset(
+                        10,
+                        0
+                    ),
+
+                Size =
+                    UDim2.fromOffset(
+                        25,
+                        38
+                    ),
+
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = "•",
+
+                TextColor3 =
+                    Theme.SubText,
+
+                TextSize = 15,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Center,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center
+            }
+        )
+    end
+
+    return Icon
+end
+
+function Tab.Create(
+    Window,
+    OTC,
+    Settings
+)
+
     Settings = Settings or {}
 
-    local Theme = OTC:GetTheme()
+    local Theme =
+        OTC:GetTheme()
 
     local TabObject = {
+
         Window = Window,
+
         OTC = OTC,
 
-        Name = Settings.Name or "Tab",
-        Icon = Settings.Icon,
+        Name =
+            Settings.Name
+            or "Tab",
+
+        Icon =
+            Settings.Icon,
 
         Elements = {},
+
         Selected = false
     }
 
     --// Sidebar Button
-    local Button = create("TextButton", {
-        Name = TabObject.Name .. "_Button",
-        Parent = Window.TabContainer,
+    local Button =
+        create(
+            "TextButton",
+            {
+                Name =
+                    TabObject.Name
+                    .. "_Button",
 
-        BackgroundColor3 = Theme.Element,
-        BackgroundTransparency = 1,
+                Parent =
+                    Window.TabContainer,
 
-        BorderSizePixel = 0,
+                BackgroundColor3 =
+                    Theme.Element,
 
-        Size = UDim2.new(1, 0, 0, 38),
+                BackgroundTransparency = 1,
 
-        AutoButtonColor = false,
+                BorderSizePixel = 0,
 
-        Font = Enum.Font.GothamMedium,
+                Size =
+                    UDim2.new(
+                        1,
+                        0,
+                        0,
+                        38
+                    ),
 
-        Text = "",
+                AutoButtonColor = false,
 
-        TextColor3 = Theme.Text
-    })
+                Text = "",
 
-    create("UICorner", {
-        Parent = Button,
+                TextColor3 =
+                    Theme.Text
+            }
+        )
 
-        CornerRadius = UDim.new(0, 7)
-    })
+    create(
+        "UICorner",
+        {
+            Parent = Button,
+
+            CornerRadius =
+                UDim.new(
+                    0,
+                    7
+                )
+        }
+    )
 
     --// Icon
-    local Icon = create("TextLabel", {
-        Name = "Icon",
-
-        Parent = Button,
-
-        BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(10, 0),
-
-        Size = UDim2.fromOffset(25, 38),
-
-        Font = Enum.Font.GothamMedium,
-
-        Text = Settings.Icon or "•",
-
-        TextColor3 = Theme.SubText,
-
-        TextSize = 15,
-
-        TextXAlignment = Enum.TextXAlignment.Center,
-
-        TextYAlignment = Enum.TextYAlignment.Center
-    })
+    local Icon =
+        createIcon(
+            Button,
+            OTC,
+            Settings.Icon,
+            Theme
+        )
 
     --// Name
-    local Name = create("TextLabel", {
-        Name = "Name",
+    local Name =
+        create(
+            "TextLabel",
+            {
+                Name = "Name",
 
-        Parent = Button,
+                Parent = Button,
 
-        BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
 
-        Position = UDim2.fromOffset(42, 0),
+                Position =
+                    UDim2.fromOffset(
+                        42,
+                        0
+                    ),
 
-        Size = UDim2.new(1, -48, 1, 0),
+                Size =
+                    UDim2.new(
+                        1,
+                        -48,
+                        1,
+                        0
+                    ),
 
-        Font = Enum.Font.GothamMedium,
+                Font =
+                    Enum.Font.GothamMedium,
 
-        Text = TabObject.Name,
+                Text =
+                    TabObject.Name,
 
-        TextColor3 = Theme.SubText,
+                TextColor3 =
+                    Theme.SubText,
 
-        TextSize = 13,
+                TextSize = 13,
 
-        TextXAlignment = Enum.TextXAlignment.Left,
+                TextXAlignment =
+                    Enum.TextXAlignment.Left,
 
-        TextYAlignment = Enum.TextYAlignment.Center
-    })
+                TextYAlignment =
+                    Enum.TextYAlignment.Center
+            }
+        )
 
     --// Selected Indicator
-    local Indicator = create("Frame", {
-        Name = "Indicator",
+    local Indicator =
+        create(
+            "Frame",
+            {
+                Name = "Indicator",
 
-        Parent = Button,
+                Parent = Button,
 
-        BackgroundColor3 = Theme.Accent,
+                BackgroundColor3 =
+                    Theme.Accent,
 
-        BorderSizePixel = 0,
+                BorderSizePixel = 0,
 
-        Position = UDim2.new(
-            0,
-            0,
-            0.5,
-            -9
-        ),
+                Position =
+                    UDim2.new(
+                        0,
+                        0,
+                        0.5,
+                        -9
+                    ),
 
-        Size = UDim2.fromOffset(
-            3,
-            18
-        ),
+                Size =
+                    UDim2.fromOffset(
+                        3,
+                        18
+                    ),
 
-        Visible = false
-    })
+                Visible = false
+            }
+        )
 
-    create("UICorner", {
-        Parent = Indicator,
+    create(
+        "UICorner",
+        {
+            Parent = Indicator,
 
-        CornerRadius = UDim.new(1, 0)
-    })
+            CornerRadius =
+                UDim.new(
+                    1,
+                    0
+                )
+        }
+    )
 
     --// Content Page
-    local Page = create("ScrollingFrame", {
-        Name = TabObject.Name .. "_Page",
+    local Page =
+        create(
+            "ScrollingFrame",
+            {
+                Name =
+                    TabObject.Name
+                    .. "_Page",
 
-        Parent = Window.Content,
+                Parent =
+                    Window.Content,
 
-        BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
 
-        BorderSizePixel = 0,
+                BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 1, 0),
+                Size =
+                    UDim2.new(
+                        1,
+                        0,
+                        1,
+                        0
+                    ),
 
-        CanvasSize = UDim2.new(),
+                CanvasSize =
+                    UDim2.new(),
 
-        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                AutomaticCanvasSize =
+                    Enum.AutomaticSize.Y,
 
-        ScrollBarThickness = 3,
+                ScrollBarThickness = 3,
 
-        ScrollBarImageColor3 = Theme.Border,
+                ScrollBarImageColor3 =
+                    Theme.Border,
 
-        Visible = false
-    })
+                Visible = false
+            }
+        )
 
-    create("UIPadding", {
-        Parent = Page,
+    create(
+        "UIPadding",
+        {
+            Parent = Page,
 
-        PaddingTop = UDim.new(0, 18),
-        PaddingBottom = UDim.new(0, 18),
-        PaddingLeft = UDim.new(0, 18),
-        PaddingRight = UDim.new(0, 18)
-    })
+            PaddingTop =
+                UDim.new(
+                    0,
+                    18
+                ),
 
-    create("UIListLayout", {
-        Parent = Page,
+            PaddingBottom =
+                UDim.new(
+                    0,
+                    18
+                ),
 
-        Padding = UDim.new(0, 8),
+            PaddingLeft =
+                UDim.new(
+                    0,
+                    18
+                ),
 
-        SortOrder = Enum.SortOrder.LayoutOrder
-    })
+            PaddingRight =
+                UDim.new(
+                    0,
+                    18
+                )
+        }
+    )
 
-    TabObject.Button = Button
-    TabObject.Page = Page
+    create(
+        "UIListLayout",
+        {
+            Parent = Page,
 
-    TabObject.Indicator = Indicator
-    TabObject.IconLabel = Icon
-    TabObject.NameLabel = Name
+            Padding =
+                UDim.new(
+                    0,
+                    8
+                ),
+
+            SortOrder =
+                Enum.SortOrder.LayoutOrder
+        }
+    )
+
+    TabObject.Button =
+        Button
+
+    TabObject.Page =
+        Page
+
+    TabObject.Indicator =
+        Indicator
+
+    TabObject.IconLabel =
+        Icon
+
+    TabObject.NameLabel =
+        Name
 
     --// Selected
-    function TabObject:SetSelected(Value)
+    function TabObject:SetSelected(
+        Value
+    )
+
         self.Selected = Value
 
         if Value then
+
             Page.Visible = true
+
             Indicator.Visible = true
 
-            tween(Button, 0.2, {
-                BackgroundTransparency = 0
-            })
+            tween(
+                Button,
+                0.2,
+                {
+                    BackgroundTransparency = 0
+                }
+            )
 
-            tween(Name, 0.2, {
-                TextColor3 = Theme.Text
-            })
+            tween(
+                Name,
+                0.2,
+                {
+                    TextColor3 =
+                        Theme.Text
+                }
+            )
 
-            tween(Icon, 0.2, {
-                TextColor3 = Theme.Text
-            })
+            if Icon:IsA(
+                "ImageLabel"
+            ) then
+
+                tween(
+                    Icon,
+                    0.2,
+                    {
+                        ImageColor3 =
+                            Theme.Text
+                    }
+                )
+
+            else
+
+                tween(
+                    Icon,
+                    0.2,
+                    {
+                        TextColor3 =
+                            Theme.Text
+                    }
+                )
+            end
+
         else
+
             Page.Visible = false
+
             Indicator.Visible = false
 
-            tween(Button, 0.2, {
-                BackgroundTransparency = 1
-            })
+            tween(
+                Button,
+                0.2,
+                {
+                    BackgroundTransparency = 1
+                }
+            )
 
-            tween(Name, 0.2, {
-                TextColor3 = Theme.SubText
-            })
+            tween(
+                Name,
+                0.2,
+                {
+                    TextColor3 =
+                        Theme.SubText
+                }
+            )
 
-            tween(Icon, 0.2, {
-                TextColor3 = Theme.SubText
-            })
+            if Icon:IsA(
+                "ImageLabel"
+            ) then
+
+                tween(
+                    Icon,
+                    0.2,
+                    {
+                        ImageColor3 =
+                            Theme.SubText
+                    }
+                )
+
+            else
+
+                tween(
+                    Icon,
+                    0.2,
+                    {
+                        TextColor3 =
+                            Theme.SubText
+                    }
+                )
+            end
         end
     end
 
     --// Hover
-    Button.MouseEnter:Connect(function()
-        if not TabObject.Selected then
-            tween(Button, 0.15, {
-                BackgroundTransparency = 0.7
-            })
+    Button.MouseEnter:Connect(
+        function()
 
-            tween(Name, 0.15, {
-                TextColor3 = Theme.Text
-            })
+            if not TabObject.Selected then
 
-            tween(Icon, 0.15, {
-                TextColor3 = Theme.Text
-            })
+                tween(
+                    Button,
+                    0.15,
+                    {
+                        BackgroundTransparency =
+                            0.7
+                    }
+                )
+
+                tween(
+                    Name,
+                    0.15,
+                    {
+                        TextColor3 =
+                            Theme.Text
+                    }
+                )
+
+                if Icon:IsA(
+                    "ImageLabel"
+                ) then
+
+                    tween(
+                        Icon,
+                        0.15,
+                        {
+                            ImageColor3 =
+                                Theme.Text
+                        }
+                    )
+
+                else
+
+                    tween(
+                        Icon,
+                        0.15,
+                        {
+                            TextColor3 =
+                                Theme.Text
+                        }
+                    )
+                end
+            end
         end
-    end)
+    )
 
-    Button.MouseLeave:Connect(function()
-        if not TabObject.Selected then
-            tween(Button, 0.15, {
-                BackgroundTransparency = 1
-            })
+    Button.MouseLeave:Connect(
+        function()
 
-            tween(Name, 0.15, {
-                TextColor3 = Theme.SubText
-            })
+            if not TabObject.Selected then
 
-            tween(Icon, 0.15, {
-                TextColor3 = Theme.SubText
-            })
+                tween(
+                    Button,
+                    0.15,
+                    {
+                        BackgroundTransparency = 1
+                    }
+                )
+
+                tween(
+                    Name,
+                    0.15,
+                    {
+                        TextColor3 =
+                            Theme.SubText
+                    }
+                )
+
+                if Icon:IsA(
+                    "ImageLabel"
+                ) then
+
+                    tween(
+                        Icon,
+                        0.15,
+                        {
+                            ImageColor3 =
+                                Theme.SubText
+                        }
+                    )
+
+                else
+
+                    tween(
+                        Icon,
+                        0.15,
+                        {
+                            TextColor3 =
+                                Theme.SubText
+                        }
+                    )
+                end
+            end
         end
-    end)
+    )
 
     --// Click
-    Button.MouseButton1Click:Connect(function()
-        Window:SelectTab(TabObject)
-    end)
+    Button.MouseButton1Click:Connect(
+        function()
+
+            Window:SelectTab(
+                TabObject
+            )
+        end
+    )
 
     --// Add Element
-    function TabObject:AddElement(Element)
+    function TabObject:AddElement(
+        Element
+    )
+
         if Element then
-            table.insert(self.Elements, Element)
+
+            table.insert(
+                self.Elements,
+                Element
+            )
         end
 
         return Element
     end
 
     --// Section
-    function TabObject:CreateSection(Text)
-        local Section = create("TextLabel", {
-            Name = "Section",
+    function TabObject:CreateSection(
+        Text
+    )
 
-            Parent = Page,
+        local Section =
+            create(
+                "TextLabel",
+                {
+                    Name = "Section",
 
-            BackgroundTransparency = 1,
+                    Parent = Page,
 
-            Size = UDim2.new(1, 0, 0, 28),
+                    BackgroundTransparency = 1,
 
-            Font = Enum.Font.GothamBold,
+                    Size =
+                        UDim2.new(
+                            1,
+                            0,
+                            0,
+                            28
+                        ),
 
-            Text = Text or "Section",
+                    Font =
+                        Enum.Font.GothamBold,
 
-            TextColor3 = Theme.Text,
+                    Text =
+                        Text
+                        or "Section",
 
-            TextSize = 14,
+                    TextColor3 =
+                        Theme.Text,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
+                    TextSize = 14,
 
-            TextYAlignment = Enum.TextYAlignment.Center
-        })
+                    TextXAlignment =
+                        Enum.TextXAlignment.Left,
 
-        self:AddElement(Section)
+                    TextYAlignment =
+                        Enum.TextYAlignment.Center
+                }
+            )
+
+        self:AddElement(
+            Section
+        )
 
         return Section
     end
 
     --// Text
-    function TabObject:CreateText(Text)
-        local Label = create("TextLabel", {
-            Name = "Text",
+    function TabObject:CreateText(
+        Text
+    )
 
-            Parent = Page,
+        local Label =
+            create(
+                "TextLabel",
+                {
+                    Name = "Text",
 
-            BackgroundTransparency = 1,
+                    Parent = Page,
 
-            Size = UDim2.new(1, 0, 0, 24),
+                    BackgroundTransparency = 1,
 
-            Font = Enum.Font.Gotham,
+                    Size =
+                        UDim2.new(
+                            1,
+                            0,
+                            0,
+                            24
+                        ),
 
-            Text = Text or "",
+                    Font =
+                        Enum.Font.Gotham,
 
-            TextColor3 = Theme.SubText,
+                    Text =
+                        Text
+                        or "",
 
-            TextSize = 13,
+                    TextColor3 =
+                        Theme.SubText,
 
-            TextWrapped = true,
+                    TextSize = 13,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
+                    TextWrapped = true,
 
-            TextYAlignment = Enum.TextYAlignment.Center
-        })
+                    TextXAlignment =
+                        Enum.TextXAlignment.Left,
 
-        self:AddElement(Label)
+                    TextYAlignment =
+                        Enum.TextYAlignment.Center
+                }
+            )
+
+        self:AddElement(
+            Label
+        )
 
         return Label
     end
 
     --// Button
-    function TabObject:CreateButton(Settings)
+    function TabObject:CreateButton(
+        Settings
+    )
+
         Settings = Settings or {}
 
-        local Module = self.OTC._Modules
+        local Module =
+            self.OTC._Modules
             and self.OTC._Modules.Button
 
         if not Module then
-            error("[OTC Hub] Button module is not loaded")
+
+            error(
+                "[OTC Hub] Button module is not loaded"
+            )
         end
 
         return Module.Create(
@@ -370,14 +989,21 @@ function Tab.Create(Window, OTC, Settings)
     end
 
     --// Toggle
-    function TabObject:CreateToggle(Settings)
+    function TabObject:CreateToggle(
+        Settings
+    )
+
         Settings = Settings or {}
 
-        local Module = self.OTC._Modules
+        local Module =
+            self.OTC._Modules
             and self.OTC._Modules.Toggle
 
         if not Module then
-            error("[OTC Hub] Toggle module is not loaded")
+
+            error(
+                "[OTC Hub] Toggle module is not loaded"
+            )
         end
 
         return Module.Create(
@@ -388,14 +1014,21 @@ function Tab.Create(Window, OTC, Settings)
     end
 
     --// Slider
-    function TabObject:CreateSlider(Settings)
+    function TabObject:CreateSlider(
+        Settings
+    )
+
         Settings = Settings or {}
 
-        local Module = self.OTC._Modules
+        local Module =
+            self.OTC._Modules
             and self.OTC._Modules.Slider
 
         if not Module then
-            error("[OTC Hub] Slider module is not loaded")
+
+            error(
+                "[OTC Hub] Slider module is not loaded"
+            )
         end
 
         return Module.Create(
@@ -406,14 +1039,21 @@ function Tab.Create(Window, OTC, Settings)
     end
 
     --// Dropdown
-    function TabObject:CreateDropdown(Settings)
+    function TabObject:CreateDropdown(
+        Settings
+    )
+
         Settings = Settings or {}
 
-        local Module = self.OTC._Modules
+        local Module =
+            self.OTC._Modules
             and self.OTC._Modules.Dropdown
 
         if not Module then
-            error("[OTC Hub] Dropdown module is not loaded")
+
+            error(
+                "[OTC Hub] Dropdown module is not loaded"
+            )
         end
 
         return Module.Create(
@@ -424,14 +1064,21 @@ function Tab.Create(Window, OTC, Settings)
     end
 
     --// Input
-    function TabObject:CreateInput(Settings)
+    function TabObject:CreateInput(
+        Settings
+    )
+
         Settings = Settings or {}
 
-        local Module = self.OTC._Modules
+        local Module =
+            self.OTC._Modules
             and self.OTC._Modules.Input
 
         if not Module then
-            error("[OTC Hub] Input module is not loaded")
+
+            error(
+                "[OTC Hub] Input module is not loaded"
+            )
         end
 
         return Module.Create(
@@ -442,11 +1089,16 @@ function Tab.Create(Window, OTC, Settings)
     end
 
     --// Register Tab
-    Window:AddTab(TabObject)
+    Window:AddTab(
+        TabObject
+    )
 
     --// First Tab
     if #Window.Tabs == 1 then
-        Window:SelectTab(TabObject)
+
+        Window:SelectTab(
+            TabObject
+        )
     end
 
     return TabObject
