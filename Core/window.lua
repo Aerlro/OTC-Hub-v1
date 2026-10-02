@@ -1,46 +1,14 @@
---[[
-    OTC Hub v1
-    Window System
-    by Aerlro
-]]
-
 local Window = {}
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
---// Roblox Logo
 local LOGO_URL = "rbxassetid://82435776198191"
 
---// Window Size
-local WINDOW_WIDTH = 560
-local WINDOW_HEIGHT = 380
-
---// Tween
-local function tween(Object, Time, Properties)
-    local Info = TweenInfo.new(
-        Time or 0.25,
-        Enum.EasingStyle.Quint,
-        Enum.EasingDirection.Out
-    )
-
-    local Animation = TweenService:Create(
-        Object,
-        Info,
-        Properties
-    )
-
-    Animation:Play()
-
-    return Animation
-end
-
---// Create
-local function create(Class, Properties)
-    local Object = Instance.new(Class)
+local function create(ClassName, Properties)
+    local Object = Instance.new(ClassName)
 
     for Property, Value in pairs(Properties or {}) do
         Object[Property] = Value
@@ -49,1146 +17,514 @@ local function create(Class, Properties)
     return Object
 end
 
-function Window.Create(Settings, OTC)
+local function getAvatar()
+    local Success, Image = pcall(function()
+        return Players:GetUserThumbnailAsync(
+            LocalPlayer.UserId,
+            Enum.ThumbnailType.HeadShot,
+            Enum.ThumbnailSize.Size100x100
+        )
+    end)
 
+    if Success then
+        return Image
+    end
+
+    return ""
+end
+
+function Window.Create(Settings, OTC)
     Settings = Settings or {}
 
     local Theme = OTC:GetTheme()
 
-    --// ScreenGui
+    local Object = {}
+
+    Object.OTC = OTC
+    Object.Settings = Settings
+    Object.ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightControl
+
+    --==================================================
+    -- SCREEN GUI
+    --==================================================
+
     local ScreenGui = create("ScreenGui", {
         Name = "OTC_Hub",
+        Parent = game:GetService("CoreGui"),
         ResetOnSpawn = false,
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     })
 
-    pcall(function()
-        ScreenGui.Parent = game:GetService("CoreGui")
-    end)
+    Object.ScreenGui = ScreenGui
 
-    if not ScreenGui.Parent then
-        ScreenGui.Parent =
-            LocalPlayer:WaitForChild("PlayerGui")
-    end
+    --==================================================
+    -- MAIN
+    --==================================================
 
-    --// Main
     local Main = create("Frame", {
         Name = "Main",
         Parent = ScreenGui,
-
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
-
+        Position = UDim2.new(0.5, -280, 0.5, -190),
+        Size = UDim2.fromOffset(560, 380),
         ClipsDescendants = true,
-
-        Size = UDim2.fromOffset(
-            WINDOW_WIDTH,
-            WINDOW_HEIGHT
-        ),
-
-        Position = UDim2.new(
-            0.5,
-            -WINDOW_WIDTH / 2,
-            0.5,
-            -WINDOW_HEIGHT / 2
-        )
+        ZIndex = 1
     })
 
     create("UICorner", {
         Parent = Main,
-
-        CornerRadius = UDim.new(
-            0,
-            10
-        )
+        CornerRadius = UDim.new(0, 8)
     })
 
-    create("UIStroke", {
+    Object.Main = Main
+
+    --==================================================
+    -- TOP BAR
+    --==================================================
+
+    local TopBar = create("Frame", {
+        Name = "TopBar",
         Parent = Main,
-
-        Color = Theme.Border,
-
-        Thickness = 1
-    })
-
-    --// Topbar
-    local Topbar = create("Frame", {
-        Name = "Topbar",
-        Parent = Main,
-
         BackgroundColor3 = Theme.Secondary,
         BorderSizePixel = 0,
-
-        Size = UDim2.new(
-            1,
-            0,
-            0,
-            60
-        )
+        Position = UDim2.fromOffset(0, 0),
+        Size = UDim2.new(1, 0, 0, 60),
+        ZIndex = 5
     })
 
-    create("UICorner", {
-        Parent = Topbar,
+    Object.TopBar = TopBar
 
-        CornerRadius = UDim.new(
-            0,
-            10
-        )
-    })
-
-    create("Frame", {
-        Name = "BottomFix",
-        Parent = Topbar,
-
-        BackgroundColor3 = Theme.Secondary,
-        BorderSizePixel = 0,
-
-        Position = UDim2.new(
-            0,
-            0,
-            1,
-            -10
-        ),
-
-        Size = UDim2.new(
-            1,
-            0,
-            0,
-            10
-        )
-    })
-
-    --// Logo / Name
-    local Logo = create("TextLabel", {
+    local Logo = create("ImageLabel", {
         Name = "Logo",
-        Parent = Topbar,
-
+        Parent = TopBar,
         BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(
-            18,
-            8
-        ),
-
-        Size = UDim2.fromOffset(
-            250,
-            25
-        ),
-
-        Font = Enum.Font.GothamBold,
-
-        Text = Settings.Name
-            or "OTC Hub",
-
-        TextColor3 = Theme.Text,
-
-        TextSize = 18,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Left
+        Position = UDim2.fromOffset(15, 10),
+        Size = UDim2.fromOffset(40, 40),
+        Image = LOGO_URL,
+        ScaleType = Enum.ScaleType.Fit,
+        ZIndex = 6
     })
 
-    --// Subtitle
+    create("UICorner", {
+        Parent = Logo,
+        CornerRadius = UDim.new(0, 6)
+    })
+
+    local Title = create("TextLabel", {
+        Name = "Title",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(65, 8),
+        Size = UDim2.new(1, -150, 0, 25),
+        Font = Enum.Font.GothamBold,
+        Text = Settings.Name or "OTC Hub",
+        TextColor3 = Theme.Text,
+        TextSize = 17,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 6
+    })
+
     local Subtitle = create("TextLabel", {
         Name = "Subtitle",
-        Parent = Topbar,
-
+        Parent = TopBar,
         BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(
-            19,
-            32
-        ),
-
-        Size = UDim2.fromOffset(
-            250,
-            20
-        ),
-
+        Position = UDim2.fromOffset(65, 32),
+        Size = UDim2.new(1, -150, 0, 18),
         Font = Enum.Font.Gotham,
-
-        Text = Settings.Subtitle
-            or "by Aerlro",
-
+        Text = Settings.Subtitle or "by Aerlro",
         TextColor3 = Theme.SubText,
-
-        TextSize = 11,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Left
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 6
     })
 
-    --// Close
-    local Close = create("TextButton", {
-        Name = "Close",
-        Parent = Topbar,
+    --==================================================
+    -- MINIMIZE BUTTON
+    --==================================================
 
-        BackgroundTransparency = 1,
-
-        Position = UDim2.new(
-            1,
-            -45,
-            0,
-            15
-        ),
-
-        Size = UDim2.fromOffset(
-            30,
-            30
-        ),
-
-        Font = Enum.Font.GothamBold,
-
-        Text = "×",
-
-        TextColor3 = Theme.SubText,
-
-        TextSize = 22,
-
-        AutoButtonColor = false
-    })
-
-    --// Minimize
-    local Minimize = create("TextButton", {
+    local MinimizeButton = create("ImageButton", {
         Name = "Minimize",
-        Parent = Topbar,
-
-        BackgroundTransparency = 1,
-
-        Position = UDim2.new(
-            1,
-            -80,
-            0,
-            15
-        ),
-
-        Size = UDim2.fromOffset(
-            30,
-            30
-        ),
-
-        Font = Enum.Font.GothamBold,
-
-        Text = "−",
-
-        TextColor3 = Theme.SubText,
-
-        TextSize = 20,
-
-        AutoButtonColor = false
+        Parent = TopBar,
+        BackgroundColor3 = Theme.Element,
+        BorderSizePixel = 0,
+        Position = UDim2.new(1, -45, 0, 15),
+        Size = UDim2.fromOffset(30, 30),
+        Image = LOGO_URL,
+        ScaleType = Enum.ScaleType.Fit,
+        AutoButtonColor = false,
+        ZIndex = 10
     })
 
-    --// Sidebar
+    create("UICorner", {
+        Parent = MinimizeButton,
+        CornerRadius = UDim.new(0, 6)
+    })
+
+    Object.MinimizeButton = MinimizeButton
+
+    --==================================================
+    -- SIDEBAR
+    --==================================================
+
     local Sidebar = create("Frame", {
         Name = "Sidebar",
         Parent = Main,
-
         BackgroundColor3 = Theme.Secondary,
-
         BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            0,
-            60
-        ),
-
-        Size = UDim2.new(
-            0,
-            170,
-            1,
-            -60
-        )
+        Position = UDim2.fromOffset(0, 60),
+        Size = UDim2.new(0, 170, 1, -60),
+        ClipsDescendants = true,
+        ZIndex = 2
     })
 
-    --// Tabs
-    --// Only tabs are inside this container.
-    local TabContainer = create("ScrollingFrame", {
-        Name = "Tabs",
+    Object.Sidebar = Sidebar
+
+    --==================================================
+    -- TABS AREA
+    --==================================================
+
+    local USER_AREA_HEIGHT = 72
+
+    local TabsArea = create("Frame", {
+        Name = "TabsArea",
         Parent = Sidebar,
-
         BackgroundTransparency = 1,
-
         BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            10,
-            15
-        ),
-
+        Position = UDim2.fromOffset(10, 15),
         Size = UDim2.new(
             1,
             -20,
             1,
-            -82
+            -(15 + USER_AREA_HEIGHT)
         ),
-
-        CanvasSize = UDim2.new(),
-
-        AutomaticCanvasSize =
-            Enum.AutomaticSize.Y,
-
-        ScrollBarThickness = 0,
-
-        ScrollingDirection =
-            Enum.ScrollingDirection.Y
+        ClipsDescendants = true,
+        ZIndex = 2
     })
+
+    Object.TabsArea = TabsArea
+
+    local TabContainer = create("ScrollingFrame", {
+        Name = "Tabs",
+        Parent = TabsArea,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(0, 0),
+        Size = UDim2.fromScale(1, 1),
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        ScrollBarThickness = 0,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
+        ClipsDescendants = true,
+        ZIndex = 2
+    })
+
+    Object.TabContainer = TabContainer
 
     create("UIListLayout", {
         Parent = TabContainer,
-
-        Padding = UDim.new(
-            0,
-            5
-        ),
-
-        SortOrder =
-            Enum.SortOrder.LayoutOrder
+        Padding = UDim.new(0, 5),
+        SortOrder = Enum.SortOrder.LayoutOrder
     })
 
-    --// User Card
-    --// This is OUTSIDE TabContainer.
+    --==================================================
+    -- USER AREA
+    --==================================================
+
+    local UserArea = create("Frame", {
+        Name = "UserArea",
+        Parent = Sidebar,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 1, -USER_AREA_HEIGHT),
+        Size = UDim2.new(1, 0, 0, USER_AREA_HEIGHT),
+        ZIndex = 10
+    })
+
+    Object.UserArea = UserArea
+
+    -- Separator
+    local UserSeparator = create("Frame", {
+        Name = "UserSeparator",
+        Parent = UserArea,
+        BackgroundColor3 = Theme.Border,
+        BorderSizePixel = 0,
+        Position = UDim2.fromOffset(10, 0),
+        Size = UDim2.new(1, -20, 0, 1),
+        ZIndex = 11
+    })
+
+    Object.UserSeparator = UserSeparator
+
+    --==================================================
+    -- USER CARD
+    --==================================================
+
     local UserCard = create("Frame", {
         Name = "UserCard",
-
-        Parent = Sidebar,
-
-        BackgroundColor3 =
-            Theme.Element,
-
-        BackgroundTransparency = 0,
-
+        Parent = UserArea,
+        BackgroundColor3 = Theme.Element,
         BorderSizePixel = 0,
-
-        Position = UDim2.new(
-            0,
-            10,
-            1,
-            -62
-        ),
-
-        Size = UDim2.new(
-            1,
-            -20,
-            0,
-            52
-        ),
-
-        ZIndex = 20
+        Position = UDim2.fromOffset(10, 10),
+        Size = UDim2.new(1, -20, 0, 52),
+        ZIndex = 11
     })
 
     create("UICorner", {
         Parent = UserCard,
-
-        CornerRadius =
-            UDim.new(
-                0,
-                7
-            )
+        CornerRadius = UDim.new(0, 6)
     })
 
-    create("UIStroke", {
-        Parent = UserCard,
+    Object.UserCard = UserCard
 
-        Color = Theme.Border,
+    --==================================================
+    -- USER AVATAR
+    --==================================================
 
-        Thickness = 1
-    })
-
-    --// User Avatar
     local UserAvatar = create("ImageLabel", {
         Name = "Avatar",
-
         Parent = UserCard,
-
-        BackgroundColor3 =
-            Theme.Secondary,
-
-        BackgroundTransparency = 0,
-
+        BackgroundColor3 = Theme.Hover,
         BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            7,
-            7
-        ),
-
-        Size = UDim2.fromOffset(
-            38,
-            38
-        ),
-
-        Image = "",
-
-        ScaleType =
-            Enum.ScaleType.Crop,
-
-        ZIndex = 21
+        Position = UDim2.fromOffset(7, 7),
+        Size = UDim2.fromOffset(38, 38),
+        Image = getAvatar(),
+        ZIndex = 12
     })
 
     create("UICorner", {
         Parent = UserAvatar,
-
-        CornerRadius =
-            UDim.new(
-                1,
-                0
-            )
+        CornerRadius = UDim.new(1, 0)
     })
 
-    --// Display Name
+    Object.UserAvatar = UserAvatar
+
+    --==================================================
+    -- DISPLAY NAME
+    --==================================================
+
     local UserDisplayName = create("TextLabel", {
         Name = "DisplayName",
-
         Parent = UserCard,
-
         BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(
-            53,
-            6
-        ),
-
-        Size = UDim2.new(
-            1,
-            -60,
-            0,
-            20
-        ),
-
-        Font =
-            Enum.Font.GothamMedium,
-
-        Text =
-            LocalPlayer.DisplayName,
-
-        TextColor3 =
-            Theme.Text,
-
-        TextSize = 13,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Left,
-
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
-
-        TextTruncate =
-            Enum.TextTruncate.AtEnd,
-
-        ZIndex = 21
+        Position = UDim2.fromOffset(52, 8),
+        Size = UDim2.new(1, -59, 0, 18),
+        Font = Enum.Font.GothamSemibold,
+        Text = LocalPlayer.DisplayName,
+        TextColor3 = Theme.Text,
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        ZIndex = 12
     })
 
-    --// Username
+    Object.UserDisplayName = UserDisplayName
+
+    --==================================================
+    -- USERNAME
+    --==================================================
+
     local UserUsername = create("TextLabel", {
         Name = "Username",
-
         Parent = UserCard,
-
         BackgroundTransparency = 1,
-
-        Position = UDim2.fromOffset(
-            53,
-            26
-        ),
-
-        Size = UDim2.new(
-            1,
-            -60,
-            0,
-            17
-        ),
-
-        Font =
-            Enum.Font.Gotham,
-
-        Text =
-            "@"
-            .. LocalPlayer.Name,
-
-        TextColor3 =
-            Theme.SubText,
-
-        TextSize = 11,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Left,
-
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
-
-        TextTruncate =
-            Enum.TextTruncate.AtEnd,
-
-        ZIndex = 21
+        Position = UDim2.fromOffset(52, 27),
+        Size = UDim2.new(1, -59, 0, 16),
+        Font = Enum.Font.Gotham,
+        Text = "@" .. LocalPlayer.Name,
+        TextColor3 = Theme.SubText,
+        TextSize = 10,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        ZIndex = 12
     })
 
-    --// Get Roblox Avatar
-    task.spawn(function()
+    Object.UserUsername = UserUsername
 
-        local Success, Image =
-            pcall(function()
+    --==================================================
+    -- CONTENT
+    --==================================================
 
-                return Players:GetUserThumbnailAsync(
-                    LocalPlayer.UserId,
-
-                    Enum.ThumbnailType.HeadShot,
-
-                    Enum.ThumbnailSize.Size100x100
-                )
-
-            end)
-
-        if Success
-            and Image
-            and UserAvatar.Parent then
-
-            UserAvatar.Image = Image
-        end
-    end)
-
-    --// Content
     local Content = create("Frame", {
         Name = "Content",
         Parent = Main,
-
-        BackgroundColor3 =
-            Theme.Background,
-
+        BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
-
-        Position = UDim2.fromOffset(
-            170,
-            60
-        ),
-
-        Size = UDim2.new(
-            1,
-            -170,
-            1,
-            -60
-        )
+        Position = UDim2.fromOffset(170, 60),
+        Size = UDim2.new(1, -170, 1, -60),
+        ClipsDescendants = true,
+        ZIndex = 1
     })
 
-    --// Minimized Logo Button
-    local MinimizedButton = create("ImageButton", {
-        Name = "OTC_MinimizedButton",
+    Object.Content = Content
 
+    --==================================================
+    -- DRAGGING
+    --==================================================
+
+    local Dragging = false
+    local DragStart
+    local StartPosition
+
+    TopBar.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
+            Dragging = true
+            DragStart = Input.Position
+            StartPosition = Main.Position
+
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if not Dragging then
+            return
+        end
+
+        if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
+            local Delta = Input.Position - DragStart
+
+            Main.Position = UDim2.new(
+                StartPosition.X.Scale,
+                StartPosition.X.Offset + Delta.X,
+                StartPosition.Y.Scale,
+                StartPosition.Y.Offset + Delta.Y
+            )
+        end
+    end)
+
+    --==================================================
+    -- MINIMIZE
+    --==================================================
+
+    local Minimized = false
+
+    local MiniButton = create("ImageButton", {
+        Name = "OTC_Minimized",
         Parent = ScreenGui,
-
-        BackgroundTransparency = 1,
-
+        BackgroundColor3 = Theme.Element,
         BorderSizePixel = 0,
-
-        Size = UDim2.fromOffset(
-            58,
-            58
-        ),
-
         Position = UDim2.new(
-            0,
-            20,
-            0.5,
-            -29
+            Main.Position.X.Scale,
+            Main.Position.X.Offset,
+            Main.Position.Y.Scale,
+            Main.Position.Y.Offset
         ),
-
+        Size = UDim2.fromOffset(45, 45),
         Image = LOGO_URL,
-
-        ImageTransparency = 0,
-
-        AutoButtonColor = false,
-
+        ScaleType = Enum.ScaleType.Fit,
         Visible = false,
-
+        AutoButtonColor = false,
         ZIndex = 100
     })
 
-    --// Logo Hover
-    MinimizedButton.MouseEnter:Connect(function()
+    create("UICorner", {
+        Parent = MiniButton,
+        CornerRadius = UDim.new(0, 8)
+    })
 
-        if not MinimizedButton.Visible then
-            return
-        end
+    Object.MinimizedButton = MiniButton
 
-        tween(
-            MinimizedButton,
-            0.15,
-            {
-                Size = UDim2.fromOffset(
-                    64,
-                    64
-                )
-            }
+    MinimizeButton.MouseButton1Click:Connect(function()
+        Minimized = true
+        Main.Visible = false
+        MiniButton.Visible = true
+
+        MiniButton.Position = UDim2.new(
+            Main.Position.X.Scale,
+            Main.Position.X.Offset,
+            Main.Position.Y.Scale,
+            Main.Position.Y.Offset
         )
     end)
 
-    MinimizedButton.MouseLeave:Connect(function()
-
-        if not MinimizedButton.Visible then
-            return
-        end
-
-        tween(
-            MinimizedButton,
-            0.15,
-            {
-                Size = UDim2.fromOffset(
-                    58,
-                    58
-                )
-            }
-        )
-    end)
-
-    --// Window Object
-    local Object = {
-
-        OTC = OTC,
-
-        ScreenGui = ScreenGui,
-
-        Main = Main,
-
-        Topbar = Topbar,
-
-        Sidebar = Sidebar,
-
-        TabContainer = TabContainer,
-
-        UserCard = UserCard,
-
-        UserAvatar = UserAvatar,
-
-        UserDisplayName = UserDisplayName,
-
-        UserUsername = UserUsername,
-
-        Content = Content,
-
-        MinimizedButton =
-            MinimizedButton,
-
-        Tabs = {},
-
-        CurrentTab = nil,
-
-        Visible = true,
-
-        Minimized = false,
-
-        ToggleKey =
-            Settings.ToggleKey
-            or Enum.KeyCode.RightShift,
-
-        Name =
-            Settings.Name
-            or "OTC Hub",
-
-        Subtitle =
-            Settings.Subtitle
-            or "by Aerlro"
-    }
-
-    --// Add Tab
-    function Object:AddTab(TabObject)
-
-        if not TabObject then
-            return
-        end
-
-        if table.find(
-            self.Tabs,
-            TabObject
-        ) then
-
-            return TabObject
-        end
-
-        table.insert(
-            self.Tabs,
-            TabObject
-        )
-
-        return TabObject
-    end
-
-    --// Select Tab
-    function Object:SelectTab(TabObject)
-
-        if not TabObject then
-            return
-        end
-
-        for _, Tab in ipairs(
-            self.Tabs
-        ) do
-
-            if Tab
-                and Tab.SetSelected then
-
-                Tab:SetSelected(
-                    Tab == TabObject
-                )
-            end
-        end
-
-        self.CurrentTab =
-            TabObject
-    end
-
-    --// Visibility
-    function Object:SetVisible(Value)
-
-        self.Visible = Value
-
-        ScreenGui.Enabled = Value
-    end
-
-    --// Toggle
-    function Object:Toggle()
-
-        self:SetVisible(
-            not self.Visible
-        )
-    end
-
-    --// Minimize
-    function Object:Minimize()
-
-        if self.Minimized then
-            return
-        end
-
-        self.Minimized = true
-
-        local StartPosition =
-            Main.Position
-
-        local CenterX =
-            StartPosition.X.Offset
-            + WINDOW_WIDTH / 2
-
-        local CenterY =
-            StartPosition.Y.Offset
-            + WINDOW_HEIGHT / 2
-
-        MinimizedButton.Visible = true
-
-        MinimizedButton.Size =
-            UDim2.fromOffset(
-                1,
-                1
-            )
-
-        MinimizedButton.BackgroundTransparency =
-            1
-
-        MinimizedButton.ImageTransparency =
-            1
-
-        tween(
-            Main,
-            0.3,
-            {
-                Size = UDim2.fromOffset(
-                    0,
-                    0
-                ),
-
-                Position = UDim2.new(
-                    StartPosition.X.Scale,
-                    CenterX,
-
-                    StartPosition.Y.Scale,
-                    CenterY
-                ),
-
-                BackgroundTransparency = 1
-            }
-        )
-
-        tween(
-            MinimizedButton,
-            0.3,
-            {
-                Size = UDim2.fromOffset(
-                    58,
-                    58
-                ),
-
-                ImageTransparency = 0
-            }
-        )
-
-        task.delay(
-            0.3,
-            function()
-
-                Main.Visible = false
-
-                Main.Size =
-                    UDim2.fromOffset(
-                        WINDOW_WIDTH,
-                        WINDOW_HEIGHT
-                    )
-
-                Main.Position =
-                    StartPosition
-
-                Main.BackgroundTransparency =
-                    0
-            end
-        )
-    end
-
-    --// Restore
-    function Object:Restore()
-
-        if not self.Minimized then
-            return
-        end
-
-        self.Minimized = false
-
-        local TargetPosition =
-            Main.Position
-
-        local CenterX =
-            TargetPosition.X.Offset
-            + WINDOW_WIDTH / 2
-
-        local CenterY =
-            TargetPosition.Y.Offset
-            + WINDOW_HEIGHT / 2
-
-        tween(
-            MinimizedButton,
-            0.2,
-            {
-                Size = UDim2.fromOffset(
-                    1,
-                    1
-                ),
-
-                ImageTransparency = 1
-            }
-        )
-
+    MiniButton.MouseButton1Click:Connect(function()
+        Minimized = false
         Main.Visible = true
+        MiniButton.Visible = false
+    end)
 
-        Main.Size =
-            UDim2.fromOffset(
-                0,
-                0
-            )
+    --==================================================
+    -- MINIMIZED BUTTON DRAG
+    --==================================================
 
-        Main.Position =
-            UDim2.new(
-                TargetPosition.X.Scale,
-                CenterX,
+    local MiniDragging = false
+    local MiniDragStart
+    local MiniStartPosition
 
-                TargetPosition.Y.Scale,
-                CenterY
-            )
+    MiniButton.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
 
-        Main.BackgroundTransparency = 1
+            MiniDragging = true
+            MiniDragStart = Input.Position
+            MiniStartPosition = MiniButton.Position
 
-        tween(
-            Main,
-            0.3,
-            {
-                Size = UDim2.fromOffset(
-                    WINDOW_WIDTH,
-                    WINDOW_HEIGHT
-                ),
-
-                Position = TargetPosition,
-
-                BackgroundTransparency = 0
-            }
-        )
-
-        task.delay(
-            0.2,
-            function()
-
-                MinimizedButton.Visible =
-                    false
-
-                MinimizedButton.Size =
-                    UDim2.fromOffset(
-                        58,
-                        58
-                    )
-
-                MinimizedButton.BackgroundTransparency =
-                    1
-
-                MinimizedButton.ImageTransparency =
-                    0
-            end
-        )
-    end
-
-    --// Destroy
-    function Object:Destroy()
-
-        if ScreenGui then
-            ScreenGui:Destroy()
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    MiniDragging = false
+                end
+            end)
         end
-    end
+    end)
 
-    --// Refresh Theme
-    function Object:RefreshTheme()
-
-        local NewTheme =
-            self.OTC:GetTheme()
-
-        if not NewTheme then
+    UserInputService.InputChanged:Connect(function(Input)
+        if not MiniDragging then
             return
         end
 
-        Main.BackgroundColor3 =
-            NewTheme.Background
+        if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
 
-        Topbar.BackgroundColor3 =
-            NewTheme.Secondary
+            local Delta = Input.Position - MiniDragStart
 
-        Sidebar.BackgroundColor3 =
-            NewTheme.Secondary
+            MiniButton.Position = UDim2.new(
+                MiniStartPosition.X.Scale,
+                MiniStartPosition.X.Offset + Delta.X,
+                MiniStartPosition.Y.Scale,
+                MiniStartPosition.Y.Offset + Delta.Y
+            )
+        end
+    end)
 
-        Content.BackgroundColor3 =
-            NewTheme.Background
+    --==================================================
+    -- THEME
+    --==================================================
 
-        UserCard.BackgroundColor3 =
-            NewTheme.Element
+    function Object:RefreshTheme()
+        local NewTheme = OTC:GetTheme()
 
-        UserAvatar.BackgroundColor3 =
-            NewTheme.Secondary
+        Main.BackgroundColor3 = NewTheme.Background
+        TopBar.BackgroundColor3 = NewTheme.Secondary
+        Sidebar.BackgroundColor3 = NewTheme.Secondary
+        Content.BackgroundColor3 = NewTheme.Background
 
-        UserDisplayName.TextColor3 =
-            NewTheme.Text
+        Title.TextColor3 = NewTheme.Text
+        Subtitle.TextColor3 = NewTheme.SubText
 
-        UserUsername.TextColor3 =
-            NewTheme.SubText
+        MinimizeButton.BackgroundColor3 = NewTheme.Element
+        MiniButton.BackgroundColor3 = NewTheme.Element
 
-        Logo.TextColor3 =
-            NewTheme.Text
+        UserCard.BackgroundColor3 = NewTheme.Element
+        UserAvatar.BackgroundColor3 = NewTheme.Hover
 
-        Subtitle.TextColor3 =
-            NewTheme.SubText
+        UserDisplayName.TextColor3 = NewTheme.Text
+        UserUsername.TextColor3 = NewTheme.SubText
 
-        Close.TextColor3 =
-            NewTheme.SubText
-
-        Minimize.TextColor3 =
-            NewTheme.SubText
+        UserSeparator.BackgroundColor3 = NewTheme.Border
     end
 
-    --// Drag Main Window
-    local Dragging = false
-    local DragStart = nil
-    local StartPosition = nil
-
-    Topbar.InputBegan:Connect(function(Input)
-
-        if Input.UserInputType
-            == Enum.UserInputType.MouseButton1
-            or Input.UserInputType
-            == Enum.UserInputType.Touch then
-
-            Dragging = true
-
-            DragStart =
-                Input.Position
-
-            StartPosition =
-                Main.Position
-        end
-    end)
-
-    Topbar.InputEnded:Connect(function(Input)
-
-        if Input.UserInputType
-            == Enum.UserInputType.MouseButton1
-            or Input.UserInputType
-            == Enum.UserInputType.Touch then
-
-            Dragging = false
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if not Dragging then
-                return
-            end
-
-            if Input.UserInputType
-                ~= Enum.UserInputType.MouseMovement
-                and Input.UserInputType
-                ~= Enum.UserInputType.Touch then
-
-                return
-            end
-
-            local Delta =
-                Input.Position
-                - DragStart
-
-            Main.Position =
-                UDim2.new(
-
-                    StartPosition.X.Scale,
-
-                    StartPosition.X.Offset
-                        + Delta.X,
-
-                    StartPosition.Y.Scale,
-
-                    StartPosition.Y.Offset
-                        + Delta.Y
-                )
-        end
-    )
-
-    --// Drag Minimized Logo
-    local LogoDragging = false
-    local LogoDragStart = nil
-    local LogoStartPosition = nil
-
-    MinimizedButton.InputBegan:Connect(
-        function(Input)
-
-            if Input.UserInputType
-                == Enum.UserInputType.MouseButton1
-                or Input.UserInputType
-                == Enum.UserInputType.Touch then
-
-                LogoDragging = true
-
-                LogoDragStart =
-                    Input.Position
-
-                LogoStartPosition =
-                    MinimizedButton.Position
-            end
-        end
-    )
-
-    MinimizedButton.InputEnded:Connect(
-        function(Input)
-
-            if Input.UserInputType
-                == Enum.UserInputType.MouseButton1
-                or Input.UserInputType
-                == Enum.UserInputType.Touch then
-
-                LogoDragging = false
-            end
-        end
-    )
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if not LogoDragging then
-                return
-            end
-
-            if Input.UserInputType
-                ~= Enum.UserInputType.MouseMovement
-                and Input.UserInputType
-                ~= Enum.UserInputType.Touch then
-
-                return
-            end
-
-            local Delta =
-                Input.Position
-                - LogoDragStart
-
-            MinimizedButton.Position =
-                UDim2.new(
-
-                    LogoStartPosition.X.Scale,
-
-                    LogoStartPosition.X.Offset
-                        + Delta.X,
-
-                    LogoStartPosition.Y.Scale,
-
-                    LogoStartPosition.Y.Offset
-                        + Delta.Y
-                )
-        end
-    )
-
-    --// Close Hover
-    Close.MouseEnter:Connect(function()
-
-        tween(
-            Close,
-            0.15,
-            {
-                TextColor3 =
-                    Color3.fromRGB(
-                        255,
-                        80,
-                        80
-                    )
-            }
-        )
-    end)
-
-    Close.MouseLeave:Connect(function()
-
-        tween(
-            Close,
-            0.15,
-            {
-                TextColor3 =
-                    Theme.SubText
-            }
-        )
-    end)
-
-    --// Close
-    Close.MouseButton1Click:Connect(
-        function()
-
-            tween(
-                Main,
-                0.2,
-                {
-                    Size = UDim2.fromOffset(
-                        WINDOW_WIDTH,
-                        0
-                    )
-                }
-            )
-
-            task.wait(0.2)
-
-            Object:Destroy()
-        end
-    )
-
-    --// Minimize
-    Minimize.MouseButton1Click:Connect(
-        function()
-
-            Object:Minimize()
-        end
-    )
-
-    --// Restore
-    MinimizedButton.MouseButton1Click:Connect(
-        function()
-
-            Object:Restore()
-        end
-    )
+    --==================================================
+    -- RETURN
+    --==================================================
 
     return Object
 end
