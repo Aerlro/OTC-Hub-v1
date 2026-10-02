@@ -559,6 +559,245 @@ function Window.Create(Settings, OTC)
         end)
     end
 
+    local function Unload()
+        if Object.Closed then
+            return
+        end
+
+        Object.Closed = true
+
+        local Scale = Main:FindFirstChild("AnimationScale")
+
+        if Scale then
+            TweenService:Create(
+                Scale,
+                TweenInfo.new(
+                    0.14,
+                    Enum.EasingStyle.Quint,
+                    Enum.EasingDirection.In
+                ),
+                {
+                    Scale = 0.92
+                }
+            ):Play()
+        end
+
+        TweenService:Create(
+            Main,
+            TweenInfo.new(
+                0.14,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.In
+            ),
+            {
+                Position = Main.Position + UDim2.fromOffset(0, 20)
+            }
+        ):Play()
+
+        task.delay(0.15, function()
+            if ScreenGui then
+                ScreenGui:Destroy()
+            end
+        end)
+    end
+
+    local function CreateUnloadConfirmation()
+        if ScreenGui:FindFirstChild("UnloadConfirmation") then
+            return
+        end
+
+        local Overlay = create("Frame", {
+            Name = "UnloadConfirmation",
+            Parent = ScreenGui,
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            BackgroundTransparency = 0.45,
+            BorderSizePixel = 0,
+            Size = UDim2.fromScale(1, 1),
+            ZIndex = 200
+        })
+
+        local Popup = create("Frame", {
+            Name = "Popup",
+            Parent = Overlay,
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            BackgroundColor3 = Theme.Background,
+            BorderSizePixel = 0,
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(360, 175),
+            ZIndex = 201
+        })
+
+        create("UICorner", {
+            Parent = Popup,
+            CornerRadius = UDim.new(0, 10)
+        })
+
+        create("UIStroke", {
+            Parent = Popup,
+            Color = Theme.Border,
+            Thickness = 1
+        })
+
+        local PopupTitle = create("TextLabel", {
+            Name = "Title",
+            Parent = Popup,
+            BackgroundTransparency = 1,
+            Text = "Unload OTC Hub?",
+            TextColor3 = Theme.Text,
+            Font = Enum.Font.GothamBold,
+            TextSize = 18,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Position = UDim2.fromOffset(20, 18),
+            Size = UDim2.new(1, -40, 0, 28),
+            ZIndex = 202
+        })
+
+        local PopupText = create("TextLabel", {
+            Name = "Description",
+            Parent = Popup,
+            BackgroundTransparency = 1,
+            Text = "Are you sure you want to unload the UI?",
+            TextColor3 = Theme.SubText,
+            Font = Enum.Font.Gotham,
+            TextSize = 13,
+            TextWrapped = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Position = UDim2.fromOffset(20, 52),
+            Size = UDim2.new(1, -40, 0, 42),
+            ZIndex = 202
+        })
+
+        local CancelButton = create("TextButton", {
+            Name = "Cancel",
+            Parent = Popup,
+            BackgroundColor3 = Theme.Element,
+            BorderSizePixel = 0,
+            Text = "Cancel",
+            TextColor3 = Theme.Text,
+            Font = Enum.Font.GothamBold,
+            TextSize = 13,
+            Position = UDim2.new(1, -190, 1, -48),
+            Size = UDim2.fromOffset(80, 32),
+            AutoButtonColor = false,
+            ZIndex = 202
+        })
+
+        create("UICorner", {
+            Parent = CancelButton,
+            CornerRadius = UDim.new(0, 7)
+        })
+
+        local UnloadButton = create("TextButton", {
+            Name = "Unload",
+            Parent = Popup,
+            BackgroundColor3 = Theme.Text,
+            BorderSizePixel = 0,
+            Text = "Unload",
+            TextColor3 = Theme.Background,
+            Font = Enum.Font.GothamBold,
+            TextSize = 13,
+            Position = UDim2.new(1, -100, 1, -48),
+            Size = UDim2.fromOffset(80, 32),
+            AutoButtonColor = false,
+            ZIndex = 202
+        })
+
+        create("UICorner", {
+            Parent = UnloadButton,
+            CornerRadius = UDim.new(0, 7)
+        })
+
+        local PopupScale = Instance.new("UIScale")
+        PopupScale.Scale = 0.9
+        PopupScale.Parent = Popup
+
+        Overlay.BackgroundTransparency = 1
+
+        TweenService:Create(
+            Overlay,
+            TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {
+                BackgroundTransparency = 0.45
+            }
+        ):Play()
+
+        TweenService:Create(
+            PopupScale,
+            TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {
+                Scale = 1
+            }
+        ):Play()
+
+        CancelButton.MouseEnter:Connect(function()
+            TweenService:Create(
+                CancelButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {
+                    BackgroundColor3 = Theme.Hover
+                }
+            ):Play()
+        end)
+
+        CancelButton.MouseLeave:Connect(function()
+            TweenService:Create(
+                CancelButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {
+                    BackgroundColor3 = Theme.Element
+                }
+            ):Play()
+        end)
+
+        UnloadButton.MouseEnter:Connect(function()
+            TweenService:Create(
+                UnloadButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {
+                    BackgroundColor3 = Theme.AccentDark
+                }
+            ):Play()
+        end)
+
+        UnloadButton.MouseLeave:Connect(function()
+            TweenService:Create(
+                UnloadButton,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {
+                    BackgroundColor3 = Theme.Text
+                }
+            ):Play()
+        end)
+
+        CancelButton.MouseButton1Click:Connect(function()
+            TweenService:Create(
+                PopupScale,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                {
+                    Scale = 0.9
+                }
+            ):Play()
+
+            TweenService:Create(
+                Overlay,
+                TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                {
+                    BackgroundTransparency = 1
+                }
+            ):Play()
+
+            task.delay(0.11, function()
+                if Overlay then
+                    Overlay:Destroy()
+                end
+            end)
+        end)
+
+        UnloadButton.MouseButton1Click:Connect(function()
+            Unload()
+        end)
+    end
+
     MinimizeButton.MouseButton1Click:Connect(function()
         Minimize()
     end)
@@ -568,24 +807,7 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        Object.Closed = true
-
-        Animation:Scale(
-            Main,
-            0.92,
-            0.18
-        )
-
-        Animation:FadeOut(
-            Main,
-            0.18
-        )
-
-        task.delay(0.2, function()
-            if ScreenGui then
-                ScreenGui:Destroy()
-            end
-        end)
+        CreateUnloadConfirmation()
     end)
 
     MinimizeButton.MouseEnter:Connect(function()
@@ -769,6 +991,10 @@ function Window.Create(Settings, OTC)
         if self.ScreenGui then
             self.ScreenGui:Destroy()
         end
+    end
+
+    function Object:Unload()
+        Unload()
     end
 
     function Object:RefreshTheme()
