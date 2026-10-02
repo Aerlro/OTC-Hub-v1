@@ -98,9 +98,10 @@ function Window.Create(Settings, OTC)
 
     local Logo = Instance.new("ImageLabel")
     Logo.Name = "Logo"
-    Logo.Size = UDim2.new(0, 38, 0, 38)
-    Logo.Position = UDim2.new(0, 12, 0.5, -19)
+    Logo.Size = UDim2.new(0, 30, 0, 30)
+    Logo.Position = UDim2.new(0, 14, 0.5, -15)
     Logo.BackgroundTransparency = 1
+    Logo.BorderSizePixel = 0
     Logo.Image = "rbxassetid://116094782851554"
     Logo.ScaleType = Enum.ScaleType.Fit
     Logo.Parent = TopBar
@@ -108,7 +109,7 @@ function Window.Create(Settings, OTC)
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 58, 0, 9)
+    Title.Position = UDim2.new(0, 52, 0, 9)
     Title.Size = UDim2.new(0, 300, 0, 24)
     Title.Font = Enum.Font.GothamBold
     Title.Text = Settings.Name or "OTC Hub"
@@ -120,7 +121,7 @@ function Window.Create(Settings, OTC)
     local Subtitle = Instance.new("TextLabel")
     Subtitle.Name = "Subtitle"
     Subtitle.BackgroundTransparency = 1
-    Subtitle.Position = UDim2.new(0, 58, 0, 32)
+    Subtitle.Position = UDim2.new(0, 52, 0, 32)
     Subtitle.Size = UDim2.new(0, 300, 0, 18)
     Subtitle.Font = Enum.Font.Gotham
     Subtitle.Text = Settings.Subtitle or "by Aerlro"
@@ -753,7 +754,6 @@ function Window.Create(Settings, OTC)
         TopBar.BackgroundColor3 = NewTheme.Secondary
         BottomFix.BackgroundColor3 = NewTheme.Secondary
 
-        Logo.ImageColor3 = NewTheme.Text
         Title.TextColor3 = NewTheme.Text
         Subtitle.TextColor3 = NewTheme.SubText
 
