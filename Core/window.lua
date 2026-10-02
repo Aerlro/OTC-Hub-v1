@@ -6,7 +6,7 @@ local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
 
-local LOGO_URL = "rbxassetid://82435776198191"
+local LOGO_URL = "rbxassetid://116094782851554"
 
 local function create(ClassName, Properties)
     local Object = Instance.new(ClassName)
