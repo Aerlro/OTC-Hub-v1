@@ -1,8 +1,16 @@
+--[[
+    OTC Hub v1
+    Button Element
+    by Aerlro
+]]
+
 local Button = {}
 
 local TweenService = game:GetService("TweenService")
 
+--// Create
 local function create(Class, Properties)
+
     local Object = Instance.new(Class)
 
     for Property, Value in pairs(Properties or {}) do
@@ -12,7 +20,14 @@ local function create(Class, Properties)
     return Object
 end
 
+--// Tween
 local function tween(Object, Time, Properties)
+
+    if not Object
+        or not Object.Parent then
+        return
+    end
+
     local Animation = TweenService:Create(
         Object,
         TweenInfo.new(
@@ -28,301 +43,653 @@ local function tween(Object, Time, Properties)
     return Animation
 end
 
-function Button.Create(Tab, OTC, Settings)
+--// Create Button
+function Button.Create(
+    Tab,
+    OTC,
+    Settings
+)
 
     Settings = Settings or {}
 
-    local Theme = OTC:GetTheme()
+    local Name =
+        Settings.Name
+        or "Button"
 
-    local Name = Settings.Name or "Button"
-    local Description = Settings.Description
-    local Callback = Settings.Callback or function() end
+    local Description =
+        Settings.Description
 
-    local FrameHeight = Description and 62 or 48
+    local Callback =
+        Settings.Callback
+        or function()
+        end
 
-    local Frame = create("Frame", {
-        Name = "Button",
-        Parent = Tab.Page,
+    --// Current Theme
+    local function getTheme()
 
-        BackgroundColor3 = Theme.Element,
-        BorderSizePixel = 0,
+        return OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes.Default
 
-        Size = UDim2.new(1, 0, 0, FrameHeight)
-    })
+    end
 
-    create("UICorner", {
-        Parent = Frame,
-        CornerRadius = UDim.new(0, 8)
-    })
+    local Theme =
+        getTheme()
 
-    local Stroke = create("UIStroke", {
-        Parent = Frame,
-        Color = Theme.Border,
-        Thickness = 1
-    })
+    --// State
+    local Hovered = false
+    local Pressed = false
 
-    local Scale = create("UIScale", {
-        Parent = Frame,
-        Scale = 1
-    })
+    --// Height
+    local FrameHeight =
+        Description
+        and 62
+        or 48
 
-    local ButtonObject = create("TextButton", {
-        Name = "Button",
-        Parent = Frame,
+    --// Main Frame
+    local Frame = create(
+        "Frame",
+        {
+            Name = "Button",
 
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
+            Parent = Tab.Page,
 
-        Size = UDim2.fromScale(1, 1),
+            BackgroundColor3 =
+                Theme.Element,
 
-        AutoButtonColor = false,
-        Text = ""
-    })
+            BorderSizePixel = 0,
 
+            Size =
+                UDim2.new(
+                    1,
+                    0,
+                    0,
+                    FrameHeight
+                )
+        }
+    )
+
+    create(
+        "UICorner",
+        {
+            Parent = Frame,
+
+            CornerRadius =
+                UDim.new(
+                    0,
+                    8
+                )
+        }
+    )
+
+    --// Stroke
+    local Stroke = create(
+        "UIStroke",
+        {
+            Parent = Frame,
+
+            Color =
+                Theme.Border,
+
+            Thickness = 1
+        }
+    )
+
+    --// Scale
+    local Scale = create(
+        "UIScale",
+        {
+            Parent = Frame,
+
+            Scale = 1
+        }
+    )
+
+    --// Button
+    local ButtonObject = create(
+        "TextButton",
+        {
+            Name = "Button",
+
+            Parent = Frame,
+
+            BackgroundTransparency = 1,
+
+            BorderSizePixel = 0,
+
+            Size =
+                UDim2.fromScale(
+                    1,
+                    1
+                ),
+
+            AutoButtonColor = false,
+
+            Text = ""
+        }
+    )
+
+    --// Title
     local Title
 
     if Description then
-        Title = create("TextLabel", {
-            Name = "Title",
-            Parent = ButtonObject,
 
-            BackgroundTransparency = 1,
+        Title = create(
+            "TextLabel",
+            {
+                Name = "Title",
 
-            Position = UDim2.fromOffset(15, 7),
-            Size = UDim2.new(1, -90, 0, 24),
+                Parent = ButtonObject,
 
-            Font = Enum.Font.GothamMedium,
+                BackgroundTransparency = 1,
 
-            Text = Name,
-            TextColor3 = Theme.Text,
-            TextSize = 13,
+                Position =
+                    UDim2.fromOffset(
+                        15,
+                        7
+                    ),
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+                Size =
+                    UDim2.new(
+                        1,
+                        -90,
+                        0,
+                        24
+                    ),
 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        })
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = Name,
+
+                TextColor3 =
+                    Theme.Text,
+
+                TextSize = 13,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Left,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center,
+
+                TextTruncate =
+                    Enum.TextTruncate.AtEnd
+            }
+        )
+
     else
-        Title = create("TextLabel", {
-            Name = "Title",
-            Parent = ButtonObject,
 
-            BackgroundTransparency = 1,
+        Title = create(
+            "TextLabel",
+            {
+                Name = "Title",
 
-            AnchorPoint = Vector2.new(0, 0.5),
-            Position = UDim2.new(0, 15, 0.5, 0),
-            Size = UDim2.new(1, -90, 0, 24),
+                Parent = ButtonObject,
 
-            Font = Enum.Font.GothamMedium,
+                BackgroundTransparency = 1,
 
-            Text = Name,
-            TextColor3 = Theme.Text,
-            TextSize = 13,
+                AnchorPoint =
+                    Vector2.new(
+                        0,
+                        0.5
+                    ),
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+                Position =
+                    UDim2.new(
+                        0,
+                        15,
+                        0.5,
+                        0
+                    ),
 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        })
+                Size =
+                    UDim2.new(
+                        1,
+                        -90,
+                        0,
+                        24
+                    ),
+
+                Font =
+                    Enum.Font.GothamMedium,
+
+                Text = Name,
+
+                TextColor3 =
+                    Theme.Text,
+
+                TextSize = 13,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Left,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center,
+
+                TextTruncate =
+                    Enum.TextTruncate.AtEnd
+            }
+        )
     end
 
+    --// Description
     local DescriptionLabel
 
     if Description then
-        DescriptionLabel = create("TextLabel", {
-            Name = "Description",
+
+        DescriptionLabel = create(
+            "TextLabel",
+            {
+                Name = "Description",
+
+                Parent = ButtonObject,
+
+                BackgroundTransparency = 1,
+
+                Position =
+                    UDim2.fromOffset(
+                        15,
+                        31
+                    ),
+
+                Size =
+                    UDim2.new(
+                        1,
+                        -90,
+                        0,
+                        20
+                    ),
+
+                Font =
+                    Enum.Font.Gotham,
+
+                Text = Description,
+
+                TextColor3 =
+                    Theme.SubText,
+
+                TextSize = 11,
+
+                TextWrapped = true,
+
+                TextXAlignment =
+                    Enum.TextXAlignment.Left,
+
+                TextYAlignment =
+                    Enum.TextYAlignment.Center,
+
+                TextTruncate =
+                    Enum.TextTruncate.AtEnd
+            }
+        )
+    end
+
+    --// Execute
+    local Execute = create(
+        "TextLabel",
+        {
+            Name = "Execute",
+
             Parent = ButtonObject,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(15, 31),
-            Size = UDim2.new(1, -90, 0, 20),
+            AnchorPoint =
+                Vector2.new(
+                    1,
+                    0.5
+                ),
 
-            Font = Enum.Font.Gotham,
+            Position =
+                UDim2.new(
+                    1,
+                    -15,
+                    0.5,
+                    0
+                ),
 
-            Text = Description,
-            TextColor3 = Theme.SubText,
-            TextSize = 11,
+            Size =
+                UDim2.fromOffset(
+                    55,
+                    25
+                ),
 
-            TextWrapped = true,
+            Font =
+                Enum.Font.GothamMedium,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+            Text = "EXECUTE",
 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        })
-    end
+            TextColor3 =
+                Theme.Accent,
 
-    local Execute = create("TextLabel", {
-        Name = "Execute",
-        Parent = ButtonObject,
+            TextSize = 10,
 
-        BackgroundTransparency = 1,
+            TextXAlignment =
+                Enum.TextXAlignment.Right,
 
-        AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -15, 0.5, 0),
+            TextYAlignment =
+                Enum.TextYAlignment.Center
+        }
+    )
 
-        Size = UDim2.fromOffset(55, 25),
-
-        Font = Enum.Font.GothamMedium,
-
-        Text = "EXECUTE",
-        TextColor3 = Theme.Accent,
-        TextSize = 10,
-
-        TextXAlignment = Enum.TextXAlignment.Right,
-        TextYAlignment = Enum.TextYAlignment.Center
-    })
-
-    ButtonObject.MouseEnter:Connect(function()
-
-        tween(Frame, 0.15, {
-            BackgroundColor3 = Theme.Hover
-        })
-
-        tween(Stroke, 0.15, {
-            Color = Theme.AccentDark
-        })
-
-        tween(Execute, 0.15, {
-            TextColor3 = Theme.Text
-        })
-
-    end)
-
-    ButtonObject.MouseLeave:Connect(function()
-
-        tween(Frame, 0.15, {
-            BackgroundColor3 = Theme.Element
-        })
-
-        tween(Stroke, 0.15, {
-            Color = Theme.Border
-        })
-
-        tween(Execute, 0.15, {
-            TextColor3 = Theme.Accent
-        })
-
-    end)
-
-    ButtonObject.MouseButton1Down:Connect(function()
-
-        tween(Scale, 0.08, {
-            Scale = 0.985
-        })
-
-    end)
-
-    ButtonObject.MouseButton1Up:Connect(function()
-
-        tween(Scale, 0.12, {
-            Scale = 1
-        })
-
-    end)
-
-    ButtonObject.MouseButton1Click:Connect(function()
-
-        tween(Scale, 0.06, {
-            Scale = 0.975
-        })
-
-        task.delay(0.06, function()
-
-            if Scale and Scale.Parent then
-
-                tween(Scale, 0.1, {
-                    Scale = 1
-                })
-
-            end
-
-        end)
-
-        local Success, Error = pcall(Callback)
-
-        if not Success then
-
-            warn(
-                "[OTC Hub] Button callback error:",
-                Error
-            )
-
-        end
-
-    end)
-
-    local Object = {}
-
-    function Object:SetName(NewName)
-
-        Name = tostring(NewName)
-
-        Title.Text = Name
-
-    end
-
-    function Object:SetDescription(NewDescription)
-
-        Description = NewDescription
-
-        if DescriptionLabel then
-
-            DescriptionLabel.Text =
-                tostring(NewDescription)
-
-        end
-
-    end
-
-    function Object:SetCallback(NewCallback)
-
-        if type(NewCallback) == "function" then
-
-            Callback = NewCallback
-
-        end
-
-    end
-
-    function Object:RefreshTheme()
+    --// Apply State
+    local function applyState(Animated)
 
         local CurrentTheme =
-            OTC._Themes[Tab.Window.Theme]
-            or OTC._Themes.Default
+            getTheme()
 
-        Frame.BackgroundColor3 =
-            CurrentTheme.Element
+        local BackgroundColor
+        local StrokeColor
+        local ExecuteColor
 
-        Stroke.Color =
-            CurrentTheme.Border
+        if Pressed then
 
-        Title.TextColor3 =
-            CurrentTheme.Text
+            BackgroundColor =
+                CurrentTheme.Hover
 
-        if DescriptionLabel then
+            StrokeColor =
+                CurrentTheme.Accent
+
+            ExecuteColor =
+                CurrentTheme.Text
+
+        elseif Hovered then
+
+            BackgroundColor =
+                CurrentTheme.Hover
+
+            StrokeColor =
+                CurrentTheme.AccentDark
+
+            ExecuteColor =
+                CurrentTheme.Text
+
+        else
+
+            BackgroundColor =
+                CurrentTheme.Element
+
+            StrokeColor =
+                CurrentTheme.Border
+
+            ExecuteColor =
+                CurrentTheme.Accent
+        end
+
+        if Animated then
+
+            tween(
+                Frame,
+                0.15,
+                {
+                    BackgroundColor3 =
+                        BackgroundColor
+                }
+            )
+
+            tween(
+                Stroke,
+                0.15,
+                {
+                    Color =
+                        StrokeColor
+                }
+            )
+
+            tween(
+                Execute,
+                0.15,
+                {
+                    TextColor3 =
+                        ExecuteColor
+                }
+            )
+
+        else
+
+            Frame.BackgroundColor3 =
+                BackgroundColor
+
+            Stroke.Color =
+                StrokeColor
+
+            Execute.TextColor3 =
+                ExecuteColor
+        end
+    end
+
+    --// Mouse Enter
+    ButtonObject.MouseEnter:Connect(
+        function()
+
+            Hovered = true
+
+            applyState(true)
+
+        end
+    )
+
+    --// Mouse Leave
+    ButtonObject.MouseLeave:Connect(
+        function()
+
+            Hovered = false
+            Pressed = false
+
+            applyState(true)
+
+        end
+    )
+
+    --// Mouse Down
+    ButtonObject.MouseButton1Down:Connect(
+        function()
+
+            Pressed = true
+
+            tween(
+                Scale,
+                0.08,
+                {
+                    Scale = 0.985
+                }
+            )
+
+            applyState(true)
+
+        end
+    )
+
+    --// Mouse Up
+    ButtonObject.MouseButton1Up:Connect(
+        function()
+
+            Pressed = false
+
+            tween(
+                Scale,
+                0.12,
+                {
+                    Scale = 1
+                }
+            )
+
+            applyState(true)
+
+        end
+    )
+
+    --// Click
+    ButtonObject.MouseButton1Click:Connect(
+        function()
+
+            tween(
+                Scale,
+                0.06,
+                {
+                    Scale = 0.975
+                }
+            )
+
+            task.delay(
+                0.06,
+                function()
+
+                    if Scale
+                        and Scale.Parent then
+
+                        tween(
+                            Scale,
+                            0.1,
+                            {
+                                Scale = 1
+                            }
+                        )
+
+                    end
+                end
+            )
+
+            local Success, Error =
+                pcall(
+                    Callback
+                )
+
+            if not Success then
+
+                warn(
+                    "[OTC Hub] Button callback error:",
+                    Error
+                )
+
+            end
+        end
+    )
+
+    --// Object
+    local Object = {}
+
+    Object.Type =
+        "Button"
+
+    Object.Instance =
+        Frame
+
+    Object.Button =
+        ButtonObject
+
+    Object.Title =
+        Title
+
+    Object.Description =
+        DescriptionLabel
+
+    Object.Execute =
+        Execute
+
+    --// Set Name
+    function Object:SetName(NewName)
+
+        Name =
+            tostring(
+                NewName
+            )
+
+        if Title
+            and Title.Parent then
+
+            Title.Text =
+                Name
+        end
+    end
+
+    --// Set Description
+    function Object:SetDescription(
+        NewDescription
+    )
+
+        Description =
+            NewDescription
+
+        if DescriptionLabel
+            and DescriptionLabel.Parent then
+
+            DescriptionLabel.Text =
+                tostring(
+                    NewDescription
+                )
+        end
+    end
+
+    --// Set Callback
+    function Object:SetCallback(
+        NewCallback
+    )
+
+        if type(NewCallback)
+            == "function" then
+
+            Callback =
+                NewCallback
+        end
+    end
+
+    --// Refresh Theme
+    function Object:RefreshTheme()
+
+        if not Frame
+            or not Frame.Parent then
+            return
+        end
+
+        local CurrentTheme =
+            getTheme()
+
+        --// Title
+        if Title
+            and Title.Parent then
+
+            Title.TextColor3 =
+                CurrentTheme.Text
+        end
+
+        --// Description
+        if DescriptionLabel
+            and DescriptionLabel.Parent then
 
             DescriptionLabel.TextColor3 =
                 CurrentTheme.SubText
-
         end
 
-        Execute.TextColor3 =
-            CurrentTheme.Accent
+        --// Execute
+        if Execute
+            and Execute.Parent then
+
+            Execute.TextColor3 =
+                CurrentTheme.Accent
+        end
+
+        --// Main colors
+        --// Respect current hover/pressed state
+        applyState(false)
 
     end
 
+    --// Destroy
     function Object:Destroy()
 
-        Frame:Destroy()
+        if Frame
+            and Frame.Parent then
 
+            Frame:Destroy()
+
+        end
     end
 
-    Object.Instance = Frame
-    Object.Button = ButtonObject
-
-    Tab:AddElement(Object)
+    --// Register
+    Tab:AddElement(
+        Object
+    )
 
     return Object
 end
