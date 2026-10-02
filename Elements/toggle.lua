@@ -1,3 +1,9 @@
+--[[
+    OTC Hub v1
+    Toggle Element
+    by Aerlro
+]]
+
 local Toggle = {}
 
 local TweenService = game:GetService("TweenService")
@@ -34,45 +40,81 @@ function Toggle.Create(Tab, OTC, Settings)
 
     local Theme = OTC:GetTheme()
 
-    local Name = Settings.Name or "Toggle"
-    local Description = Settings.Description
-    local Flag = Settings.Flag
-    local CurrentValue = Settings.CurrentValue == true
-    local Callback = Settings.Callback or function() end
+    local Name =
+        Settings.Name
+        or "Toggle"
 
-    local FrameHeight = Description and 62 or 48
+    local Description =
+        Settings.Description
+
+    local Flag =
+        Settings.Flag
+
+    local CurrentValue =
+        Settings.CurrentValue == true
+
+    local Callback =
+        Settings.Callback
+        or function() end
+
+    local FrameHeight =
+        Description and 62 or 48
 
     local Frame = create("Frame", {
         Name = "Toggle",
+
         Parent = Tab.Page,
 
-        BackgroundColor3 = Theme.Element,
+        BackgroundColor3 =
+            Theme.Element,
+
         BorderSizePixel = 0,
 
-        Size = UDim2.new(1, 0, 0, FrameHeight)
+        Size =
+            UDim2.new(
+                1,
+                0,
+                0,
+                FrameHeight
+            )
     })
 
     create("UICorner", {
         Parent = Frame,
-        CornerRadius = UDim.new(0, 8)
+
+        CornerRadius =
+            UDim.new(
+                0,
+                8
+            )
     })
 
     local Stroke = create("UIStroke", {
         Parent = Frame,
-        Color = Theme.Border,
+
+        Color =
+            Theme.Border,
+
         Thickness = 1
     })
 
     local Button = create("TextButton", {
         Name = "Button",
+
         Parent = Frame,
 
         BackgroundTransparency = 1,
+
         BorderSizePixel = 0,
 
-        Size = UDim2.fromScale(1, 1),
+        Size =
+            UDim2.fromScale(
+                1,
+                1
+            ),
 
         AutoButtonColor = false,
+
         Text = ""
     })
 
@@ -82,47 +124,96 @@ function Toggle.Create(Tab, OTC, Settings)
 
         Title = create("TextLabel", {
             Name = "Title",
+
             Parent = Button,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(15, 7),
-            Size = UDim2.new(1, -90, 0, 24),
+            Position =
+                UDim2.fromOffset(
+                    15,
+                    7
+                ),
 
-            Font = Enum.Font.GothamMedium,
+            Size =
+                UDim2.new(
+                    1,
+                    -90,
+                    0,
+                    24
+                ),
 
-            Text = Name,
-            TextColor3 = Theme.Text,
+            Font =
+                Enum.Font.GothamMedium,
+
+            Text =
+                Name,
+
+            TextColor3 =
+                Theme.Text,
+
             TextSize = 13,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
 
-            TextTruncate = Enum.TextTruncate.AtEnd
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
+
+            TextTruncate =
+                Enum.TextTruncate.AtEnd
         })
 
     else
 
         Title = create("TextLabel", {
             Name = "Title",
+
             Parent = Button,
 
             BackgroundTransparency = 1,
 
-            AnchorPoint = Vector2.new(0, 0.5),
-            Position = UDim2.new(0, 15, 0.5, 0),
-            Size = UDim2.new(1, -90, 0, 24),
+            AnchorPoint =
+                Vector2.new(
+                    0,
+                    0.5
+                ),
 
-            Font = Enum.Font.GothamMedium,
+            Position =
+                UDim2.new(
+                    0,
+                    15,
+                    0.5,
+                    0
+                ),
 
-            Text = Name,
-            TextColor3 = Theme.Text,
+            Size =
+                UDim2.new(
+                    1,
+                    -90,
+                    0,
+                    24
+                ),
+
+            Font =
+                Enum.Font.GothamMedium,
+
+            Text =
+                Name,
+
+            TextColor3 =
+                Theme.Text,
+
             TextSize = 13,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
 
-            TextTruncate = Enum.TextTruncate.AtEnd
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
+
+            TextTruncate =
+                Enum.TextTruncate.AtEnd
         })
 
     end
@@ -133,168 +224,332 @@ function Toggle.Create(Tab, OTC, Settings)
 
         DescriptionLabel = create("TextLabel", {
             Name = "Description",
+
             Parent = Button,
 
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(15, 31),
-            Size = UDim2.new(1, -90, 0, 20),
+            Position =
+                UDim2.fromOffset(
+                    15,
+                    31
+                ),
 
-            Font = Enum.Font.Gotham,
+            Size =
+                UDim2.new(
+                    1,
+                    -90,
+                    0,
+                    20
+                ),
 
-            Text = Description,
-            TextColor3 = Theme.SubText,
+            Font =
+                Enum.Font.Gotham,
+
+            Text =
+                Description,
+
+            TextColor3 =
+                Theme.SubText,
+
             TextSize = 11,
 
             TextWrapped = true,
 
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
 
-            TextTruncate = Enum.TextTruncate.AtEnd
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
+
+            TextTruncate =
+                Enum.TextTruncate.AtEnd
         })
 
     end
 
     local ToggleBackground = create("Frame", {
-        Name = "ToggleBackground",
-        Parent = Button,
+        Name =
+            "ToggleBackground",
 
-        BackgroundColor3 = Theme.Background,
+        Parent =
+            Button,
+
+        BackgroundColor3 =
+            Theme.Background,
+
         BorderSizePixel = 0,
 
-        AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -15, 0.5, 0),
+        AnchorPoint =
+            Vector2.new(
+                1,
+                0.5
+            ),
 
-        Size = UDim2.fromOffset(42, 22)
+        Position =
+            UDim2.new(
+                1,
+                -15,
+                0.5,
+                0
+            ),
+
+        Size =
+            UDim2.fromOffset(
+                42,
+                22
+            )
     })
 
     create("UICorner", {
-        Parent = ToggleBackground,
-        CornerRadius = UDim.new(1, 0)
+        Parent =
+            ToggleBackground,
+
+        CornerRadius =
+            UDim.new(
+                1,
+                0
+            )
     })
 
     local ToggleStroke = create("UIStroke", {
-        Parent = ToggleBackground,
-        Color = Theme.Border,
+        Parent =
+            ToggleBackground,
+
+        Color =
+            Theme.Border,
+
         Thickness = 1
     })
 
     local Circle = create("Frame", {
         Name = "Circle",
-        Parent = ToggleBackground,
 
-        BackgroundColor3 = Theme.SubText,
+        Parent =
+            ToggleBackground,
+
+        BackgroundColor3 =
+            Theme.SubText,
+
         BorderSizePixel = 0,
 
-        Position = UDim2.fromOffset(3, 3),
-        Size = UDim2.fromOffset(16, 16)
+        Position =
+            UDim2.fromOffset(
+                3,
+                3
+            ),
+
+        Size =
+            UDim2.fromOffset(
+                16,
+                16
+            )
     })
 
     create("UICorner", {
         Parent = Circle,
-        CornerRadius = UDim.new(1, 0)
+
+        CornerRadius =
+            UDim.new(
+                1,
+                0
+            )
     })
+
+    local function getTheme()
+
+        return OTC._Themes[
+            Tab.Window.Theme
+        ]
+        or OTC._Themes.Default
+
+    end
 
     local function updateVisual()
 
+        local CurrentTheme =
+            getTheme()
+
         if CurrentValue then
 
-            tween(ToggleBackground, 0.2, {
-                BackgroundColor3 = Theme.Accent
-            })
+            tween(
+                ToggleBackground,
+                0.2,
+                {
+                    BackgroundColor3 =
+                        CurrentTheme.Accent
+                }
+            )
 
-            tween(ToggleStroke, 0.2, {
-                Color = Theme.Accent
-            })
+            tween(
+                ToggleStroke,
+                0.2,
+                {
+                    Color =
+                        CurrentTheme.Accent
+                }
+            )
 
-            tween(Circle, 0.2, {
-                Position = UDim2.new(1, -19, 0, 3),
-                BackgroundColor3 = Theme.Background
-            })
+            tween(
+                Circle,
+                0.2,
+                {
+                    Position =
+                        UDim2.new(
+                            1,
+                            -19,
+                            0,
+                            3
+                        ),
+
+                    BackgroundColor3 =
+                        CurrentTheme.Background
+                }
+            )
 
         else
 
-            tween(ToggleBackground, 0.2, {
-                BackgroundColor3 = Theme.Background
-            })
+            tween(
+                ToggleBackground,
+                0.2,
+                {
+                    BackgroundColor3 =
+                        CurrentTheme.Background
+                }
+            )
 
-            tween(ToggleStroke, 0.2, {
-                Color = Theme.Border
-            })
+            tween(
+                ToggleStroke,
+                0.2,
+                {
+                    Color =
+                        CurrentTheme.Border
+                }
+            )
 
-            tween(Circle, 0.2, {
-                Position = UDim2.fromOffset(3, 3),
-                BackgroundColor3 = Theme.SubText
-            })
+            tween(
+                Circle,
+                0.2,
+                {
+                    Position =
+                        UDim2.fromOffset(
+                            3,
+                            3
+                        ),
+
+                    BackgroundColor3 =
+                        CurrentTheme.SubText
+                }
+            )
 
         end
 
     end
 
-    local function setValue(Value, RunCallback)
+    local function setValue(
+        Value,
+        RunCallback
+    )
 
-        CurrentValue = Value == true
+        CurrentValue =
+            Value == true
 
         updateVisual()
 
         if Flag then
+
             OTC:SetFlag(
                 Flag,
                 CurrentValue
             )
+
         end
 
         if RunCallback then
 
-            local Success, Error = pcall(
-                Callback,
-                CurrentValue
-            )
+            local Success, Error =
+                pcall(
+                    Callback,
+                    CurrentValue
+                )
 
             if not Success then
+
                 warn(
                     "[OTC Hub] Toggle callback error:",
                     Error
                 )
+
             end
 
         end
 
     end
 
-    Button.MouseEnter:Connect(function()
+    Button.MouseEnter:Connect(
+        function()
 
-        tween(Frame, 0.15, {
-            BackgroundColor3 = Theme.Hover
-        })
+            local CurrentTheme =
+                getTheme()
 
-        tween(Stroke, 0.15, {
-            Color = Theme.AccentDark
-        })
+            tween(
+                Frame,
+                0.15,
+                {
+                    BackgroundColor3 =
+                        CurrentTheme.Hover
+                }
+            )
 
-    end)
+            tween(
+                Stroke,
+                0.15,
+                {
+                    Color =
+                        CurrentTheme.AccentDark
+                }
+            )
 
-    Button.MouseLeave:Connect(function()
+        end
+    )
 
-        tween(Frame, 0.15, {
-            BackgroundColor3 = Theme.Element
-        })
+    Button.MouseLeave:Connect(
+        function()
 
-        tween(Stroke, 0.15, {
-            Color = Theme.Border
-        })
+            local CurrentTheme =
+                getTheme()
 
-    end)
+            tween(
+                Frame,
+                0.15,
+                {
+                    BackgroundColor3 =
+                        CurrentTheme.Element
+                }
+            )
 
-    Button.MouseButton1Click:Connect(function()
+            tween(
+                Stroke,
+                0.15,
+                {
+                    Color =
+                        CurrentTheme.Border
+                }
+            )
 
-        setValue(
-            not CurrentValue,
-            true
-        )
+        end
+    )
 
-    end)
+    Button.MouseButton1Click:Connect(
+        function()
+
+            setValue(
+                not CurrentValue,
+                true
+            )
+
+        end
+    )
 
     setValue(
         CurrentValue,
@@ -304,43 +559,127 @@ function Toggle.Create(Tab, OTC, Settings)
     local Object = {}
 
     function Object:SetValue(Value)
+
         setValue(
             Value,
             true
         )
+
     end
 
     function Object:GetValue()
+
         return CurrentValue
+
     end
 
     function Object:SetName(NewName)
-        Name = tostring(NewName)
-        Title.Text = Name
+
+        Name =
+            tostring(NewName)
+
+        Title.Text =
+            Name
+
     end
 
-    function Object:SetDescription(NewDescription)
-        Description = NewDescription
+    function Object:SetDescription(
+        NewDescription
+    )
+
+        Description =
+            NewDescription
 
         if DescriptionLabel then
-            DescriptionLabel.Text = tostring(NewDescription)
+
+            DescriptionLabel.Text =
+                tostring(
+                    NewDescription
+                )
+
         end
+
     end
 
-    function Object:SetCallback(NewCallback)
-        if type(NewCallback) == "function" then
-            Callback = NewCallback
+    function Object:SetCallback(
+        NewCallback
+    )
+
+        if type(NewCallback) ==
+            "function" then
+
+            Callback =
+                NewCallback
+
         end
+
+    end
+
+    function Object:RefreshTheme()
+
+        local CurrentTheme =
+            OTC._Themes[
+                Tab.Window.Theme
+            ]
+            or OTC._Themes.Default
+
+        Frame.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Stroke.Color =
+            CurrentTheme.Border
+
+        Title.TextColor3 =
+            CurrentTheme.Text
+
+        if DescriptionLabel then
+
+            DescriptionLabel.TextColor3 =
+                CurrentTheme.SubText
+
+        end
+
+        if CurrentValue then
+
+            ToggleBackground.BackgroundColor3 =
+                CurrentTheme.Accent
+
+            ToggleStroke.Color =
+                CurrentTheme.Accent
+
+            Circle.BackgroundColor3 =
+                CurrentTheme.Background
+
+        else
+
+            ToggleBackground.BackgroundColor3 =
+                CurrentTheme.Background
+
+            ToggleStroke.Color =
+                CurrentTheme.Border
+
+            Circle.BackgroundColor3 =
+                CurrentTheme.SubText
+
+        end
+
     end
 
     function Object:Destroy()
+
         Frame:Destroy()
+
     end
 
-    Object.Instance = Frame
-    Object.Button = Button
+    Object.Instance =
+        Frame
 
-    Tab:AddElement(Object)
+    Object.Button =
+        Button
+
+    Tab:AddElement(
+        Object
+    )
 
     return Object
 end
