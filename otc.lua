@@ -9,7 +9,7 @@ local OTC = {}
 OTC.Version = "1.0.0"
 OTC.Name = "OTC Hub"
 
--- Services
+--// Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -17,13 +17,35 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
--- Internal data
+--// GitHub
+local BASE_URL = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/"
+
+local function LoadModule(Path)
+    local URL = BASE_URL .. Path
+
+    local Success, Result = pcall(function()
+        return loadstring(game:HttpGet(URL))()
+    end)
+
+    if not Success then
+        error(
+            "[OTC Hub] Failed to load module: "
+            .. Path
+            .. "\n"
+            .. tostring(Result)
+        )
+    end
+
+    return Result
+end
+
+--// Internal data
 OTC._Windows = {}
 OTC._Themes = {}
 OTC._Flags = {}
 OTC._Connections = {}
 
--- Default theme
+--// Default Theme
 OTC._Themes.Default = {
     Background = Color3.fromRGB(10, 10, 10),
     Secondary = Color3.fromRGB(15, 15, 15),
@@ -41,7 +63,21 @@ OTC._Themes.Default = {
 
 OTC.CurrentTheme = "Default"
 
--- Utility
+--// Load Core
+local TabModule = LoadModule("Core/Tab.lua")
+local WindowModule = LoadModule("Core/Window.lua")
+local ThemeModule = LoadModule("Core/Theme.lua")
+local AnimationModule = LoadModule("Core/Animation.lua")
+local NotificationModule = LoadModule("Core/Notification.lua")
+
+--// Load Elements
+local ButtonModule = LoadModule("Elements/Button.lua")
+local ToggleModule = LoadModule("Elements/Toggle.lua")
+local SliderModule = LoadModule("Elements/Slider.lua")
+local DropdownModule = LoadModule("Elements/Dropdown.lua")
+local InputModule = LoadModule("Elements/Input.lua")
+
+--// Theme
 function OTC:GetTheme()
     return self._Themes[self.CurrentTheme]
 end
@@ -68,7 +104,7 @@ function OTC:SetTheme(Name)
     end
 end
 
--- Tween utility
+--// Tween
 function OTC:Tween(Object, Time, Properties, Style, Direction)
     if not Object then
         return
@@ -80,18 +116,18 @@ function OTC:Tween(Object, Time, Properties, Style, Direction)
         Direction or Enum.EasingDirection.Out
     )
 
-    local Tween = TweenService:Create(
+    local Animation = TweenService:Create(
         Object,
         Info,
         Properties
     )
 
-    Tween:Play()
+    Animation:Play()
 
-    return Tween
+    return Animation
 end
 
--- Notification
+--// Notify
 function OTC:Notify(Data)
     Data = Data or {}
 
@@ -99,17 +135,16 @@ function OTC:Notify(Data)
     local Content = Data.Content or ""
     local Duration = Data.Duration or 3
 
-    print(string.format(
-        "[OTC Hub] %s: %s",
-        Title,
-        Content
-    ))
-
-    -- Notification UI will be implemented
-    -- in Core/Notification.lua
+    print(
+        string.format(
+            "[OTC Hub] %s: %s",
+            Title,
+            Content
+        )
+    )
 end
 
--- Flags
+--// Flags
 function OTC:SetFlag(Name, Value)
     self._Flags[Name] = Value
 end
@@ -118,7 +153,7 @@ function OTC:GetFlag(Name)
     return self._Flags[Name]
 end
 
--- Connection management
+--// Connections
 function OTC:Connect(Connection)
     table.insert(self._Connections, Connection)
 
@@ -135,62 +170,76 @@ function OTC:DisconnectAll()
     table.clear(self._Connections)
 end
 
--- Create Window
+--// Create Window
 function OTC:CreateWindow(Settings)
     Settings = Settings or {}
 
-    local Window = {
-        Name = Settings.Name or "OTC Hub",
-        Subtitle = Settings.Subtitle or "by Aerlro",
+    local Window = WindowModule.Create(
+        self,
+        Settings
+    )
 
-        LoadingTitle = Settings.LoadingTitle or "OTC Hub",
-        LoadingSubtitle = Settings.LoadingSubtitle or "Initializing...",
+    -- Store reference
+    table.insert(self._Windows, Window)
 
-        ToggleKey = Settings.ToggleKey or Enum.KeyCode.RightShift,
-
-        Theme = Settings.Theme or self.CurrentTheme,
-
-        Tabs = {},
-        Visible = true
-    }
+    -- Save original CreateTab
+    local OriginalCreateTab = Window.CreateTab
 
     function Window:CreateTab(TabSettings)
         TabSettings = TabSettings or {}
 
-        local Tab = {
-            Name = TabSettings.Name or "Tab",
-            Icon = TabSettings.Icon,
-            Elements = {},
-            Window = self
-        }
-
-        table.insert(self.Tabs, Tab)
-
-        return Tab
+        return TabModule.Create(
+            self,
+            OTC,
+            TabSettings
+        )
     end
 
-    function Window:SetVisibility(State)
-        self.Visible = State
-
-        -- UI visibility will be handled
-        -- by Core/Window.lua
+    -- Element creators
+    function Window:CreateButton(Tab, Settings)
+        return ButtonModule.Create(
+            Tab,
+            OTC,
+            Settings
+        )
     end
 
-    function Window:Toggle()
-        self:SetVisibility(not self.Visible)
+    function Window:CreateToggle(Tab, Settings)
+        return ToggleModule.Create(
+            Tab,
+            OTC,
+            Settings
+        )
     end
 
-    function Window:RefreshTheme()
-        -- Theme refresh will be implemented
-        -- by Core/Theme.lua
+    function Window:CreateSlider(Tab, Settings)
+        return SliderModule.Create(
+            Tab,
+            OTC,
+            Settings
+        )
     end
 
-    table.insert(self._Windows or {}, Window)
+    function Window:CreateDropdown(Tab, Settings)
+        return DropdownModule.Create(
+            Tab,
+            OTC,
+            Settings
+        )
+    end
+
+    function Window:CreateInput(Tab, Settings)
+        return InputModule.Create(
+            Tab,
+            OTC,
+            Settings
+        )
+    end
 
     return Window
 end
 
--- Global toggle handling
+--// Input
 function OTC:InitializeInput()
     if self._InputInitialized then
         return
@@ -199,17 +248,21 @@ function OTC:InitializeInput()
     self._InputInitialized = true
 
     self:Connect(
-        UserInputService.InputBegan:Connect(function(Input, GameProcessed)
-            if GameProcessed then
-                return
-            end
+        UserInputService.InputBegan:Connect(
+            function(Input, GameProcessed)
+                if GameProcessed then
+                    return
+                end
 
-            for _, Window in pairs(self._Windows) do
-                if Input.KeyCode == Window.ToggleKey then
-                    Window:Toggle()
+                for _, Window in pairs(self._Windows) do
+                    if Input.KeyCode == Window.ToggleKey then
+                        if Window.Toggle then
+                            Window:Toggle()
+                        end
+                    end
                 end
             end
-        end)
+        )
     )
 end
 
