@@ -102,7 +102,9 @@ function Window.Create(Settings, OTC)
     Logo.Size = UDim2.new(0, 38, 0, 38)
     Logo.Position = UDim2.new(0, 12, 0.5, -19)
     Logo.BackgroundTransparency = 1
+    Logo.BorderSizePixel = 0
     Logo.Image = "rbxassetid://116094782851554"
+    Logo.ImageTransparency = 0
     Logo.ScaleType = Enum.ScaleType.Fit
     Logo.Parent = TopBar
 
@@ -293,21 +295,18 @@ function Window.Create(Settings, OTC)
     MiniButton.Size = UDim2.new(0, 70, 0, 70)
     MiniButton.Position = UDim2.new(0.5, -35, 0.5, -35)
     MiniButton.BackgroundColor3 = Theme.Background
+    MiniButton.BackgroundTransparency = 1
     MiniButton.BorderSizePixel = 0
     MiniButton.Visible = false
     MiniButton.AutoButtonColor = false
     MiniButton.Image = "rbxassetid://116094782851554"
+    MiniButton.ImageTransparency = 0
     MiniButton.ScaleType = Enum.ScaleType.Fit
     MiniButton.Parent = ScreenGui
 
     local MiniCorner = Instance.new("UICorner")
     MiniCorner.CornerRadius = UDim.new(1, 0)
     MiniCorner.Parent = MiniButton
-
-    local MiniStroke = Instance.new("UIStroke")
-    MiniStroke.Color = Theme.Border
-    MiniStroke.Thickness = 2
-    MiniStroke.Parent = MiniButton
 
     Object.TopBar = TopBar
     Object.BottomFix = BottomFix
@@ -327,7 +326,6 @@ function Window.Create(Settings, OTC)
     Object.UserDisplay = UserDisplay
     Object.UserName = UserName
     Object.MiniButton = MiniButton
-    Object.MiniStroke = MiniStroke
 
     local Dragging = false
     local DragStart
@@ -406,7 +404,8 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        local CurrentTheme = OTC._Themes[OTC.CurrentTheme]
+        local CurrentTheme =
+            OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes[Object.Theme]
             or OTC._Themes.Default
 
@@ -500,28 +499,32 @@ function Window.Create(Settings, OTC)
         UnloadCorner.Parent = UnloadButton
 
         CancelButton.MouseEnter:Connect(function()
-            local Current = OTC._Themes[OTC.CurrentTheme]
+            local Current =
+                OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
             CancelButton.BackgroundColor3 = Current.Hover
         end)
 
         CancelButton.MouseLeave:Connect(function()
-            local Current = OTC._Themes[OTC.CurrentTheme]
+            local Current =
+                OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
             CancelButton.BackgroundColor3 = Current.Element
         end)
 
         UnloadButton.MouseEnter:Connect(function()
-            local Current = OTC._Themes[OTC.CurrentTheme]
+            local Current =
+                OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
             UnloadButton.BackgroundColor3 = Current.AccentDark
         end)
 
         UnloadButton.MouseLeave:Connect(function()
-            local Current = OTC._Themes[OTC.CurrentTheme]
+            local Current =
+                OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
             UnloadButton.BackgroundColor3 = Current.Accent
@@ -764,7 +767,8 @@ function Window.Create(Settings, OTC)
         TopBar.BackgroundColor3 = NewTheme.Secondary
         BottomFix.BackgroundColor3 = NewTheme.Secondary
 
-        Logo.ImageColor3 = NewTheme.Text
+        Logo.ImageTransparency = 0
+
         Title.TextColor3 = NewTheme.Text
         Subtitle.TextColor3 = NewTheme.SubText
 
@@ -789,8 +793,8 @@ function Window.Create(Settings, OTC)
         UserDisplay.TextColor3 = NewTheme.Text
         UserName.TextColor3 = NewTheme.SubText
 
-        MiniButton.BackgroundColor3 = NewTheme.Background
-        MiniStroke.Color = NewTheme.Border
+        MiniButton.BackgroundTransparency = 1
+        MiniButton.ImageTransparency = 0
 
         if self.UnloadConfirmation then
             local Popup = self.UnloadConfirmation
