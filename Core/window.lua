@@ -739,7 +739,7 @@ function Window.Create(Settings, OTC)
             0,
             8,
             1,
-            -60
+            -68
         )
 
     UserCard.BackgroundColor3 =
@@ -1571,7 +1571,7 @@ function Window.Create(Settings, OTC)
                 0,
                 8,
                 1,
-                -60
+                -68
             )
 
         UserCard.Size =
