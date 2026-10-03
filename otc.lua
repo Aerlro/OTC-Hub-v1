@@ -6,32 +6,26 @@
 
 local OTC = {}
 
-OTC.Version = "1.0.0"
+OTC.Version = "1.0.1"
 OTC.Name = "OTC Hub"
 
---// Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
---// GitHub
 local BASE_URL =
     "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/"
 
---// Internal Data
 OTC._Windows = {}
 OTC._Themes = {}
 OTC._Flags = {}
 OTC._Connections = {}
 OTC._Modules = {}
 
---// Load Module
-local function LoadModule(Path)
+local function LoadRawModule(Path)
     local URL = BASE_URL .. Path
-
-    print("[OTC Hub] Loading:", Path)
 
     local Success, Source = pcall(function()
         return game:HttpGet(URL)
@@ -77,12 +71,156 @@ local function LoadModule(Path)
         )
     end
 
-    print("[OTC Hub] Loaded:", Path)
+    return Result
+end
+
+--// Loading Screen
+local LoadingModule = LoadRawModule(
+    "Core/loading.lua"
+)
+
+local ModulesToLoad = {
+    "Core/tab.lua",
+    "Core/window.lua",
+    "Core/theme.lua",
+    "Core/animation.lua",
+    "Core/notification.lua",
+    "Core/lucide.lua",
+    "Elements/button.lua",
+    "Elements/toggle.lua",
+    "Elements/slider.lua",
+    "Elements/dropdown.lua",
+    "Elements/input.lua"
+}
+
+local Loading = LoadingModule.Create(
+    #ModulesToLoad
+)
+
+--// Module Loader
+local function LoadModule(Path)
+    local Current =
+        Loading.Current
+
+    Loading:Update(
+        Current,
+        "Loading OTC Hub...",
+        "Downloading " .. Path
+    )
+
+    local URL = BASE_URL .. Path
+
+    print(
+        "[OTC Hub] Loading:",
+        Path
+    )
+
+    local Success, Source = pcall(function()
+        return game:HttpGet(URL)
+    end)
+
+    if not Success then
+        Loading:Update(
+            Current,
+            "Failed to download module",
+            Path
+        )
+
+        task.wait(0.25)
+
+        error(
+            "[OTC Hub] Failed to download module: "
+            .. Path
+            .. "\n"
+            .. tostring(Source)
+        )
+    end
+
+    Loading:Update(
+        Current,
+        "Compiling module...",
+        Path
+    )
+
+    local CompileSuccess, Module = pcall(function()
+        return loadstring(Source)
+    end)
+
+    if not CompileSuccess or not Module then
+        Loading:Update(
+            Current,
+            "Compilation failed",
+            Path
+        )
+
+        task.wait(0.25)
+
+        error(
+            "[OTC Hub] Failed to compile module: "
+            .. Path
+            .. "\n"
+            .. tostring(Module)
+        )
+    end
+
+    Loading:Update(
+        Current,
+        "Initializing module...",
+        Path
+    )
+
+    local RunSuccess, Result = pcall(Module)
+
+    if not RunSuccess then
+        Loading:Update(
+            Current,
+            "Module initialization failed",
+            Path
+        )
+
+        task.wait(0.25)
+
+        error(
+            "[OTC Hub] Failed to load module: "
+            .. Path
+            .. "\n"
+            .. tostring(Result)
+        )
+    end
+
+    if Result == nil then
+        Loading:Update(
+            Current,
+            "Module returned nil",
+            Path
+        )
+
+        task.wait(0.25)
+
+        error(
+            "[OTC Hub] Module returned nil: "
+            .. Path
+        )
+    end
+
+    Loading.Current =
+        Loading.Current + 1
+
+    Loading:Update(
+        Loading.Current,
+        "Module loaded",
+        Path
+    )
+
+    print(
+        "[OTC Hub] Loaded:",
+        Path
+    )
 
     return Result
 end
 
---// Load Core Modules
+--// Core Modules
 local TabModule = LoadModule(
     "Core/tab.lua"
 )
@@ -107,17 +245,22 @@ local LucideModule = LoadModule(
     "Core/lucide.lua"
 )
 
---// Use Theme System
-OTC._Themes = ThemeModule.BuiltIn
-OTC.CurrentTheme = "Default"
+--// Themes
+OTC._Themes =
+    ThemeModule.BuiltIn
 
---// Theme Functions
+OTC.CurrentTheme =
+    "Default"
+
 function OTC:GetTheme()
     return self._Themes[self.CurrentTheme]
         or self._Themes.Default
 end
 
-function OTC:RegisterTheme(Name, ThemeData)
+function OTC:RegisterTheme(
+    Name,
+    ThemeData
+)
     return ThemeModule:Register(
         Name,
         ThemeData
@@ -134,9 +277,12 @@ function OTC:SetTheme(Name)
         return false
     end
 
-    self.CurrentTheme = Name
+    self.CurrentTheme =
+        Name
 
-    for _, Window in pairs(self._Windows) do
+    for _, Window in pairs(
+        self._Windows
+    ) do
         if Window.SetTheme then
             Window:SetTheme(Name)
         elseif Window.RefreshTheme then
@@ -169,11 +315,12 @@ function OTC:Tween(
         Direction or Enum.EasingDirection.Out
     )
 
-    local Animation = TweenService:Create(
-        Object,
-        Info,
-        Properties
-    )
+    local Animation =
+        TweenService:Create(
+            Object,
+            Info,
+            Properties
+        )
 
     Animation:Play()
 
@@ -181,8 +328,12 @@ function OTC:Tween(
 end
 
 --// Flags
-function OTC:SetFlag(Name, Value)
-    self._Flags[Name] = Value
+function OTC:SetFlag(
+    Name,
+    Value
+)
+    self._Flags[Name] =
+        Value
 end
 
 function OTC:GetFlag(Name)
@@ -215,14 +366,23 @@ function OTC:DisconnectAll()
     )
 end
 
---// Register Core Modules
-OTC._TabModule = TabModule
-OTC._WindowModule = WindowModule
-OTC._ThemeModule = ThemeModule
-OTC._AnimationModule = AnimationModule
-OTC._NotificationModule = NotificationModule
+--// Core References
+OTC._TabModule =
+    TabModule
 
---// Load Element Modules
+OTC._WindowModule =
+    WindowModule
+
+OTC._ThemeModule =
+    ThemeModule
+
+OTC._AnimationModule =
+    AnimationModule
+
+OTC._NotificationModule =
+    NotificationModule
+
+--// Element Modules
 local ButtonModule = LoadModule(
     "Elements/button.lua"
 )
@@ -243,7 +403,6 @@ local InputModule = LoadModule(
     "Elements/input.lua"
 )
 
---// Register Element Modules
 OTC._Modules = {
     Button = ButtonModule,
     Toggle = ToggleModule,
@@ -252,14 +411,16 @@ OTC._Modules = {
     Input = InputModule,
 }
 
---// Register Lucide
-OTC._Lucide = LucideModule
+--// Lucide
+OTC._Lucide =
+    LucideModule
 
---// Notification
+--// Notifications
 function OTC:Notify(Data)
     Data = Data or {}
 
-    local Window = self._Windows[1]
+    local Window =
+        self._Windows[1]
 
     if Window
         and Window.ScreenGui then
@@ -276,29 +437,37 @@ function OTC:Notify(Data)
     )
 end
 
---// Create Window
-function OTC:CreateWindow(Settings)
-    Settings = Settings or {}
+--// Window
+function OTC:CreateWindow(
+    Settings
+)
+    Settings =
+        Settings or {}
 
-    --// Window Theme
     if Settings.Theme then
-        if not self._Themes[Settings.Theme] then
+        if not self._Themes[
+            Settings.Theme
+        ] then
+
             warn(
                 "[OTC Hub] Theme does not exist:",
                 Settings.Theme,
                 "| Using Default"
             )
 
-            Settings.Theme = "Default"
+            Settings.Theme =
+                "Default"
         end
     else
-        Settings.Theme = self.CurrentTheme
+        Settings.Theme =
+            self.CurrentTheme
     end
 
-    local Window = WindowModule.Create(
-        Settings,
-        self
-    )
+    local Window =
+        WindowModule.Create(
+            Settings,
+            self
+        )
 
     if not Window then
         error(
@@ -311,9 +480,11 @@ function OTC:CreateWindow(Settings)
         Window
     )
 
-    --// Create Tab
-    function Window:CreateTab(TabSettings)
-        TabSettings = TabSettings or {}
+    function Window:CreateTab(
+        TabSettings
+    )
+        TabSettings =
+            TabSettings or {}
 
         return TabModule.Create(
             self,
@@ -331,7 +502,8 @@ function OTC:InitializeInput()
         return
     end
 
-    self._InputInitialized = true
+    self._InputInitialized =
+        true
 
     self:Connect(
         UserInputService.InputBegan:Connect(
@@ -359,7 +531,9 @@ function OTC:InitializeInput()
     )
 end
 
---// Initialize
 OTC:InitializeInput()
+
+--// Finish Loading
+Loading:Finish()
 
 return OTC
