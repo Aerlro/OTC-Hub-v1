@@ -7,6 +7,8 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
+local LOGO_ASSET = "rbxassetid://104463753775983"
+
 local function Tween(Object, Info, Properties)
     local TweenObject = TweenService:Create(Object, Info, Properties)
     TweenObject:Play()
@@ -17,6 +19,69 @@ local function GetTheme(Object)
     return Object.OTC._Themes[Object.OTC.CurrentTheme]
         or Object.OTC._Themes[Object.Theme]
         or Object.OTC._Themes.Default
+end
+
+local function ApplyGradient(Object, GradientData)
+    if not Object or not GradientData then
+        return nil
+    end
+
+    local Existing = Object:FindFirstChild("OTCGradient")
+
+    if Existing then
+        Existing:Destroy()
+    end
+
+    if GradientData.Enabled ~= true then
+        return nil
+    end
+
+    local UIGradient = Instance.new("UIGradient")
+    UIGradient.Name = "OTCGradient"
+    UIGradient.Color = GradientData.Colors
+        or ColorSequence.new(Color3.new(1, 1, 1))
+    UIGradient.Rotation = GradientData.Rotation or 0
+    UIGradient.Parent = Object
+
+    return UIGradient
+end
+
+local function ApplyTransparency(Object, Value)
+    if not Object then
+        return
+    end
+
+    if Value ~= nil then
+        Object.BackgroundTransparency = Value
+    end
+end
+
+local function ApplyCorner(Object, Radius)
+    if not Object or Radius == nil then
+        return
+    end
+
+    local Corner = Object:FindFirstChildOfClass("UICorner")
+
+    if Corner then
+        Corner.CornerRadius = UDim.new(0, Radius)
+    end
+end
+
+local function ApplyStroke(StrokeObject, ThemeData)
+    if not StrokeObject or not ThemeData then
+        return
+    end
+
+    local Stroke = ThemeData.Stroke
+
+    if not Stroke then
+        return
+    end
+
+    StrokeObject.Enabled = Stroke.Enabled ~= false
+    StrokeObject.Thickness = Stroke.Thickness or 1
+    StrokeObject.Transparency = Stroke.Transparency or 0
 end
 
 function Window.Create(Settings, OTC)
@@ -40,6 +105,7 @@ function Window.Create(Settings, OTC)
     Object.Minimized = false
     Object.Closed = false
     Object.UnloadConfirmation = nil
+    Object.ThemeGradients = {}
 
     local Theme = GetTheme(Object)
 
@@ -64,16 +130,29 @@ function Window.Create(Settings, OTC)
     Main.Size = UDim2.new(0, 560, 0, 380)
     Main.Position = UDim2.new(0.5, -280, 0.5, -190)
     Main.BackgroundColor3 = Theme.Background
+    Main.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Main
+        or 0
     Main.BorderSizePixel = 0
     Main.Parent = ScreenGui
 
     local MainCorner = Instance.new("UICorner")
-    MainCorner.CornerRadius = UDim.new(0, 10)
+    MainCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Main
+            or 10
+    )
     MainCorner.Parent = Main
 
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Color = Theme.Border
-    MainStroke.Thickness = 1
+    MainStroke.Thickness = Theme.Stroke
+        and Theme.Stroke.Thickness
+        or 1
+    MainStroke.Transparency = Theme.Stroke
+        and Theme.Stroke.Transparency
+        or 0
     MainStroke.Parent = Main
 
     Object.Main = Main
@@ -83,17 +162,28 @@ function Window.Create(Settings, OTC)
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 60)
     TopBar.BackgroundColor3 = Theme.Secondary
+    TopBar.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Secondary
+        or 0
     TopBar.BorderSizePixel = 0
     TopBar.Parent = Main
 
     local TopCorner = Instance.new("UICorner")
-    TopCorner.CornerRadius = UDim.new(0, 10)
+    TopCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Main
+            or 10
+    )
     TopCorner.Parent = TopBar
 
     local BottomFix = Instance.new("Frame")
     BottomFix.Size = UDim2.new(1, 0, 0, 12)
     BottomFix.Position = UDim2.new(0, 0, 1, -12)
     BottomFix.BackgroundColor3 = Theme.Secondary
+    BottomFix.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Secondary
+        or 0
     BottomFix.BorderSizePixel = 0
     BottomFix.Parent = TopBar
 
@@ -103,7 +193,7 @@ function Window.Create(Settings, OTC)
     Logo.Position = UDim2.new(0, 12, 0.5, -19)
     Logo.BackgroundTransparency = 1
     Logo.BorderSizePixel = 0
-    Logo.Image = "rbxassetid://116094782851554"
+    Logo.Image = LOGO_ASSET
     Logo.ImageTransparency = 0
     Logo.ScaleType = Enum.ScaleType.Fit
     Logo.Parent = TopBar
@@ -137,6 +227,9 @@ function Window.Create(Settings, OTC)
     MinimizeButton.Size = UDim2.new(0, 34, 0, 34)
     MinimizeButton.Position = UDim2.new(1, -78, 0.5, -17)
     MinimizeButton.BackgroundColor3 = Theme.Element
+    MinimizeButton.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Element
+        or 0
     MinimizeButton.BorderSizePixel = 0
     MinimizeButton.AutoButtonColor = false
     MinimizeButton.Text = "—"
@@ -146,7 +239,12 @@ function Window.Create(Settings, OTC)
     MinimizeButton.Parent = TopBar
 
     local MinimizeCorner = Instance.new("UICorner")
-    MinimizeCorner.CornerRadius = UDim.new(0, 7)
+    MinimizeCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Button
+            or 7
+    )
     MinimizeCorner.Parent = MinimizeButton
 
     local CloseButton = Instance.new("TextButton")
@@ -154,6 +252,9 @@ function Window.Create(Settings, OTC)
     CloseButton.Size = UDim2.new(0, 34, 0, 34)
     CloseButton.Position = UDim2.new(1, -40, 0.5, -17)
     CloseButton.BackgroundColor3 = Theme.Element
+    CloseButton.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Element
+        or 0
     CloseButton.BorderSizePixel = 0
     CloseButton.AutoButtonColor = false
     CloseButton.Text = "×"
@@ -163,7 +264,12 @@ function Window.Create(Settings, OTC)
     CloseButton.Parent = TopBar
 
     local CloseCorner = Instance.new("UICorner")
-    CloseCorner.CornerRadius = UDim.new(0, 7)
+    CloseCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Button
+            or 7
+    )
     CloseCorner.Parent = CloseButton
 
     local Sidebar = Instance.new("Frame")
@@ -171,17 +277,28 @@ function Window.Create(Settings, OTC)
     Sidebar.Size = UDim2.new(0, 150, 1, -60)
     Sidebar.Position = UDim2.new(0, 0, 0, 60)
     Sidebar.BackgroundColor3 = Theme.Secondary
+    Sidebar.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Secondary
+        or 0
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = Main
 
     local SidebarCorner = Instance.new("UICorner")
-    SidebarCorner.CornerRadius = UDim.new(0, 10)
+    SidebarCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Main
+            or 10
+    )
     SidebarCorner.Parent = Sidebar
 
     local SidebarFix = Instance.new("Frame")
     SidebarFix.Size = UDim2.new(0, 12, 1, 0)
     SidebarFix.Position = UDim2.new(1, -12, 0, 0)
     SidebarFix.BackgroundColor3 = Theme.Secondary
+    SidebarFix.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Secondary
+        or 0
     SidebarFix.BorderSizePixel = 0
     SidebarFix.Parent = Sidebar
 
@@ -198,6 +315,9 @@ function Window.Create(Settings, OTC)
     Content.Size = UDim2.new(1, -151, 1, -60)
     Content.Position = UDim2.new(0, 151, 0, 60)
     Content.BackgroundColor3 = Theme.Background
+    Content.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Main
+        or 0
     Content.BorderSizePixel = 0
     Content.Parent = Main
 
@@ -208,7 +328,7 @@ function Window.Create(Settings, OTC)
     TabsContainer.BackgroundTransparency = 1
     TabsContainer.BorderSizePixel = 0
     TabsContainer.ScrollBarThickness = 2
-    TabsContainer.ScrollBarImageColor3 = Theme.Border
+    TabsContainer.ScrollBarImageColor3 = Theme.Scrollbar or Theme.Border
     TabsContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     TabsContainer.Parent = Sidebar
 
@@ -231,11 +351,19 @@ function Window.Create(Settings, OTC)
     UserCard.Size = UDim2.new(1, -12, 0, 60)
     UserCard.Position = UDim2.new(0, 6, 1, -68)
     UserCard.BackgroundColor3 = Theme.Element
+    UserCard.BackgroundTransparency = Theme.Transparency
+        and Theme.Transparency.Element
+        or 0
     UserCard.BorderSizePixel = 0
     UserCard.Parent = Sidebar
 
     local UserCorner = Instance.new("UICorner")
-    UserCorner.CornerRadius = UDim.new(0, 8)
+    UserCorner.CornerRadius = UDim.new(
+        0,
+        Theme.Corners
+            and Theme.Corners.Element
+            or 8
+    )
     UserCorner.Parent = UserCard
 
     local UserSeparator = Instance.new("Frame")
@@ -299,7 +427,7 @@ function Window.Create(Settings, OTC)
     MiniButton.BorderSizePixel = 0
     MiniButton.Visible = false
     MiniButton.AutoButtonColor = false
-    MiniButton.Image = "rbxassetid://116094782851554"
+    MiniButton.Image = LOGO_ASSET
     MiniButton.ImageTransparency = 0
     MiniButton.ScaleType = Enum.ScaleType.Fit
     MiniButton.Parent = ScreenGui
@@ -423,18 +551,33 @@ function Window.Create(Settings, OTC)
         Popup.Name = "UnloadConfirmation"
         Popup.Size = UDim2.new(0, 360, 0, 190)
         Popup.Position = UDim2.new(0.5, -180, 0.5, -95)
-        Popup.BackgroundColor3 = CurrentTheme.Background
+        Popup.BackgroundColor3 = CurrentTheme.PopupBackground
+            or CurrentTheme.Background
+        Popup.BackgroundTransparency = CurrentTheme.Transparency
+            and CurrentTheme.Transparency.Popup
+            or 0
         Popup.BorderSizePixel = 0
         Popup.ZIndex = 101
         Popup.Parent = Overlay
 
         local PopupCorner = Instance.new("UICorner")
-        PopupCorner.CornerRadius = UDim.new(0, 10)
+        PopupCorner.CornerRadius = UDim.new(
+            0,
+            CurrentTheme.Corners
+                and CurrentTheme.Corners.Popup
+                or 10
+        )
         PopupCorner.Parent = Popup
 
         local PopupStroke = Instance.new("UIStroke")
-        PopupStroke.Color = CurrentTheme.Border
-        PopupStroke.Thickness = 1
+        PopupStroke.Color = CurrentTheme.PopupBorder
+            or CurrentTheme.Border
+        PopupStroke.Thickness = CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Thickness
+            or 1
+        PopupStroke.Transparency = CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Transparency
+            or 0
         PopupStroke.Parent = Popup
 
         local TitleLabel = Instance.new("TextLabel")
@@ -466,7 +609,8 @@ function Window.Create(Settings, OTC)
         CancelButton.Name = "Cancel"
         CancelButton.Size = UDim2.new(0, 145, 0, 42)
         CancelButton.Position = UDim2.new(0, 20, 1, -62)
-        CancelButton.BackgroundColor3 = CurrentTheme.Element
+        CancelButton.BackgroundColor3 = CurrentTheme.Button
+            or CurrentTheme.Element
         CancelButton.BorderSizePixel = 0
         CancelButton.AutoButtonColor = false
         CancelButton.Font = Enum.Font.GothamSemibold
@@ -477,7 +621,12 @@ function Window.Create(Settings, OTC)
         CancelButton.Parent = Popup
 
         local CancelCorner = Instance.new("UICorner")
-        CancelCorner.CornerRadius = UDim.new(0, 7)
+        CancelCorner.CornerRadius = UDim.new(
+            0,
+            CurrentTheme.Corners
+                and CurrentTheme.Corners.Button
+                or 7
+        )
         CancelCorner.Parent = CancelButton
 
         local UnloadButton = Instance.new("TextButton")
@@ -489,21 +638,37 @@ function Window.Create(Settings, OTC)
         UnloadButton.AutoButtonColor = false
         UnloadButton.Font = Enum.Font.GothamSemibold
         UnloadButton.Text = "Unload"
-        UnloadButton.TextColor3 = CurrentTheme.Background
+        UnloadButton.TextColor3 = CurrentTheme.AccentText
+            or CurrentTheme.Background
         UnloadButton.TextSize = 14
         UnloadButton.ZIndex = 102
         UnloadButton.Parent = Popup
 
         local UnloadCorner = Instance.new("UICorner")
-        UnloadCorner.CornerRadius = UDim.new(0, 7)
+        UnloadCorner.CornerRadius = UDim.new(
+            0,
+            CurrentTheme.Corners
+                and CurrentTheme.Corners.Button
+                or 7
+        )
         UnloadCorner.Parent = UnloadButton
+
+        local PopupGradient = CurrentTheme.Gradients
+            and CurrentTheme.Gradients.Main
+
+        if PopupGradient then
+            ApplyGradient(Popup, PopupGradient)
+        end
 
         CancelButton.MouseEnter:Connect(function()
             local Current =
                 OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
-            CancelButton.BackgroundColor3 = Current.Hover
+            CancelButton.BackgroundColor3 =
+                Current.ButtonHover
+                or Current.Hover
+                or Current.Element
         end)
 
         CancelButton.MouseLeave:Connect(function()
@@ -511,7 +676,9 @@ function Window.Create(Settings, OTC)
                 OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
-            CancelButton.BackgroundColor3 = Current.Element
+            CancelButton.BackgroundColor3 =
+                Current.Button
+                or Current.Element
         end)
 
         UnloadButton.MouseEnter:Connect(function()
@@ -519,7 +686,9 @@ function Window.Create(Settings, OTC)
                 OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
-            UnloadButton.BackgroundColor3 = Current.AccentDark
+            UnloadButton.BackgroundColor3 =
+                Current.AccentHover
+                or Current.Accent
         end)
 
         UnloadButton.MouseLeave:Connect(function()
@@ -527,7 +696,8 @@ function Window.Create(Settings, OTC)
                 OTC._Themes[OTC.CurrentTheme]
                 or OTC._Themes.Default
 
-            UnloadButton.BackgroundColor3 = Current.Accent
+            UnloadButton.BackgroundColor3 =
+                Current.Accent
         end)
 
         CancelButton.MouseButton1Click:Connect(function()
@@ -688,7 +858,11 @@ function Window.Create(Settings, OTC)
 
         Tween(
             MiniButton,
-            TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            TweenInfo.new(
+                0.2,
+                Enum.EasingStyle.Back,
+                Enum.EasingDirection.Out
+            ),
             {
                 Size = UDim2.new(0, 70, 0, 70)
             }
@@ -704,7 +878,11 @@ function Window.Create(Settings, OTC)
 
         Tween(
             MiniButton,
-            TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            TweenInfo.new(
+                0.15,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.In
+            ),
             {
                 Size = UDim2.new(0, 0, 0, 0)
             }
@@ -721,7 +899,10 @@ function Window.Create(Settings, OTC)
     end
 
     function Object:AddTab(TabObject)
-        table.insert(self.Tabs, TabObject)
+        table.insert(
+            self.Tabs,
+            TabObject
+        )
 
         TabObject.Button.Parent = TabsContainer
 
@@ -735,7 +916,9 @@ function Window.Create(Settings, OTC)
             return
         end
 
-        if self.SelectedTab and self.SelectedTab.Page then
+        if self.SelectedTab
+            and self.SelectedTab.Page then
+
             self.SelectedTab.Page.Visible = false
         end
 
@@ -747,7 +930,9 @@ function Window.Create(Settings, OTC)
 
         for _, Tab in ipairs(self.Tabs) do
             if Tab.SetSelected then
-                Tab:SetSelected(Tab == TabObject)
+                Tab:SetSelected(
+                    Tab == TabObject
+                )
             end
         end
     end
@@ -755,61 +940,295 @@ function Window.Create(Settings, OTC)
     function Object:RefreshTheme()
         local ThemeName = self.OTC.CurrentTheme
 
-        local NewTheme = self.OTC._Themes[ThemeName]
+        local NewTheme =
+            self.OTC._Themes[ThemeName]
             or self.OTC._Themes[self.Theme]
             or self.OTC._Themes.Default
 
         self.Theme = ThemeName
 
-        Main.BackgroundColor3 = NewTheme.Background
-        MainStroke.Color = NewTheme.Border
+        local Transparency =
+            NewTheme.Transparency or {}
 
-        TopBar.BackgroundColor3 = NewTheme.Secondary
-        BottomFix.BackgroundColor3 = NewTheme.Secondary
+        local Stroke =
+            NewTheme.Stroke or {}
+
+        local Corners =
+            NewTheme.Corners or {}
+
+        local Gradients =
+            NewTheme.Gradients or {}
+
+        local Effects =
+            NewTheme.Effects or {}
+
+        Main.BackgroundColor3 =
+            NewTheme.Background
+
+        Main.BackgroundTransparency =
+            Transparency.Main or 0
+
+        MainStroke.Color =
+            NewTheme.Border
+
+        MainStroke.Thickness =
+            Stroke.Thickness or 1
+
+        MainStroke.Transparency =
+            Stroke.Transparency or 0
+
+        MainStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        ApplyCorner(
+            Main,
+            Corners.Main or 10
+        )
+
+        TopBar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        TopBar.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        BottomFix.BackgroundColor3 =
+            NewTheme.Secondary
+
+        BottomFix.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        Sidebar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        Sidebar.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        SidebarFix.BackgroundColor3 =
+            NewTheme.Secondary
+
+        SidebarFix.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        Content.BackgroundColor3 =
+            NewTheme.Background
+
+        Content.BackgroundTransparency =
+            Transparency.Main or 0
+
+        Logo.Image =
+            LOGO_ASSET
 
         Logo.ImageTransparency = 0
 
-        Title.TextColor3 = NewTheme.Text
-        Subtitle.TextColor3 = NewTheme.SubText
+        Title.TextColor3 =
+            NewTheme.Text
 
-        MinimizeButton.BackgroundColor3 = NewTheme.Element
-        MinimizeButton.TextColor3 = NewTheme.Text
+        Subtitle.TextColor3 =
+            NewTheme.SubText
 
-        CloseButton.BackgroundColor3 = NewTheme.Element
-        CloseButton.TextColor3 = NewTheme.Text
+        MinimizeButton.BackgroundColor3 =
+            NewTheme.Button
+            or NewTheme.Element
 
-        Sidebar.BackgroundColor3 = NewTheme.Secondary
-        SidebarFix.BackgroundColor3 = NewTheme.Secondary
+        MinimizeButton.BackgroundTransparency =
+            Transparency.Element or 0
 
-        Separator.BackgroundColor3 = NewTheme.Border
+        MinimizeButton.TextColor3 =
+            NewTheme.Text
 
-        Content.BackgroundColor3 = NewTheme.Background
+        CloseButton.BackgroundColor3 =
+            NewTheme.Button
+            or NewTheme.Element
 
-        TabsContainer.ScrollBarImageColor3 = NewTheme.Border
+        CloseButton.BackgroundTransparency =
+            Transparency.Element or 0
 
-        UserCard.BackgroundColor3 = NewTheme.Element
-        UserSeparator.BackgroundColor3 = NewTheme.Border
+        CloseButton.TextColor3 =
+            NewTheme.Text
 
-        UserDisplay.TextColor3 = NewTheme.Text
-        UserName.TextColor3 = NewTheme.SubText
+        ApplyCorner(
+            MinimizeButton,
+            Corners.Button or 7
+        )
+
+        ApplyCorner(
+            CloseButton,
+            Corners.Button or 7
+        )
+
+        TabsContainer.ScrollBarImageColor3 =
+            NewTheme.Scrollbar
+            or NewTheme.Border
+
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserCard.BackgroundTransparency =
+            Transparency.Element or 0
+
+        UserSeparator.BackgroundColor3 =
+            NewTheme.Border
+
+        UserDisplay.TextColor3 =
+            NewTheme.Text
+
+        UserName.TextColor3 =
+            NewTheme.SubText
+
+        ApplyCorner(
+            UserCard,
+            Corners.Element or 8
+        )
 
         MiniButton.BackgroundTransparency = 1
+        MiniButton.Image = LOGO_ASSET
         MiniButton.ImageTransparency = 0
 
+        if Gradients.Main then
+            Object.ThemeGradients.Main =
+                ApplyGradient(
+                    Main,
+                    Gradients.Main
+                )
+        end
+
+        if Gradients.TopBar then
+            Object.ThemeGradients.TopBar =
+                ApplyGradient(
+                    TopBar,
+                    Gradients.TopBar
+                )
+        end
+
+        if Gradients.Sidebar then
+            Object.ThemeGradients.Sidebar =
+                ApplyGradient(
+                    Sidebar,
+                    Gradients.Sidebar
+                )
+        end
+
+        if Gradients.Element then
+            Object.ThemeGradients.UserCard =
+                ApplyGradient(
+                    UserCard,
+                    Gradients.Element
+                )
+
+            Object.ThemeGradients.Minimize =
+                ApplyGradient(
+                    MinimizeButton,
+                    Gradients.Element
+                )
+
+            Object.ThemeGradients.Close =
+                ApplyGradient(
+                    CloseButton,
+                    Gradients.Element
+                )
+        end
+
+        ApplyStroke(
+            MainStroke,
+            NewTheme
+        )
+
+        if Effects.AnimatedGradient then
+            for _, GradientObject in pairs(
+                Object.ThemeGradients
+            ) do
+                if GradientObject then
+                    task.spawn(function()
+                        local StartRotation =
+                            GradientObject.Rotation
+
+                        Tween(
+                            GradientObject,
+                            TweenInfo.new(
+                                6,
+                                Enum.EasingStyle.Linear,
+                                Enum.EasingDirection.In,
+                                -1
+                            ),
+                            {
+                                Rotation =
+                                    StartRotation + 360
+                            }
+                        )
+                    end)
+                end
+            end
+        end
+
         if self.UnloadConfirmation then
-            local Popup = self.UnloadConfirmation
+            local Popup =
+                self.UnloadConfirmation
 
-            Popup.Popup.BackgroundColor3 = NewTheme.Background
-            Popup.PopupStroke.Color = NewTheme.Border
+            Popup.Popup.BackgroundColor3 =
+                NewTheme.PopupBackground
+                or NewTheme.Background
 
-            Popup.Title.TextColor3 = NewTheme.Text
-            Popup.Description.TextColor3 = NewTheme.SubText
+            Popup.Popup.BackgroundTransparency =
+                Transparency.Popup or 0
 
-            Popup.CancelButton.BackgroundColor3 = NewTheme.Element
-            Popup.CancelButton.TextColor3 = NewTheme.Text
+            Popup.PopupStroke.Color =
+                NewTheme.PopupBorder
+                or NewTheme.Border
 
-            Popup.UnloadButton.BackgroundColor3 = NewTheme.Accent
-            Popup.UnloadButton.TextColor3 = NewTheme.Background
+            Popup.PopupStroke.Thickness =
+                Stroke.Thickness or 1
+
+            Popup.PopupStroke.Transparency =
+                Stroke.Transparency or 0
+
+            Popup.Title.TextColor3 =
+                NewTheme.Text
+
+            Popup.Description.TextColor3 =
+                NewTheme.SubText
+
+            Popup.CancelButton.BackgroundColor3 =
+                NewTheme.Button
+                or NewTheme.Element
+
+            Popup.CancelButton.TextColor3 =
+                NewTheme.Text
+
+            Popup.UnloadButton.BackgroundColor3 =
+                NewTheme.Accent
+
+            Popup.UnloadButton.TextColor3 =
+                NewTheme.AccentText
+                or NewTheme.Background
+
+            ApplyCorner(
+                Popup.Popup,
+                Corners.Popup or 10
+            )
+
+            ApplyCorner(
+                Popup.CancelButton,
+                Corners.Button or 7
+            )
+
+            ApplyCorner(
+                Popup.UnloadButton,
+                Corners.Button or 7
+            )
+
+            if Gradients.Main then
+                ApplyGradient(
+                    Popup.Popup,
+                    Gradients.Main
+                )
+            end
+
+            if Gradients.Accent then
+                ApplyGradient(
+                    Popup.UnloadButton,
+                    Gradients.Accent
+                )
+            end
         end
 
         for _, TabObject in ipairs(self.Tabs) do
@@ -827,7 +1246,9 @@ function Window.Create(Settings, OTC)
         OTC._InitializeInput()
     end
 
-    if OTC._Animation and OTC._Animation.Appear then
+    if OTC._Animation
+        and OTC._Animation.Appear then
+
         pcall(function()
             OTC._Animation:Appear(
                 Main,
