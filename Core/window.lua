@@ -62,16 +62,6 @@ local function ApplyGradient(Object, GradientData)
     return UIGradient
 end
 
-local function ApplyTransparency(Object, Value)
-    if not Object then
-        return
-    end
-
-    if Value ~= nil then
-        Object.BackgroundTransparency = Value
-    end
-end
-
 local function ApplyCorner(Object, Radius)
     if not Object or Radius == nil then
         return
@@ -188,6 +178,9 @@ function Window.Create(Settings, OTC)
         or 0
 
     Main.BorderSizePixel = 0
+
+    Main.ClipsDescendants = true
+
     Main.Parent = ScreenGui
 
     local MainCorner =
@@ -234,7 +227,15 @@ function Window.Create(Settings, OTC)
             1,
             0,
             0,
-            60
+            62
+        )
+
+    TopBar.Position =
+        UDim2.new(
+            0,
+            0,
+            0,
+            0
         )
 
     TopBar.BackgroundColor3 =
@@ -246,10 +247,8 @@ function Window.Create(Settings, OTC)
         or 0
 
     TopBar.BorderSizePixel = 0
-    TopBar.Parent = Main
 
-    -- TopBar nu mai are UICorner.
-    -- Astfel nu mai apare spațiul/banda dintre TopBar și Content.
+    TopBar.Parent = Main
 
     local Logo =
         Instance.new("ImageLabel")
@@ -276,7 +275,9 @@ function Window.Create(Settings, OTC)
     Logo.BorderSizePixel = 0
     Logo.Image = LOGO_ASSET
     Logo.ImageTransparency = 0
-    Logo.ScaleType = Enum.ScaleType.Fit
+    Logo.ScaleType =
+        Enum.ScaleType.Fit
+
     Logo.Parent = TopBar
 
     local Title =
@@ -391,7 +392,9 @@ function Window.Create(Settings, OTC)
     MinimizeButton.Text = "—"
     MinimizeButton.TextColor3 = Theme.Text
     MinimizeButton.TextSize = 18
-    MinimizeButton.Font = Enum.Font.GothamBold
+    MinimizeButton.Font =
+        Enum.Font.GothamBold
+
     MinimizeButton.Parent = TopBar
 
     local MinimizeCorner =
@@ -442,7 +445,9 @@ function Window.Create(Settings, OTC)
     CloseButton.Text = "×"
     CloseButton.TextColor3 = Theme.Text
     CloseButton.TextSize = 22
-    CloseButton.Font = Enum.Font.GothamBold
+    CloseButton.Font =
+        Enum.Font.GothamBold
+
     CloseButton.Parent = TopBar
 
     local CloseCorner =
@@ -477,7 +482,7 @@ function Window.Create(Settings, OTC)
             0,
             0,
             0,
-            60
+            59
         )
 
     Sidebar.BackgroundColor3 =
@@ -489,6 +494,7 @@ function Window.Create(Settings, OTC)
         or 0
 
     Sidebar.BorderSizePixel = 0
+
     Sidebar.Parent = Main
 
     local SidebarCorner =
@@ -522,7 +528,7 @@ function Window.Create(Settings, OTC)
             0,
             150,
             0,
-            60
+            59
         )
 
     Content.BackgroundColor3 =
@@ -534,6 +540,7 @@ function Window.Create(Settings, OTC)
         or 0
 
     Content.BorderSizePixel = 0
+
     Content.Parent = Main
 
     local TabsContainer =
@@ -598,6 +605,7 @@ function Window.Create(Settings, OTC)
                 0,
                 TabsLayout.AbsoluteContentSize.Y + 8
             )
+
     end)
 
     local UserCard =
@@ -630,6 +638,7 @@ function Window.Create(Settings, OTC)
         or 0
 
     UserCard.BorderSizePixel = 0
+
     UserCard.Parent = Sidebar
 
     local UserCorner =
@@ -671,6 +680,7 @@ function Window.Create(Settings, OTC)
 
     UserAvatar.BackgroundTransparency = 0
     UserAvatar.BorderSizePixel = 0
+
     UserAvatar.Parent = UserCard
 
     local AvatarCorner =
@@ -1532,6 +1542,7 @@ function Window.Create(Settings, OTC)
         end
 
         self.Theme = Name
+
         self:RefreshTheme()
 
         return true
@@ -1558,7 +1569,6 @@ function Window.Create(Settings, OTC)
             or self.Closed then
 
             return
-
         end
 
         self.Minimized = true
@@ -1600,7 +1610,6 @@ function Window.Create(Settings, OTC)
             or self.Closed then
 
             return
-
         end
 
         self.Minimized = false
@@ -1661,7 +1670,6 @@ function Window.Create(Settings, OTC)
             TabObject then
 
             return
-
         end
 
         if self.SelectedTab
@@ -1746,17 +1754,65 @@ function Window.Create(Settings, OTC)
             Corners.Main or 10
         )
 
+        TopBar.Size =
+            UDim2.new(
+                1,
+                0,
+                0,
+                62
+            )
+
+        TopBar.Position =
+            UDim2.new(
+                0,
+                0,
+                0,
+                0
+            )
+
         TopBar.BackgroundColor3 =
             NewTheme.Secondary
 
         TopBar.BackgroundTransparency =
             Transparency.Secondary or 0
 
+        Sidebar.Size =
+            UDim2.new(
+                0,
+                150,
+                1,
+                -60
+            )
+
+        Sidebar.Position =
+            UDim2.new(
+                0,
+                0,
+                0,
+                59
+            )
+
         Sidebar.BackgroundColor3 =
             NewTheme.Secondary
 
         Sidebar.BackgroundTransparency =
             Transparency.Secondary or 0
+
+        Content.Size =
+            UDim2.new(
+                1,
+                -150,
+                1,
+                -60
+            )
+
+        Content.Position =
+            UDim2.new(
+                0,
+                150,
+                0,
+                59
+            )
 
         Content.BackgroundColor3 =
             NewTheme.Background
