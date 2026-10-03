@@ -9,9 +9,9 @@ local LocalPlayer = Players.LocalPlayer
 
 local LOGO_ASSET = "rbxassetid://104463753775983"
 
-local BAT_ASSET = "rbxassetid://137864586815122"
-local PUMPKIN_ASSET = "rbxassetid://102189125140178"
-local GHOST_ASSET = "rbxassetid://103854297771658"
+local BAT_ASSET = "rbxassetid://100531600237687"
+local PUMPKIN_ASSET = "rbxassetid://79838536194671"
+local GHOST_ASSET = "rbxassetid://74505285697812"
 
 local function Tween(Object, Time, Properties, Style, Direction)
     local TweenObject = TweenService:Create(
