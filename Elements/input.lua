@@ -13,6 +13,10 @@ local function create(Class, Properties)
 end
 
 local function tween(Object, Time, Properties)
+    if not Object or not Object.Parent then
+        return
+    end
+
     local Animation = TweenService:Create(
         Object,
         TweenInfo.new(
@@ -28,30 +32,86 @@ local function tween(Object, Time, Properties)
     return Animation
 end
 
+local function applyGradient(Object, GradientData)
+    if not Object then
+        return
+    end
+
+    local Existing = Object:FindFirstChild("OTCGradient")
+
+    if Existing then
+        Existing:Destroy()
+    end
+
+    if not GradientData
+        or GradientData.Enabled ~= true
+        or not GradientData.Colors then
+        return
+    end
+
+    local Gradient = Instance.new("UIGradient")
+
+    Gradient.Name = "OTCGradient"
+    Gradient.Color = GradientData.Colors
+    Gradient.Rotation = GradientData.Rotation or 0
+
+    Gradient.Parent = Object
+
+    return Gradient
+end
+
 function Input.Create(Tab, OTC, Settings)
 
     Settings = Settings or {}
 
-    local Theme = OTC:GetTheme()
+    local function getTheme()
+        return OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes.Default
+    end
 
-    local Name = Settings.Name or "Input"
-    local Description = Settings.Description
-    local Placeholder = Settings.Placeholder or "Enter text..."
-    local CurrentValue = tostring(Settings.CurrentValue or "")
-    local Flag = Settings.Flag
+    local Theme = getTheme()
+
+    local Name =
+        Settings.Name
+        or "Input"
+
+    local Description =
+        Settings.Description
+
+    local Placeholder =
+        Settings.Placeholder
+        or "Enter text..."
+
+    local CurrentValue =
+        tostring(
+            Settings.CurrentValue
+            or ""
+        )
+
+    local Flag =
+        Settings.Flag
+
     local ClearTextOnFocus =
         Settings.ClearTextOnFocus == true
+
     local Numeric =
         Settings.Numeric == true
+
     local MaxLength =
-        tonumber(Settings.MaxLength)
+        tonumber(
+            Settings.MaxLength
+        )
 
     local Callback =
         Settings.Callback
-        or function() end
+        or function()
+        end
 
     local FrameHeight =
-        Description and 82 or 68
+        Description
+        and 82
+        or 68
 
     local Frame = create("Frame", {
         Name = "Input",
@@ -59,7 +119,13 @@ function Input.Create(Tab, OTC, Settings)
         Parent = Tab.Page,
 
         BackgroundColor3 =
-            Theme.Element,
+            Theme.Input
+            or Theme.Element,
+
+        BackgroundTransparency =
+            Theme.Transparency
+            and Theme.Transparency.Element
+            or 0,
 
         BorderSizePixel = 0,
 
@@ -71,20 +137,39 @@ function Input.Create(Tab, OTC, Settings)
         )
     })
 
-    create("UICorner", {
+    local FrameCorner = create("UICorner", {
         Parent = Frame,
 
         CornerRadius =
-            UDim.new(0, 8)
+            UDim.new(
+                0,
+                Theme.Corners
+                and Theme.Corners.Input
+                or 8
+            )
     })
 
     local Stroke = create("UIStroke", {
         Parent = Frame,
 
-        Color = Theme.Border,
+        Color =
+            Theme.Border,
 
-        Thickness = 1
+        Thickness =
+            Theme.Stroke
+            and Theme.Stroke.Thickness
+            or 1,
+
+        Transparency =
+            Theme.Stroke
+            and Theme.Stroke.Transparency
+            or 0
     })
+
+    if Theme.Stroke then
+        Stroke.Enabled =
+            Theme.Stroke.Enabled ~= false
+    end
 
     local Title = create("TextLabel", {
         Name = "Title",
@@ -159,7 +244,6 @@ function Input.Create(Tab, OTC, Settings)
             TextXAlignment =
                 Enum.TextXAlignment.Left
         })
-
     end
 
     local InputFrame = create("Frame", {
@@ -168,7 +252,13 @@ function Input.Create(Tab, OTC, Settings)
         Parent = Frame,
 
         BackgroundColor3 =
-            Theme.Background,
+            Theme.Input
+            or Theme.Background,
+
+        BackgroundTransparency =
+            Theme.Transparency
+            and Theme.Transparency.Element
+            or 0,
 
         BorderSizePixel = 0,
 
@@ -189,11 +279,16 @@ function Input.Create(Tab, OTC, Settings)
             )
     })
 
-    create("UICorner", {
+    local InputCorner = create("UICorner", {
         Parent = InputFrame,
 
         CornerRadius =
-            UDim.new(0, 6)
+            UDim.new(
+                0,
+                Theme.Corners
+                and Theme.Corners.Input
+                or 6
+            )
     })
 
     local InputStroke = create("UIStroke", {
@@ -202,8 +297,21 @@ function Input.Create(Tab, OTC, Settings)
         Color =
             Theme.Border,
 
-        Thickness = 1
+        Thickness =
+            Theme.Stroke
+            and Theme.Stroke.Thickness
+            or 1,
+
+        Transparency =
+            Theme.Stroke
+            and Theme.Stroke.Transparency
+            or 0
     })
+
+    if Theme.Stroke then
+        InputStroke.Enabled =
+            Theme.Stroke.Enabled ~= false
+    end
 
     local TextBox = create("TextBox", {
         Name = "TextBox",
@@ -275,40 +383,78 @@ function Input.Create(Tab, OTC, Settings)
         end
 
         return Text
+    end
 
+    local function updateInputStroke(Animated)
+
+        local CurrentTheme =
+            getTheme()
+
+        local Color
+
+        if TextBox:IsFocused() then
+
+            Color =
+                CurrentTheme.InputFocus
+                or CurrentTheme.Accent
+
+        else
+
+            Color =
+                CurrentTheme.Border
+        end
+
+        if Animated then
+
+            tween(
+                InputStroke,
+                0.15,
+                {
+                    Color = Color
+                }
+            )
+
+        else
+
+            InputStroke.Color =
+                Color
+        end
     end
 
     TextBox.Focused:Connect(function()
 
+        local CurrentTheme =
+            getTheme()
+
         tween(
             InputStroke,
             0.15,
             {
                 Color =
-                    OTC._Themes[
-                        Tab.Window.Theme
-                    ].Accent
+                    CurrentTheme.InputFocus
+                    or CurrentTheme.Accent
             }
         )
 
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
+        local Gradients =
+            CurrentTheme.Gradients
+            or {}
+
+        if Effects.Gradient
+            and Gradients.Accent then
+
+            applyGradient(
+                InputFrame,
+                Gradients.Accent
+            )
+        end
     end)
 
     TextBox.FocusLost:Connect(function()
-
-        local CurrentTheme =
-            OTC._Themes[
-                Tab.Window.Theme
-            ]
-            or OTC._Themes.Default
-
-        tween(
-            InputStroke,
-            0.15,
-            {
-                Color =
-                    CurrentTheme.Border
-            }
-        )
 
         local Text =
             sanitize(
@@ -321,13 +467,45 @@ function Input.Create(Tab, OTC, Settings)
         CurrentValue =
             Text
 
+        updateInputStroke(true)
+
+        local CurrentTheme =
+            getTheme()
+
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
+        local Gradients =
+            CurrentTheme.Gradients
+            or {}
+
+        if Effects.Gradient
+            and Gradients.Element then
+
+            applyGradient(
+                InputFrame,
+                Gradients.Element
+            )
+
+        else
+
+            local Existing =
+                InputFrame:FindFirstChild(
+                    "OTCGradient"
+                )
+
+            if Existing then
+                Existing:Destroy()
+            end
+        end
+
         if Flag then
 
             OTC:SetFlag(
                 Flag,
                 CurrentValue
             )
-
         end
 
         local Success, Error =
@@ -342,9 +520,7 @@ function Input.Create(Tab, OTC, Settings)
                 "[OTC Hub] Input callback error:",
                 Error
             )
-
         end
-
     end)
 
     TextBox:GetPropertyChangedSignal(
@@ -360,9 +536,7 @@ function Input.Create(Tab, OTC, Settings)
 
             TextBox.Text =
                 Text
-
         end
-
     end)
 
     InputFrame.MouseEnter:Connect(
@@ -371,22 +545,19 @@ function Input.Create(Tab, OTC, Settings)
             if not TextBox:IsFocused() then
 
                 local CurrentTheme =
-                    OTC._Themes[
-                        Tab.Window.Theme
-                    ]
-                    or OTC._Themes.Default
+                    getTheme()
 
                 tween(
                     InputStroke,
                     0.15,
                     {
                         Color =
-                            CurrentTheme.AccentDark
+                            CurrentTheme.InputHover
+                            or CurrentTheme.AccentDark
+                            or CurrentTheme.Border
                     }
                 )
-
             end
-
         end
     )
 
@@ -396,10 +567,7 @@ function Input.Create(Tab, OTC, Settings)
             if not TextBox:IsFocused() then
 
                 local CurrentTheme =
-                    OTC._Themes[
-                        Tab.Window.Theme
-                    ]
-                    or OTC._Themes.Default
+                    getTheme()
 
                 tween(
                     InputStroke,
@@ -409,9 +577,7 @@ function Input.Create(Tab, OTC, Settings)
                             CurrentTheme.Border
                     }
                 )
-
             end
-
         end
     )
 
@@ -421,15 +587,40 @@ function Input.Create(Tab, OTC, Settings)
             Flag,
             CurrentValue
         )
-
     end
 
     local Object = {}
 
+    Object.Type =
+        "Input"
+
+    Object.Instance =
+        Frame
+
+    Object.InputFrame =
+        InputFrame
+
+    Object.TextBox =
+        TextBox
+
+    Object.Title =
+        Title
+
+    Object.Description =
+        DescriptionLabel
+
+    Object.Stroke =
+        Stroke
+
+    Object.InputStroke =
+        InputStroke
+
     function Object:SetValue(Value)
 
         CurrentValue =
-            tostring(Value or "")
+            tostring(
+                Value or ""
+            )
 
         TextBox.Text =
             CurrentValue
@@ -440,9 +631,7 @@ function Input.Create(Tab, OTC, Settings)
                 Flag,
                 CurrentValue
             )
-
         end
-
     end
 
     function Object:GetValue()
@@ -453,29 +642,34 @@ function Input.Create(Tab, OTC, Settings)
 
     function Object:SetPlaceholder(Value)
 
-        TextBox.PlaceholderText =
-            tostring(Value or "")
+        Placeholder =
+            tostring(
+                Value or ""
+            )
 
+        TextBox.PlaceholderText =
+            Placeholder
     end
 
     function Object:SetName(NewName)
 
-        Name = NewName
+        Name =
+            tostring(
+                NewName
+            )
 
         Title.Text =
-            NewName
-
+            Name
     end
 
     function Object:SetCallback(NewCallback)
 
-        if type(NewCallback) == "function" then
+        if type(NewCallback)
+            == "function" then
 
             Callback =
                 NewCallback
-
         end
-
     end
 
     function Object:Focus()
@@ -496,22 +690,67 @@ function Input.Create(Tab, OTC, Settings)
                 Flag,
                 ""
             )
-
         end
-
     end
 
     function Object:RefreshTheme()
 
+        if not Frame
+            or not Frame.Parent then
+            return
+        end
+
         local CurrentTheme =
-            OTC._Themes[Tab.Window.Theme]
-            or OTC._Themes.Default
+            getTheme()
+
+        local Transparency =
+            CurrentTheme.Transparency
+            or {}
+
+        local StrokeSettings =
+            CurrentTheme.Stroke
+            or {}
+
+        local Corners =
+            CurrentTheme.Corners
+            or {}
+
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
+        local Gradients =
+            CurrentTheme.Gradients
+            or {}
 
         Frame.BackgroundColor3 =
-            CurrentTheme.Element
+            CurrentTheme.Input
+            or CurrentTheme.Element
+
+        Frame.BackgroundTransparency =
+            Transparency.Element
+            or 0
 
         Stroke.Color =
             CurrentTheme.Border
+
+        Stroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        Stroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        Stroke.Enabled =
+            StrokeSettings.Enabled ~= false
+
+        FrameCorner.CornerRadius =
+            UDim.new(
+                0,
+                Corners.Input
+                or 8
+            )
 
         Title.TextColor3 =
             CurrentTheme.Text
@@ -520,14 +759,33 @@ function Input.Create(Tab, OTC, Settings)
 
             DescriptionLabel.TextColor3 =
                 CurrentTheme.SubText
-
         end
 
         InputFrame.BackgroundColor3 =
-            CurrentTheme.Background
+            CurrentTheme.Input
+            or CurrentTheme.Background
 
-        InputStroke.Color =
-            CurrentTheme.Border
+        InputFrame.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        InputCorner.CornerRadius =
+            UDim.new(
+                0,
+                Corners.Input
+                or 6
+            )
+
+        InputStroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        InputStroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        InputStroke.Enabled =
+            StrokeSettings.Enabled ~= false
 
         TextBox.TextColor3 =
             CurrentTheme.Text
@@ -535,18 +793,41 @@ function Input.Create(Tab, OTC, Settings)
         TextBox.PlaceholderColor3 =
             CurrentTheme.SubText
 
+        updateInputStroke(false)
+
+        if Effects.Gradient
+            and Gradients.Element then
+
+            applyGradient(
+                InputFrame,
+                Gradients.Element
+            )
+
+        else
+
+            local Existing =
+                InputFrame:FindFirstChild(
+                    "OTCGradient"
+                )
+
+            if Existing then
+                Existing:Destroy()
+            end
+        end
     end
 
     function Object:Destroy()
 
-        Frame:Destroy()
+        if Frame
+            and Frame.Parent then
 
+            Frame:Destroy()
+        end
     end
 
-    Object.Instance = Frame
-    Object.TextBox = TextBox
-
-    Tab:AddElement(Object)
+    Tab:AddElement(
+        Object
+    )
 
     return Object
 end
