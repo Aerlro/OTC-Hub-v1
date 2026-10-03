@@ -9,6 +9,10 @@ local LocalPlayer = Players.LocalPlayer
 
 local LOGO_ASSET = "rbxassetid://104463753775983"
 
+local BAT_ASSET = "rbxassetid://131729208129481"
+local PUMPKIN_ASSET = "rbxassetid://77640790921337"
+local GHOST_ASSET = "rbxassetid://121586241628401"
+
 local function Tween(Object, Time, Properties, Style, Direction)
     local TweenObject = TweenService:Create(
         Object,
@@ -101,12 +105,8 @@ local function Image(
     return Object
 end
 
-local function CreateBat(
-    Parent,
-    Position,
-    Scale
-)
-    local Bat = Instance.new("TextLabel")
+local function CreateBat(Parent, Position, Scale)
+    local Bat = Instance.new("ImageLabel")
 
     Bat.Size = UDim2.fromOffset(
         55 * Scale,
@@ -115,25 +115,16 @@ local function CreateBat(
 
     Bat.Position = Position
     Bat.BackgroundTransparency = 1
-    Bat.Text = "🦇"
-    Bat.TextSize = 25 * Scale
-    Bat.TextColor3 = Color3.fromRGB(
-        25,
-        8,
-        30
-    )
-    Bat.Font = Enum.Font.GothamBold
+    Bat.Image = BAT_ASSET
+    Bat.ImageTransparency = 0
+    Bat.ScaleType = Enum.ScaleType.Fit
     Bat.Parent = Parent
 
     return Bat
 end
 
-local function CreatePumpkin(
-    Parent,
-    Position,
-    Scale
-)
-    local Pumpkin = Instance.new("TextLabel")
+local function CreatePumpkin(Parent, Position, Scale)
+    local Pumpkin = Instance.new("ImageLabel")
 
     Pumpkin.Size = UDim2.fromOffset(
         45 * Scale,
@@ -142,20 +133,16 @@ local function CreatePumpkin(
 
     Pumpkin.Position = Position
     Pumpkin.BackgroundTransparency = 1
-    Pumpkin.Text = "🎃"
-    Pumpkin.TextSize = 30 * Scale
-    Pumpkin.Font = Enum.Font.GothamBold
+    Pumpkin.Image = PUMPKIN_ASSET
+    Pumpkin.ImageTransparency = 0
+    Pumpkin.ScaleType = Enum.ScaleType.Fit
     Pumpkin.Parent = Parent
 
     return Pumpkin
 end
 
-local function CreateGhost(
-    Parent,
-    Position,
-    Scale
-)
-    local Ghost = Instance.new("TextLabel")
+local function CreateGhost(Parent, Position, Scale)
+    local Ghost = Instance.new("ImageLabel")
 
     Ghost.Size = UDim2.fromOffset(
         45 * Scale,
@@ -164,19 +151,15 @@ local function CreateGhost(
 
     Ghost.Position = Position
     Ghost.BackgroundTransparency = 1
-    Ghost.Text = "👻"
-    Ghost.TextSize = 32 * Scale
-    Ghost.Font = Enum.Font.GothamBold
+    Ghost.Image = GHOST_ASSET
+    Ghost.ImageTransparency = 0.35
+    Ghost.ScaleType = Enum.ScaleType.Fit
     Ghost.Parent = Parent
 
     return Ghost
 end
 
-local function CreateCloud(
-    Parent,
-    Position,
-    Size
-)
+local function CreateCloud(Parent, Position, Size)
     local Cloud = Instance.new("Frame")
 
     Cloud.Size = UDim2.fromOffset(
@@ -192,10 +175,7 @@ local function CreateCloud(
     Cloud.BorderSizePixel = 0
     Cloud.Parent = Parent
 
-    Corner(
-        Cloud,
-        999
-    )
+    Corner(Cloud, 999)
 
     local Circle1 = Instance.new("Frame")
 
@@ -220,10 +200,7 @@ local function CreateCloud(
     Circle1.BorderSizePixel = 0
     Circle1.Parent = Cloud
 
-    Corner(
-        Circle1,
-        999
-    )
+    Corner(Circle1, 999)
 
     local Circle2 = Instance.new("Frame")
 
@@ -248,19 +225,12 @@ local function CreateCloud(
     Circle2.BorderSizePixel = 0
     Circle2.Parent = Cloud
 
-    Corner(
-        Circle2,
-        999
-    )
+    Corner(Circle2, 999)
 
     return Cloud
 end
 
-local function CreateHauntedHouse(
-    Parent,
-    Position,
-    Scale
-)
+local function CreateHauntedHouse(Parent, Position, Scale)
     local House = Instance.new("Frame")
 
     House.Size = UDim2.fromOffset(
@@ -344,10 +314,7 @@ local function CreateHauntedHouse(
     Window1.BorderSizePixel = 0
     Window1.Parent = House
 
-    Corner(
-        Window1,
-        4
-    )
+    Corner(Window1, 4)
 
     local Window2 = Window1:Clone()
 
@@ -380,45 +347,35 @@ local function CreateHauntedHouse(
     Door.BorderSizePixel = 0
     Door.Parent = House
 
-    Corner(
-        Door,
-        4
-    )
+    Corner(Door, 4)
 
-    local MoonGlow = Instance.new("Frame")
+    local HouseGlow = Instance.new("Frame")
 
-    MoonGlow.Size = UDim2.fromOffset(
+    HouseGlow.Size = UDim2.fromOffset(
         40 * Scale,
         40 * Scale
     )
 
-    MoonGlow.Position = UDim2.new(
+    HouseGlow.Position = UDim2.new(
         0.73,
         0,
         0.10,
         0
     )
 
-    MoonGlow.BackgroundColor3 =
+    HouseGlow.BackgroundColor3 =
         Color3.fromRGB(255, 210, 120)
 
-    MoonGlow.BackgroundTransparency = 0.82
-    MoonGlow.BorderSizePixel = 0
-    MoonGlow.Parent = House
+    HouseGlow.BackgroundTransparency = 0.82
+    HouseGlow.BorderSizePixel = 0
+    HouseGlow.Parent = House
 
-    Corner(
-        MoonGlow,
-        999
-    )
+    Corner(HouseGlow, 999)
 
     return House
 end
 
---// Fade every visual object inside the loading screen.
-local function FadeOutGui(
-    Root,
-    Time
-)
+local function FadeOutGui(Root, Time)
     local Tweens = {}
 
     local function Fade(Object)
@@ -524,11 +481,7 @@ function Loading.Create(Total)
     local Background = Instance.new("Frame")
 
     Background.Name = "Background"
-    Background.Size = UDim2.fromScale(
-        1,
-        1
-    )
-
+    Background.Size = UDim2.fromScale(1, 1)
     Background.BackgroundColor3 =
         Color3.fromRGB(7, 2, 11)
 
@@ -569,10 +522,7 @@ function Loading.Create(Total)
     Moon.BorderSizePixel = 0
     Moon.Parent = Background
 
-    Corner(
-        Moon,
-        999
-    )
+    Corner(Moon, 999)
 
     local MoonGlow = Instance.new("Frame")
 
@@ -595,10 +545,7 @@ function Loading.Create(Total)
     MoonGlow.BorderSizePixel = 0
     MoonGlow.Parent = Background
 
-    Corner(
-        MoonGlow,
-        999
-    )
+    Corner(MoonGlow, 999)
 
     --// Clouds
     local Clouds = {}
@@ -634,63 +581,35 @@ function Loading.Create(Total)
         "HauntedHouses"
 
     HouseContainer.Size =
-        UDim2.fromScale(
-            1,
-            0.28
-        )
+        UDim2.fromScale(1, 0.28)
 
     HouseContainer.Position =
-        UDim2.new(
-            0,
-            0,
-            0.72,
-            0
-        )
+        UDim2.new(0, 0, 0.72, 0)
 
     HouseContainer.BackgroundTransparency = 1
     HouseContainer.Parent = Background
 
     CreateHauntedHouse(
         HouseContainer,
-        UDim2.new(
-            -0.02,
-            0,
-            0.15,
-            0
-        ),
+        UDim2.new(-0.02, 0, 0.15, 0),
         0.75
     )
 
     CreateHauntedHouse(
         HouseContainer,
-        UDim2.new(
-            0.13,
-            0,
-            0.02,
-            0
-        ),
+        UDim2.new(0.13, 0, 0.02, 0),
         0.95
     )
 
     CreateHauntedHouse(
         HouseContainer,
-        UDim2.new(
-            0.78,
-            0,
-            0.08,
-            0
-        ),
+        UDim2.new(0.78, 0, 0.08, 0),
         0.9
     )
 
     CreateHauntedHouse(
         HouseContainer,
-        UDim2.new(
-            0.91,
-            0,
-            0.18,
-            0
-        ),
+        UDim2.new(0.91, 0, 0.18, 0),
         0.65
     )
 
@@ -726,9 +645,7 @@ function Loading.Create(Total)
         0.88
     }
 
-    for _, X in ipairs(
-        GravePositions
-    ) do
+    for _, X in ipairs(GravePositions) do
         local Grave = Instance.new("Frame")
 
         Grave.Size = UDim2.fromOffset(
@@ -749,10 +666,7 @@ function Loading.Create(Total)
         Grave.BorderSizePixel = 0
         Grave.Parent = Cemetery
 
-        Corner(
-            Grave,
-            12
-        )
+        Corner(Grave, 12)
 
         local Cross = Instance.new("Frame")
 
@@ -799,10 +713,7 @@ function Loading.Create(Total)
         "HalloweenDecorations"
 
     DecorationContainer.Size =
-        UDim2.fromScale(
-            1,
-            1
-        )
+        UDim2.fromScale(1, 1)
 
     DecorationContainer.BackgroundTransparency = 1
     DecorationContainer.Parent = Background
@@ -867,8 +778,6 @@ function Loading.Create(Total)
             math.random(65, 100) / 100
         )
 
-        Ghost.TextTransparency = 0.35
-
         table.insert(
             Ghosts,
             {
@@ -887,10 +796,7 @@ function Loading.Create(Total)
         "Particles"
 
     ParticleContainer.Size =
-        UDim2.fromScale(
-            1,
-            1
-        )
+        UDim2.fromScale(1, 1)
 
     ParticleContainer.BackgroundTransparency = 1
     ParticleContainer.Parent = Background
@@ -898,11 +804,9 @@ function Loading.Create(Total)
     local Particles = {}
 
     for Index = 1, 30 do
-        local Particle =
-            Instance.new("Frame")
+        local Particle = Instance.new("Frame")
 
-        local Size =
-            math.random(2, 5)
+        local Size = math.random(2, 5)
 
         Particle.Size =
             UDim2.fromOffset(
@@ -954,112 +858,79 @@ function Loading.Create(Total)
     --// Main Glow
     local Glow = Instance.new("Frame")
 
-    Glow.Name = "Glow"
+    Glow.Size = UDim2.fromOffset(
+        500,
+        500
+    )
 
-    Glow.Size =
-        UDim2.fromOffset(
-            500,
-            500
-        )
-
-    Glow.Position =
-        UDim2.new(
-            0.5,
-            -250,
-            0.5,
-            -250
-        )
+    Glow.Position = UDim2.new(
+        0.5,
+        -250,
+        0.5,
+        -250
+    )
 
     Glow.BackgroundColor3 =
-        Color3.fromRGB(
-            255,
-            80,
-            0
-        )
+        Color3.fromRGB(255, 80, 0)
 
     Glow.BackgroundTransparency = 0.95
     Glow.BorderSizePixel = 0
     Glow.Parent = Background
 
-    Corner(
-        Glow,
-        999
-    )
+    Corner(Glow, 999)
 
     local PurpleGlow = Instance.new("Frame")
 
-    PurpleGlow.Size =
-        UDim2.fromOffset(
-            400,
-            400
-        )
+    PurpleGlow.Size = UDim2.fromOffset(
+        400,
+        400
+    )
 
-    PurpleGlow.Position =
-        UDim2.new(
-            0.5,
-            -200,
-            0.5,
-            -220
-        )
+    PurpleGlow.Position = UDim2.new(
+        0.5,
+        -200,
+        0.5,
+        -220
+    )
 
     PurpleGlow.BackgroundColor3 =
-        Color3.fromRGB(
-            165,
-            25,
-            210
-        )
+        Color3.fromRGB(165, 25, 210)
 
     PurpleGlow.BackgroundTransparency = 0.94
     PurpleGlow.BorderSizePixel = 0
     PurpleGlow.Parent = Background
 
-    Corner(
-        PurpleGlow,
-        999
-    )
+    Corner(PurpleGlow, 999)
 
     --// Main Card
     local Main = Instance.new("Frame")
 
     Main.Name = "Main"
 
-    Main.Size =
-        UDim2.fromOffset(
-            470,
-            350
-        )
+    Main.Size = UDim2.fromOffset(
+        470,
+        350
+    )
 
-    Main.Position =
-        UDim2.new(
-            0.5,
-            -235,
-            0.5,
-            -175
-        )
+    Main.Position = UDim2.new(
+        0.5,
+        -235,
+        0.5,
+        -175
+    )
 
     Main.BackgroundColor3 =
-        Color3.fromRGB(
-            20,
-            6,
-            25
-        )
+        Color3.fromRGB(20, 6, 25)
 
     Main.BackgroundTransparency = 0.08
     Main.BorderSizePixel = 0
     Main.Parent = Background
 
-    Corner(
-        Main,
-        18
-    )
+    Corner(Main, 18)
 
     local MainStroke = Stroke(
         Main,
-        Color3.fromRGB(
-            255,
-            105,
-            0
-        ),
+        Color3.fromRGB(255, 105, 0),
         1.5,
         0.25
     )
@@ -1067,21 +938,9 @@ function Loading.Create(Total)
     Gradient(
         Main,
         {
-            Color3.fromRGB(
-                20,
-                5,
-                28
-            ),
-            Color3.fromRGB(
-                45,
-                8,
-                48
-            ),
-            Color3.fromRGB(
-                20,
-                5,
-                28
-            )
+            Color3.fromRGB(20, 5, 28),
+            Color3.fromRGB(45, 8, 48),
+            Color3.fromRGB(20, 5, 28)
         },
         35
     )
@@ -1089,55 +948,34 @@ function Loading.Create(Total)
     --// Top Line
     local TopLine = Instance.new("Frame")
 
-    TopLine.Size =
-        UDim2.new(
-            1,
-            -60,
-            0,
-            2
-        )
+    TopLine.Size = UDim2.new(
+        1,
+        -60,
+        0,
+        2
+    )
 
-    TopLine.Position =
-        UDim2.new(
-            0,
-            30,
-            0,
-            18
-        )
+    TopLine.Position = UDim2.new(
+        0,
+        30,
+        0,
+        18
+    )
 
     TopLine.BackgroundColor3 =
-        Color3.fromRGB(
-            255,
-            105,
-            0
-        )
+        Color3.fromRGB(255, 105, 0)
 
     TopLine.BorderSizePixel = 0
     TopLine.Parent = Main
 
-    Corner(
-        TopLine,
-        999
-    )
+    Corner(TopLine, 999)
 
     Gradient(
         TopLine,
         {
-            Color3.fromRGB(
-                125,
-                15,
-                170
-            ),
-            Color3.fromRGB(
-                255,
-                105,
-                0
-            ),
-            Color3.fromRGB(
-                255,
-                175,
-                20
-            )
+            Color3.fromRGB(125, 15, 170),
+            Color3.fromRGB(255, 105, 0),
+            Color3.fromRGB(255, 175, 20)
         },
         0
     )
@@ -1184,19 +1022,12 @@ function Loading.Create(Total)
 
     Stroke(
         Ring,
-        Color3.fromRGB(
-            255,
-            105,
-            0
-        ),
+        Color3.fromRGB(255, 105, 0),
         2,
         0.05
     )
 
-    Corner(
-        Ring,
-        999
-    )
+    Corner(Ring, 999)
 
     local Ring2 = Instance.new("Frame")
 
@@ -1219,19 +1050,12 @@ function Loading.Create(Total)
 
     Stroke(
         Ring2,
-        Color3.fromRGB(
-            175,
-            35,
-            210
-        ),
+        Color3.fromRGB(175, 35, 210),
         1.5,
         0.2
     )
 
-    Corner(
-        Ring2,
-        999
-    )
+    Corner(Ring2, 999)
 
     --// Logo
     local LogoGlow = Image(
@@ -1380,7 +1204,7 @@ function Loading.Create(Total)
     Percentage.TextXAlignment =
         Enum.TextXAlignment.Right
 
-    --// Progress
+    --// Progress Bar
     local BarBackground =
         Instance.new("Frame")
 
@@ -1500,7 +1324,7 @@ function Loading.Create(Total)
     Object.Bar = Bar
     Object.BarBackground = BarBackground
 
-    --// Animation Loop
+    --// Animation
     local RotationConnection
 
     RotationConnection =
@@ -1542,9 +1366,7 @@ function Loading.Create(Total)
                         os.clock() * 1.5
                     ) * 0.04
 
-                for _, Data in ipairs(
-                    Bats
-                ) do
+                for _, Data in ipairs(Bats) do
                     local Current =
                         Data.Object.Position
 
@@ -1585,9 +1407,7 @@ function Loading.Create(Total)
                         ) * 8
                 end
 
-                for _, Data in ipairs(
-                    Pumpkins
-                ) do
+                for _, Data in ipairs(Pumpkins) do
                     local Y =
                         Data.Base.Y.Scale
                         + math.sin(
@@ -1610,9 +1430,7 @@ function Loading.Create(Total)
                         ) * 5
                 end
 
-                for _, Data in ipairs(
-                    Ghosts
-                ) do
+                for _, Data in ipairs(Ghosts) do
                     local Y =
                         Data.Base.Y.Scale
                         + math.sin(
@@ -1635,7 +1453,7 @@ function Loading.Create(Total)
                             0
                         )
 
-                    Data.Object.TextTransparency =
+                    Data.Object.ImageTransparency =
                         0.25
                         + math.sin(
                             os.clock() * 2
@@ -1643,9 +1461,7 @@ function Loading.Create(Total)
                         ) * 0.12
                 end
 
-                for _, Data in ipairs(
-                    Particles
-                ) do
+                for _, Data in ipairs(Particles) do
                     local Position =
                         Data.Object.Position
 
@@ -1670,9 +1486,7 @@ function Loading.Create(Total)
                         )
                 end
 
-                for _, Data in ipairs(
-                    Clouds
-                ) do
+                for _, Data in ipairs(Clouds) do
                     local Position =
                         Data.Object.Position
 
@@ -1702,7 +1516,7 @@ function Loading.Create(Total)
     Object.RotationConnection =
         RotationConnection
 
-    --// Entrance
+    --// Entrance Animation
     Main.Size =
         UDim2.fromOffset(
             430,
@@ -1821,6 +1635,7 @@ function Loading.Create(Total)
         }
     )
 
+    --// Update
     function Object:Update(
         Current,
         StatusText,
@@ -1872,6 +1687,7 @@ function Loading.Create(Total)
         )
     end
 
+    --// Finish
     function Object:Finish()
         if self.Closed
             or self.Finishing then
@@ -1888,8 +1704,6 @@ function Loading.Create(Total)
 
         task.wait(0.5)
 
-        -- Keep RenderStepped alive during
-        -- the entire fade-out animation.
         FadeOutGui(
             ScreenGui,
             0.7
@@ -1909,6 +1723,7 @@ function Loading.Create(Total)
         end
     end
 
+    --// Destroy
     function Object:Destroy()
         if self.Closed then
             return
