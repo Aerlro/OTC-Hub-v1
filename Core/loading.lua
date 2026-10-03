@@ -411,6 +411,8 @@ function Loading.Create(Total)
     Object.Current = 0
     Object.Closed = false
     Object.Finishing = false
+    Object.StartTime = os.clock()
+    Object.MinimumDuration = 1.35
 
     local ScreenGui = Instance.new("ScreenGui")
 
@@ -419,7 +421,6 @@ function Loading.Create(Total)
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior =
         Enum.ZIndexBehavior.Sibling
-
     ScreenGui.DisplayOrder = 999999
 
     pcall(function()
@@ -444,6 +445,7 @@ function Loading.Create(Total)
 
     Background.BorderSizePixel = 0
     Background.ClipsDescendants = true
+    Background.ZIndex = 1
     Background.Parent = ScreenGui
 
     Object.Background = Background
@@ -458,40 +460,18 @@ function Loading.Create(Total)
         45
     )
 
-    local Moon = Instance.new("Frame")
-
-    Moon.Size = UDim2.fromOffset(
-        180,
-        180
-    )
-
-    Moon.Position = UDim2.new(
-        0.82,
-        0,
-        0.08,
-        0
-    )
-
-    Moon.BackgroundColor3 =
-        Color3.fromRGB(255, 220, 145)
-
-    Moon.BorderSizePixel = 0
-    Moon.Parent = Background
-
-    Corner(Moon, 999)
-
     local MoonGlow = Instance.new("Frame")
 
     MoonGlow.Size = UDim2.fromOffset(
-        260,
-        260
+        270,
+        270
     )
 
     MoonGlow.Position = UDim2.new(
         0.82,
-        -40,
-        0.08,
-        -40
+        -45,
+        0.06,
+        -35
     )
 
     MoonGlow.BackgroundColor3 =
@@ -499,17 +479,41 @@ function Loading.Create(Total)
 
     MoonGlow.BackgroundTransparency = 0.92
     MoonGlow.BorderSizePixel = 0
+    MoonGlow.ZIndex = 2
     MoonGlow.Parent = Background
 
     Corner(MoonGlow, 999)
 
+    local Moon = Instance.new("Frame")
+
+    Moon.Size = UDim2.fromOffset(
+        175,
+        175
+    )
+
+    Moon.Position = UDim2.new(
+        0.82,
+        0,
+        0.06,
+        0
+    )
+
+    Moon.BackgroundColor3 =
+        Color3.fromRGB(255, 220, 145)
+
+    Moon.BorderSizePixel = 0
+    Moon.ZIndex = 3
+    Moon.Parent = Background
+
+    Corner(Moon, 999)
+
     local Clouds = {}
 
-    for Index = 1, 5 do
+    for Index = 1, 6 do
         local Cloud = CreateCloud(
             Background,
             UDim2.new(
-                math.random(0, 90) / 100,
+                math.random(-10, 90) / 100,
                 0,
                 math.random(8, 65) / 100,
                 0
@@ -517,7 +521,7 @@ function Loading.Create(Total)
             math.random(90, 170)
         )
 
-        Cloud.BackgroundTransparency = 0.35
+        Cloud.ZIndex = 4
 
         table.insert(
             Clouds,
@@ -541,6 +545,7 @@ function Loading.Create(Total)
         UDim2.new(0, 0, 0.72, 0)
 
     HouseContainer.BackgroundTransparency = 1
+    HouseContainer.ZIndex = 5
     HouseContainer.Parent = Background
 
     CreateHauntedHouse(
@@ -587,6 +592,7 @@ function Loading.Create(Total)
         Color3.fromRGB(5, 2, 7)
 
     Cemetery.BorderSizePixel = 0
+    Cemetery.ZIndex = 6
     Cemetery.Parent = Background
 
     local GravePositions = {
@@ -617,6 +623,7 @@ function Loading.Create(Total)
             Color3.fromRGB(35, 30, 40)
 
         Grave.BorderSizePixel = 0
+        Grave.ZIndex = 6
         Grave.Parent = Cemetery
 
         Corner(Grave, 12)
@@ -639,6 +646,7 @@ function Loading.Create(Total)
             Color3.fromRGB(55, 45, 60)
 
         Cross.BorderSizePixel = 0
+        Cross.ZIndex = 7
         Cross.Parent = Grave
 
         local Cross2 = Cross:Clone()
@@ -668,81 +676,123 @@ function Loading.Create(Total)
         UDim2.fromScale(1, 1)
 
     DecorationContainer.BackgroundTransparency = 1
-    DecorationContainer.ZIndex = 10
+    DecorationContainer.ZIndex = 15
     DecorationContainer.Parent = Background
 
     local Bats = {}
     local Pumpkins = {}
     local Ghosts = {}
 
-    for Index = 1, 8 do
+    for Index = 1, 16 do
+        local Y = math.random(5, 88) / 100
+
+        local StartX
+
+        if Index % 2 == 0 then
+            StartX =
+                math.random(-20, 25) / 100
+        else
+            StartX =
+                math.random(75, 120) / 100
+        end
+
         local Bat = CreateBat(
             DecorationContainer,
             UDim2.new(
-                math.random(-10, 100) / 100,
+                StartX,
                 0,
-                math.random(5, 85) / 100,
+                Y,
                 0
             ),
-            math.random(65, 110) / 100
+            math.random(65, 105) / 100
         )
 
-        Bat.ZIndex = 10
+        Bat.ZIndex = 15
 
         table.insert(
             Bats,
             {
                 Object = Bat,
-                Speed = math.random(20, 40),
-                Wave = math.random(2, 5)
+                Speed = math.random(0.035, 0.075),
+                WaveSpeed = math.random(1.5, 3),
+                WaveAmount = math.random(8, 18) / 1000,
+                RotationAmount = math.random(5, 12),
+                Direction = Index % 2 == 0 and 1 or -1
             }
         )
     end
 
-    for Index = 1, 7 do
+    for Index = 1, 12 do
+        local Side = Index % 2
+
+        local X
+
+        if Side == 0 then
+            X =
+                math.random(2, 22) / 100
+        else
+            X =
+                math.random(78, 96) / 100
+        end
+
         local Pumpkin = CreatePumpkin(
             DecorationContainer,
             UDim2.new(
-                math.random(2, 96) / 100,
+                X,
                 0,
-                math.random(68, 92) / 100,
+                math.random(65, 91) / 100,
                 0
             ),
-            math.random(70, 110) / 100
+            math.random(65, 105) / 100
         )
 
-        Pumpkin.ZIndex = 10
+        Pumpkin.ZIndex = 15
 
         table.insert(
             Pumpkins,
             {
                 Object = Pumpkin,
                 Base = Pumpkin.Position,
-                Offset = math.random() * 10
+                Offset = math.random() * 20,
+                FloatSpeed = math.random(0.8, 1.6),
+                FloatAmount = math.random(4, 9) / 1000
             }
         )
     end
 
-    for Index = 1, 5 do
+    for Index = 1, 10 do
+        local X
+
+        if Index % 2 == 0 then
+            X =
+                math.random(0, 20) / 100
+        else
+            X =
+                math.random(80, 100) / 100
+        end
+
         local Ghost = CreateGhost(
             DecorationContainer,
             UDim2.new(
-                math.random(3, 95) / 100,
+                X,
                 0,
-                math.random(15, 80) / 100,
+                math.random(12, 82) / 100,
                 0
             ),
             math.random(65, 100) / 100
         )
 
-        Ghost.ZIndex = 10
+        Ghost.ZIndex = 15
 
         table.insert(
             Ghosts,
             {
                 Object = Ghost,
                 Base = Ghost.Position,
-                Offset = math.random() * 10
+                Offset = math.random() * 20,
+                FloatSpeed = math.random(0.7, 1.4),
+                FloatAmount = math.random(10, 20) / 1000,
+                TransparencySpeed = math.random(1, 2)
             }
         )
     end
@@ -755,12 +805,12 @@ function Loading.Create(Total)
         UDim2.fromScale(1, 1)
 
     ParticleContainer.BackgroundTransparency = 1
-    ParticleContainer.ZIndex = 5
+    ParticleContainer.ZIndex = 8
     ParticleContainer.Parent = Background
 
     local Particles = {}
 
-    for Index = 1, 30 do
+    for Index = 1, 35 do
         local Particle =
             Instance.new("Frame")
 
@@ -797,6 +847,7 @@ function Loading.Create(Total)
             math.random(35, 80) / 100
 
         Particle.BorderSizePixel = 0
+        Particle.ZIndex = 8
         Particle.Parent = ParticleContainer
 
         Corner(
@@ -838,6 +889,7 @@ function Loading.Create(Total)
 
     Glow.BackgroundTransparency = 0.95
     Glow.BorderSizePixel = 0
+    Glow.ZIndex = 9
     Glow.Parent = Background
 
     Corner(Glow, 999)
@@ -867,6 +919,7 @@ function Loading.Create(Total)
 
     PurpleGlow.BackgroundTransparency = 0.94
     PurpleGlow.BorderSizePixel = 0
+    PurpleGlow.ZIndex = 9
     PurpleGlow.Parent = Background
 
     Corner(PurpleGlow, 999)
@@ -898,7 +951,7 @@ function Loading.Create(Total)
 
     Main.BackgroundTransparency = 0.08
     Main.BorderSizePixel = 0
-    Main.ZIndex = 20
+    Main.ZIndex = 30
     Main.Parent = Background
 
     Corner(Main, 18)
@@ -962,7 +1015,7 @@ function Loading.Create(Total)
         )
 
     TopLine.BorderSizePixel = 0
-    TopLine.ZIndex = 21
+    TopLine.ZIndex = 31
     TopLine.Parent = Main
 
     Corner(TopLine, 999)
@@ -1007,7 +1060,7 @@ function Loading.Create(Total)
         )
 
     RingContainer.BackgroundTransparency = 1
-    RingContainer.ZIndex = 22
+    RingContainer.ZIndex = 32
     RingContainer.Parent = Main
 
     local Ring = Instance.new("Frame")
@@ -1027,7 +1080,7 @@ function Loading.Create(Total)
         )
 
     Ring.BackgroundTransparency = 1
-    Ring.ZIndex = 22
+    Ring.ZIndex = 32
     Ring.Parent = RingContainer
 
     Stroke(
@@ -1060,7 +1113,7 @@ function Loading.Create(Total)
         )
 
     Ring2.BackgroundTransparency = 1
-    Ring2.ZIndex = 22
+    Ring2.ZIndex = 32
     Ring2.Parent = RingContainer
 
     Stroke(
@@ -1099,7 +1152,7 @@ function Loading.Create(Total)
             0
         )
 
-    LogoGlow.ZIndex = 23
+    LogoGlow.ZIndex = 33
 
     local Logo = CreateImage(
         RingContainer,
@@ -1117,7 +1170,7 @@ function Loading.Create(Total)
         0
     )
 
-    Logo.ZIndex = 24
+    Logo.ZIndex = 34
 
     local Title = CreateText(
         Main,
@@ -1133,7 +1186,7 @@ function Loading.Create(Total)
         Enum.Font.GothamBold
     )
 
-    Title.ZIndex = 25
+    Title.ZIndex = 35
 
     local Version = CreateText(
         Main,
@@ -1149,7 +1202,7 @@ function Loading.Create(Total)
         Enum.Font.Gotham
     )
 
-    Version.ZIndex = 25
+    Version.ZIndex = 35
 
     local Status = CreateText(
         Main,
@@ -1168,7 +1221,7 @@ function Loading.Create(Total)
     Status.TextTruncate =
         Enum.TextTruncate.AtEnd
 
-    Status.ZIndex = 25
+    Status.ZIndex = 35
 
     local Percentage = CreateText(
         Main,
@@ -1187,7 +1240,7 @@ function Loading.Create(Total)
     Percentage.TextXAlignment =
         Enum.TextXAlignment.Right
 
-    Percentage.ZIndex = 25
+    Percentage.ZIndex = 35
 
     local BarBackground =
         Instance.new("Frame")
@@ -1216,7 +1269,7 @@ function Loading.Create(Total)
         )
 
     BarBackground.BorderSizePixel = 0
-    BarBackground.ZIndex = 25
+    BarBackground.ZIndex = 35
     BarBackground.Parent = Main
 
     Corner(
@@ -1242,7 +1295,7 @@ function Loading.Create(Total)
         )
 
     Bar.BorderSizePixel = 0
-    Bar.ZIndex = 26
+    Bar.ZIndex = 36
     Bar.Parent = BarBackground
 
     Corner(Bar, 999)
@@ -1286,7 +1339,7 @@ function Loading.Create(Total)
     Detail.TextTruncate =
         Enum.TextTruncate.AtEnd
 
-    Detail.ZIndex = 25
+    Detail.ZIndex = 35
 
     Object.Main = Main
     Object.Logo = Logo
@@ -1308,6 +1361,8 @@ function Loading.Create(Total)
                     return
                 end
 
+                local Time = os.clock()
+
                 Ring.Rotation =
                     Ring.Rotation
                     + Delta * 55
@@ -1319,54 +1374,62 @@ function Loading.Create(Total)
                 LogoGlow.ImageTransparency =
                     0.75
                     + math.sin(
-                        os.clock() * 3
+                        Time * 3
                     ) * 0.08
 
                 Glow.BackgroundTransparency =
                     0.93
                     + math.sin(
-                        os.clock() * 2
+                        Time * 2
                     ) * 0.025
 
                 PurpleGlow.BackgroundTransparency =
                     0.92
                     + math.sin(
-                        os.clock() * 1.7
+                        Time * 1.7
                     ) * 0.025
 
                 MoonGlow.BackgroundTransparency =
                     0.88
                     + math.sin(
-                        os.clock() * 1.5
+                        Time * 1.5
                     ) * 0.04
 
                 for _, Data in ipairs(Bats) do
-                    local Current =
-                        Data.Object.Position
+                    local ObjectBat =
+                        Data.Object
+
+                    local Position =
+                        ObjectBat.Position
+
+                    local Direction =
+                        Data.Direction
 
                     local NewX =
-                        Current.X.Scale
+                        Position.X.Scale
                         + Delta
-                        * (
-                            Data.Speed
-                            / 1000
-                        )
-
-                    local Wave =
-                        math.sin(
-                            os.clock()
-                            * Data.Wave
-                        ) * 0.0007
+                        * Data.Speed
+                        * Direction
 
                     local NewY =
-                        Current.Y.Scale
-                        + Wave
+                        Position.Y.Scale
+                        + math.sin(
+                            Time
+                            * Data.WaveSpeed
+                        )
+                        * Data.WaveAmount
 
-                    if NewX > 1.1 then
-                        NewX = -0.12
+                    if Direction > 0 then
+                        if NewX > 1.15 then
+                            NewX = -0.15
+                        end
+                    else
+                        if NewX < -0.15 then
+                            NewX = 1.15
+                        end
                     end
 
-                    Data.Object.Position =
+                    ObjectBat.Position =
                         UDim2.new(
                             NewX,
                             0,
@@ -1374,22 +1437,28 @@ function Loading.Create(Total)
                             0
                         )
 
-                    Data.Object.Rotation =
+                    ObjectBat.Rotation =
                         math.sin(
-                            os.clock()
-                            * Data.Wave
-                        ) * 8
+                            Time
+                            * Data.WaveSpeed
+                        )
+                        * Data.RotationAmount
                 end
 
                 for _, Data in ipairs(Pumpkins) do
+                    local Pumpkin =
+                        Data.Object
+
                     local Y =
                         Data.Base.Y.Scale
                         + math.sin(
-                            os.clock()
+                            Time
+                            * Data.FloatSpeed
                             + Data.Offset
-                        ) * 0.004
+                        )
+                        * Data.FloatAmount
 
-                    Data.Object.Position =
+                    Pumpkin.Position =
                         UDim2.new(
                             Data.Base.X.Scale,
                             0,
@@ -1397,29 +1466,34 @@ function Loading.Create(Total)
                             0
                         )
 
-                    Data.Object.Rotation =
+                    Pumpkin.Rotation =
                         math.sin(
-                            os.clock() * 0.8
+                            Time * 1.1
                             + Data.Offset
-                        ) * 5
+                        ) * 7
                 end
 
                 for _, Data in ipairs(Ghosts) do
+                    local Ghost =
+                        Data.Object
+
                     local Y =
                         Data.Base.Y.Scale
                         + math.sin(
-                            os.clock() * 1.2
+                            Time
+                            * Data.FloatSpeed
                             + Data.Offset
-                        ) * 0.015
+                        )
+                        * Data.FloatAmount
 
                     local X =
                         Data.Base.X.Scale
                         + math.cos(
-                            os.clock() * 0.7
+                            Time * 0.65
                             + Data.Offset
-                        ) * 0.006
+                        ) * 0.008
 
-                    Data.Object.Position =
+                    Ghost.Position =
                         UDim2.new(
                             X,
                             0,
@@ -1427,10 +1501,17 @@ function Loading.Create(Total)
                             0
                         )
 
-                    Data.Object.ImageTransparency =
+                    Ghost.Rotation =
+                        math.sin(
+                            Time * 0.8
+                            + Data.Offset
+                        ) * 5
+
+                    Ghost.ImageTransparency =
                         0.25
                         + math.sin(
-                            os.clock() * 2
+                            Time
+                            * Data.TransparencySpeed
                             + Data.Offset
                         ) * 0.12
                 end
@@ -1667,20 +1748,32 @@ function Loading.Create(Total)
 
         self.Finishing = true
 
+        local Elapsed =
+            os.clock()
+            - self.StartTime
+
+        local Remaining =
+            self.MinimumDuration
+            - Elapsed
+
+        if Remaining > 0 then
+            task.wait(Remaining)
+        end
+
         self:Update(
             self.Total,
             "OTC Hub ready!",
-            "Halloween initialization complete"
+            "Initialization complete"
         )
 
-        task.wait(0.5)
+        task.wait(0.3)
 
         FadeOutGui(
             ScreenGui,
-            0.7
+            0.55
         )
 
-        task.wait(0.75)
+        task.wait(0.6)
 
         self.Closed = true
 
