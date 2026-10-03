@@ -323,12 +323,16 @@ function Window.Create(Settings, OTC)
 
     local TabsContainer = Instance.new("ScrollingFrame")
     TabsContainer.Name = "Tabs"
-    TabsContainer.Size = UDim2.new(1, -12, 1, -82)
-    TabsContainer.Position = UDim2.new(0, 6, 0, 8)
+
+    -- MODIFICAT: 8px stânga + 8px dreapta
+    TabsContainer.Size = UDim2.new(1, -16, 1, -82)
+    TabsContainer.Position = UDim2.new(0, 8, 0, 8)
+
     TabsContainer.BackgroundTransparency = 1
     TabsContainer.BorderSizePixel = 0
     TabsContainer.ScrollBarThickness = 2
-    TabsContainer.ScrollBarImageColor3 = Theme.Scrollbar or Theme.Border
+    TabsContainer.ScrollBarImageColor3 =
+        Theme.Scrollbar or Theme.Border
     TabsContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     TabsContainer.Parent = Sidebar
 
@@ -348,8 +352,11 @@ function Window.Create(Settings, OTC)
 
     local UserCard = Instance.new("Frame")
     UserCard.Name = "UserCard"
-    UserCard.Size = UDim2.new(1, -12, 0, 60)
-    UserCard.Position = UDim2.new(0, 6, 1, -68)
+
+    -- MODIFICAT: aceeași margine ca la TabsContainer
+    UserCard.Size = UDim2.new(1, -16, 0, 60)
+    UserCard.Position = UDim2.new(0, 8, 1, -68)
+
     UserCard.BackgroundColor3 = Theme.Element
     UserCard.BackgroundTransparency = Theme.Transparency
         and Theme.Transparency.Element
@@ -366,18 +373,16 @@ function Window.Create(Settings, OTC)
     )
     UserCorner.Parent = UserCard
 
-    local UserSeparator = Instance.new("Frame")
-    UserSeparator.Size = UDim2.new(1, -16, 0, 1)
-    UserSeparator.Position = UDim2.new(0, 8, 0, 8)
-    UserSeparator.BackgroundColor3 = Theme.Border
-    UserSeparator.BorderSizePixel = 0
-    UserSeparator.Parent = UserCard
-
     local UserAvatar = Instance.new("ImageLabel")
     UserAvatar.Name = "Avatar"
     UserAvatar.Size = UDim2.new(0, 36, 0, 36)
-    UserAvatar.Position = UDim2.new(0, 8, 0.5, -12)
-    UserAvatar.BackgroundTransparency = 1
+
+    -- MODIFICAT: centrare corectă
+    UserAvatar.Position = UDim2.new(0, 10, 0.5, -18)
+
+    UserAvatar.BackgroundColor3 = Theme.Background
+    UserAvatar.BackgroundTransparency = 0
+    UserAvatar.BorderSizePixel = 0
     UserAvatar.Parent = UserCard
 
     local AvatarCorner = Instance.new("UICorner")
@@ -387,8 +392,11 @@ function Window.Create(Settings, OTC)
     local UserDisplay = Instance.new("TextLabel")
     UserDisplay.Name = "DisplayName"
     UserDisplay.BackgroundTransparency = 1
-    UserDisplay.Position = UDim2.new(0, 52, 0, 17)
-    UserDisplay.Size = UDim2.new(1, -60, 0, 18)
+
+    -- MODIFICAT
+    UserDisplay.Position = UDim2.new(0, 56, 0, 13)
+    UserDisplay.Size = UDim2.new(1, -66, 0, 18)
+
     UserDisplay.Font = Enum.Font.GothamSemibold
     UserDisplay.Text = LocalPlayer.DisplayName
     UserDisplay.TextColor3 = Theme.Text
@@ -400,8 +408,11 @@ function Window.Create(Settings, OTC)
     local UserName = Instance.new("TextLabel")
     UserName.Name = "Username"
     UserName.BackgroundTransparency = 1
-    UserName.Position = UDim2.new(0, 52, 0, 35)
-    UserName.Size = UDim2.new(1, -60, 0, 16)
+
+    -- MODIFICAT
+    UserName.Position = UDim2.new(0, 56, 0, 33)
+    UserName.Size = UDim2.new(1, -66, 0, 16)
+
     UserName.Font = Enum.Font.Gotham
     UserName.Text = "@" .. LocalPlayer.Name
     UserName.TextColor3 = Theme.SubText
@@ -449,7 +460,6 @@ function Window.Create(Settings, OTC)
     Object.Content = Content
     Object.TabsContainer = TabsContainer
     Object.UserCard = UserCard
-    Object.UserSeparator = UserSeparator
     Object.UserAvatar = UserAvatar
     Object.UserDisplay = UserDisplay
     Object.UserName = UserName
@@ -1066,8 +1076,10 @@ function Window.Create(Settings, OTC)
         UserCard.BackgroundTransparency =
             Transparency.Element or 0
 
-        UserSeparator.BackgroundColor3 =
-            NewTheme.Border
+        UserAvatar.BackgroundColor3 =
+            NewTheme.Background
+
+        UserAvatar.BackgroundTransparency = 0
 
         UserDisplay.TextColor3 =
             NewTheme.Text
@@ -1078,6 +1090,11 @@ function Window.Create(Settings, OTC)
         ApplyCorner(
             UserCard,
             Corners.Element or 8
+        )
+
+        ApplyCorner(
+            UserAvatar,
+            999
         )
 
         MiniButton.BackgroundTransparency = 1
