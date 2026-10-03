@@ -1,4 +1,4 @@
-# OTC Hub v1
+# OTC Hub v1 (i know it's AI idc i'm using only for me 😁)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/OTC.png" alt="OTC Hub" width="160">
