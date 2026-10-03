@@ -1,3 +1,9 @@
+--[[
+    OTC Hub v1
+    Dropdown Element
+    by Aerlro
+]]
+
 local Dropdown = {}
 
 local RunService = game:GetService("RunService")
@@ -30,24 +36,73 @@ local function NormalizeOptions(Options)
     return Result
 end
 
+local function ApplyGradient(Object, GradientData)
+    if not Object then
+        return
+    end
+
+    local Existing =
+        Object:FindFirstChild("OTCGradient")
+
+    if Existing then
+        Existing:Destroy()
+    end
+
+    if not GradientData
+        or GradientData.Enabled ~= true
+        or not GradientData.Colors then
+        return
+    end
+
+    local Gradient =
+        Instance.new("UIGradient")
+
+    Gradient.Name =
+        "OTCGradient"
+
+    Gradient.Color =
+        GradientData.Colors
+
+    Gradient.Rotation =
+        GradientData.Rotation or 0
+
+    Gradient.Parent =
+        Object
+
+    return Gradient
+end
+
 function Dropdown.Create(TabObject, OTC, Settings)
 
     Settings = Settings or {}
 
-    local Theme = OTC:GetTheme()
+    local function GetTheme()
 
-    local Name = Settings.Name or "Dropdown"
+        return OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes[TabObject.Window.Theme]
+            or OTC._Themes.Default
 
-    local Options = NormalizeOptions(
-        Settings.Options or {}
-    )
+    end
+
+    local Theme =
+        GetTheme()
+
+    local Name =
+        Settings.Name
+        or "Dropdown"
+
+    local Options =
+        NormalizeOptions(
+            Settings.Options or {}
+        )
 
     local MultiSelect =
         Settings.MultiSelect == true
 
     local Callback =
         Settings.Callback
-        or function() end
+        or function()
+        end
 
     local DROPDOWN_WIDTH =
         Settings.Width or 260
@@ -70,216 +125,245 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     local OPEN_OFFSET = 5
 
-    local Frame = Create("Frame", {
-        Name = "Dropdown",
+    local Frame =
+        Create("Frame", {
+            Name = "Dropdown",
 
-        Parent = TabObject.Page,
+            Parent =
+                TabObject.Page,
 
-        Size =
-            UDim2.new(
-                1,
-                0,
-                0,
-                48
-            ),
+            Size =
+                UDim2.new(
+                    1,
+                    0,
+                    0,
+                    48
+                ),
 
-        BackgroundColor3 =
-            Theme.Element,
+            BackgroundColor3 =
+                Theme.Dropdown
+                or Theme.Element,
 
-        BorderSizePixel = 0,
+            BackgroundTransparency =
+                Theme.Transparency
+                and Theme.Transparency.Element
+                or 0,
 
-        ClipsDescendants = false,
+            BorderSizePixel = 0,
 
-        ZIndex = 10
-    })
+            ClipsDescendants = false,
 
-    Create("UICorner", {
-        Parent = Frame,
+            ZIndex = 10
+        })
 
-        CornerRadius =
-            UDim.new(
-                0,
-                6
-            )
-    })
+    local FrameCorner =
+        Create("UICorner", {
+            Parent = Frame,
 
-    local Stroke = Create("UIStroke", {
-        Parent = Frame,
+            CornerRadius =
+                UDim.new(
+                    0,
+                    Theme.Corners
+                    and Theme.Corners.Dropdown
+                    or 7
+                )
+        })
 
-        Color =
-            Theme.Border,
+    local Stroke =
+        Create("UIStroke", {
+            Parent = Frame,
 
-        Thickness = 1
-    })
+            Color =
+                Theme.Border,
 
-    local NameLabel = Create("TextLabel", {
-        Name = "Name",
+            Thickness =
+                Theme.Stroke
+                and Theme.Stroke.Thickness
+                or 1,
 
-        Parent = Frame,
+            Transparency =
+                Theme.Stroke
+                and Theme.Stroke.Transparency
+                or 0
+        })
 
-        BackgroundTransparency = 1,
+    if Theme.Stroke then
+        Stroke.Enabled =
+            Theme.Stroke.Enabled ~= false
+    end
 
-        AnchorPoint =
-            Vector2.new(
-                0,
-                0.5
-            ),
+    local NameLabel =
+        Create("TextLabel", {
+            Name = "Name",
 
-        Position =
-            UDim2.new(
-                0,
-                14,
-                0.5,
-                0
-            ),
+            Parent = Frame,
 
-        Size =
-            UDim2.new(
-                0.48,
-                -14,
-                0,
-                24
-            ),
+            BackgroundTransparency = 1,
 
-        Font =
-            Enum.Font.GothamMedium,
+            AnchorPoint =
+                Vector2.new(
+                    0,
+                    0.5
+                ),
 
-        Text =
-            Name,
+            Position =
+                UDim2.new(
+                    0,
+                    14,
+                    0.5,
+                    0
+                ),
 
-        TextColor3 =
-            Theme.Text,
+            Size =
+                UDim2.new(
+                    0.48,
+                    -14,
+                    0,
+                    24
+                ),
 
-        TextSize = 14,
+            Font =
+                Enum.Font.GothamMedium,
 
-        TextXAlignment =
-            Enum.TextXAlignment.Left,
+            Text =
+                Name,
 
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
+            TextColor3 =
+                Theme.Text,
 
-        TextTruncate =
-            Enum.TextTruncate.AtEnd,
+            TextSize = 14,
 
-        ZIndex = 11
-    })
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
 
-    local ValueLabel = Create("TextLabel", {
-        Name = "Value",
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
 
-        Parent = Frame,
+            TextTruncate =
+                Enum.TextTruncate.AtEnd,
 
-        BackgroundTransparency = 1,
+            ZIndex = 11
+        })
 
-        AnchorPoint =
-            Vector2.new(
-                0,
-                0.5
-            ),
+    local ValueLabel =
+        Create("TextLabel", {
+            Name = "Value",
 
-        Position =
-            UDim2.new(
-                0.48,
-                0,
-                0.5,
-                0
-            ),
+            Parent = Frame,
 
-        Size =
-            UDim2.new(
-                0.52,
-                -42,
-                0,
-                24
-            ),
+            BackgroundTransparency = 1,
 
-        Font =
-            Enum.Font.Gotham,
+            AnchorPoint =
+                Vector2.new(
+                    0,
+                    0.5
+                ),
 
-        Text = "",
+            Position =
+                UDim2.new(
+                    0.48,
+                    0,
+                    0.5,
+                    0
+                ),
 
-        TextColor3 =
-            Theme.SubText,
+            Size =
+                UDim2.new(
+                    0.52,
+                    -42,
+                    0,
+                    24
+                ),
 
-        TextSize = 13,
+            Font =
+                Enum.Font.Gotham,
 
-        TextXAlignment =
-            Enum.TextXAlignment.Right,
+            Text = "",
 
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
+            TextColor3 =
+                Theme.SubText,
 
-        TextTruncate =
-            Enum.TextTruncate.AtEnd,
+            TextSize = 13,
 
-        ZIndex = 11
-    })
+            TextXAlignment =
+                Enum.TextXAlignment.Right,
 
-    local Arrow = Create("TextLabel", {
-        Name = "Arrow",
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
 
-        Parent = Frame,
+            TextTruncate =
+                Enum.TextTruncate.AtEnd,
 
-        BackgroundTransparency = 1,
+            ZIndex = 11
+        })
 
-        AnchorPoint =
-            Vector2.new(
-                1,
-                0.5
-            ),
+    local Arrow =
+        Create("TextLabel", {
+            Name = "Arrow",
 
-        Position =
-            UDim2.new(
-                1,
-                -12,
-                0.5,
-                0
-            ),
+            Parent = Frame,
 
-        Size =
-            UDim2.fromOffset(
-                18,
-                18
-            ),
+            BackgroundTransparency = 1,
 
-        Font =
-            Enum.Font.GothamBold,
+            AnchorPoint =
+                Vector2.new(
+                    1,
+                    0.5
+                ),
 
-        Text = "⌄",
+            Position =
+                UDim2.new(
+                    1,
+                    -12,
+                    0.5,
+                    0
+                ),
 
-        TextColor3 =
-            Theme.SubText,
+            Size =
+                UDim2.fromOffset(
+                    18,
+                    18
+                ),
 
-        TextSize = 16,
+            Font =
+                Enum.Font.GothamBold,
 
-        TextXAlignment =
-            Enum.TextXAlignment.Center,
+            Text = "⌄",
 
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
+            TextColor3 =
+                Theme.SubText,
 
-        ZIndex = 11
-    })
+            TextSize = 16,
 
-    local Button = Create("TextButton", {
-        Name = "Button",
+            TextXAlignment =
+                Enum.TextXAlignment.Center,
 
-        Parent = Frame,
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
 
-        BackgroundTransparency = 1,
+            ZIndex = 11
+        })
 
-        Size =
-            UDim2.fromScale(
-                1,
-                1
-            ),
+    local Button =
+        Create("TextButton", {
+            Name = "Button",
 
-        Text = "",
+            Parent = Frame,
 
-        AutoButtonColor = false,
+            BackgroundTransparency = 1,
 
-        ZIndex = 12
-    })
+            Size =
+                UDim2.fromScale(
+                    1,
+                    1
+                ),
+
+            Text = "",
+
+            AutoButtonColor = false,
+
+            ZIndex = 12
+        })
 
     local ScreenGui
 
@@ -312,55 +396,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     if not Overlay then
 
-        Overlay = Create("Frame", {
-            Name =
-                "OTC_DropdownOverlay",
-
-            Parent =
-                ScreenGui,
-
-            BackgroundTransparency = 1,
-
-            BorderSizePixel = 0,
-
-            Position =
-                UDim2.fromScale(
-                    0,
-                    0
-                ),
-
-            Size =
-                UDim2.fromScale(
-                    1,
-                    1
-                ),
-
-            ClipsDescendants = false,
-
-            Visible = true,
-
-            Active = false,
-
-            ZIndex = 1000
-        })
-
-    end
-
-    local OutsideButton =
-        Overlay:FindFirstChild(
-            "OutsideButton"
-        )
-
-    if not OutsideButton then
-
-        OutsideButton = Create(
-            "TextButton",
-            {
+        Overlay =
+            Create("Frame", {
                 Name =
-                    "OutsideButton",
+                    "OTC_DropdownOverlay",
 
                 Parent =
-                    Overlay,
+                    ScreenGui,
 
                 BackgroundTransparency = 1,
 
@@ -378,161 +420,250 @@ function Dropdown.Create(TabObject, OTC, Settings)
                         1
                     ),
 
-                Text = "",
+                ClipsDescendants = false,
 
-                AutoButtonColor = false,
-
-                Visible = false,
+                Visible = true,
 
                 Active = false,
 
                 ZIndex = 1000
-            }
-        )
+            })
 
     end
 
-    local DropdownFrame = Create("Frame", {
-        Name =
-            "DropdownFrame",
+    local OutsideButton =
+        Overlay:FindFirstChild(
+            "OutsideButton"
+        )
 
-        Parent =
-            Overlay,
+    if not OutsideButton then
 
-        BackgroundColor3 =
-            Theme.Secondary,
+        OutsideButton =
+            Create(
+                "TextButton",
+                {
+                    Name =
+                        "OutsideButton",
 
-        BorderSizePixel = 0,
+                    Parent =
+                        Overlay,
 
-        Size =
-            UDim2.fromOffset(
-                DROPDOWN_WIDTH,
-                MIN_HEIGHT
-            ),
+                    BackgroundTransparency = 1,
 
-        Position =
-            UDim2.fromOffset(
-                0,
-                0
-            ),
+                    BorderSizePixel = 0,
 
-        Visible = false,
+                    Position =
+                        UDim2.fromScale(
+                            0,
+                            0
+                        ),
 
-        ClipsDescendants = false,
+                    Size =
+                        UDim2.fromScale(
+                            1,
+                            1
+                        ),
 
-        ZIndex = 1001
-    })
+                    Text = "",
 
-    local DropdownStroke = Create("UIStroke", {
-        Parent =
-            DropdownFrame,
+                    AutoButtonColor = false,
 
-        Color =
-            Theme.Border,
+                    Visible = false,
 
-        Thickness = 1
-    })
+                    Active = false,
 
-    Create("UICorner", {
-        Parent =
-            DropdownFrame,
-
-        CornerRadius =
-            UDim.new(
-                0,
-                7
+                    ZIndex = 1000
+                }
             )
-    })
 
-    local SearchFrame = Create("Frame", {
-        Name =
-            "SearchFrame",
+    end
 
-        Parent =
-            DropdownFrame,
+    local DropdownFrame =
+        Create("Frame", {
+            Name =
+                "DropdownFrame",
 
-        BackgroundColor3 =
-            Theme.Element,
+            Parent =
+                Overlay,
 
-        BorderSizePixel = 0,
+            BackgroundColor3 =
+                Theme.PopupBackground
+                or Theme.Secondary,
 
-        Position =
-            UDim2.fromOffset(
-                7,
-                SEARCH_TOP
-            ),
+            BackgroundTransparency =
+                Theme.Transparency
+                and Theme.Transparency.Popup
+                or 0,
 
-        Size =
-            UDim2.new(
-                1,
-                -14,
-                0,
-                SEARCH_HEIGHT
-            ),
+            BorderSizePixel = 0,
 
-        ZIndex = 1002
-    })
+            Size =
+                UDim2.fromOffset(
+                    DROPDOWN_WIDTH,
+                    MIN_HEIGHT
+                ),
 
-    local SearchStroke = Create("UIStroke", {
-        Parent =
-            SearchFrame,
+            Position =
+                UDim2.fromOffset(
+                    0,
+                    0
+                ),
 
-        Color =
-            Theme.Border,
+            Visible = false,
 
-        Thickness = 1
-    })
+            ClipsDescendants = false,
 
-    Create("UICorner", {
-        Parent =
-            SearchFrame,
+            ZIndex = 1001
+        })
 
-        CornerRadius =
-            UDim.new(
-                0,
-                5
-            )
-    })
+    local DropdownStroke =
+        Create("UIStroke", {
+            Parent =
+                DropdownFrame,
 
-    local SearchIcon = Create("TextLabel", {
-        Name =
-            "Icon",
+            Color =
+                Theme.PopupBorder
+                or Theme.Border,
 
-        Parent =
-            SearchFrame,
+            Thickness =
+                Theme.Stroke
+                and Theme.Stroke.Thickness
+                or 1,
 
-        BackgroundTransparency = 1,
+            Transparency =
+                Theme.Stroke
+                and Theme.Stroke.Transparency
+                or 0
+        })
 
-        Position =
-            UDim2.fromOffset(
-                8,
-                0
-            ),
+    if Theme.Stroke then
+        DropdownStroke.Enabled =
+            Theme.Stroke.Enabled ~= false
+    end
 
-        Size =
-            UDim2.fromOffset(
-                22,
-                SEARCH_HEIGHT
-            ),
+    local DropdownCorner =
+        Create("UICorner", {
+            Parent =
+                DropdownFrame,
 
-        Font =
-            Enum.Font.Gotham,
+            CornerRadius =
+                UDim.new(
+                    0,
+                    Theme.Corners
+                    and Theme.Corners.Popup
+                    or 10
+                )
+        })
 
-        Text = "⌕",
+    local SearchFrame =
+        Create("Frame", {
+            Name =
+                "SearchFrame",
 
-        TextColor3 =
-            Theme.SubText,
+            Parent =
+                DropdownFrame,
 
-        TextSize = 18,
+            BackgroundColor3 =
+                Theme.Input
+                or Theme.Element,
 
-        TextXAlignment =
-            Enum.TextXAlignment.Center,
+            BackgroundTransparency =
+                Theme.Transparency
+                and Theme.Transparency.Element
+                or 0,
 
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
+            BorderSizePixel = 0,
 
-        ZIndex = 1003
-    })
+            Position =
+                UDim2.fromOffset(
+                    7,
+                    SEARCH_TOP
+                ),
+
+            Size =
+                UDim2.new(
+                    1,
+                    -14,
+                    0,
+                    SEARCH_HEIGHT
+                ),
+
+            ZIndex = 1002
+        })
+
+    local SearchStroke =
+        Create("UIStroke", {
+            Parent =
+                SearchFrame,
+
+            Color =
+                Theme.Border,
+
+            Thickness =
+                Theme.Stroke
+                and Theme.Stroke.Thickness
+                or 1,
+
+            Transparency =
+                Theme.Stroke
+                and Theme.Stroke.Transparency
+                or 0
+        })
+
+    local SearchCorner =
+        Create("UICorner", {
+            Parent =
+                SearchFrame,
+
+            CornerRadius =
+                UDim.new(
+                    0,
+                    Theme.Corners
+                    and Theme.Corners.Input
+                    or 7
+                )
+        })
+
+    local SearchIcon =
+        Create("TextLabel", {
+            Name =
+                "Icon",
+
+            Parent =
+                SearchFrame,
+
+            BackgroundTransparency = 1,
+
+            Position =
+                UDim2.fromOffset(
+                    8,
+                    0
+                ),
+
+            Size =
+                UDim2.fromOffset(
+                    22,
+                    SEARCH_HEIGHT
+                ),
+
+            Font =
+                Enum.Font.Gotham,
+
+            Text = "⌕",
+
+            TextColor3 =
+                Theme.SubText,
+
+            TextSize = 18,
+
+            TextXAlignment =
+                Enum.TextXAlignment.Center,
+
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
+
+            ZIndex = 1003
+        })
 
     local SearchLucideIcon
 
@@ -591,107 +722,110 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     end
 
-    local SearchBox = Create("TextBox", {
-        Name =
-            "SearchBox",
-
-        Parent =
-            SearchFrame,
-
-        BackgroundTransparency = 1,
-
-        Position =
-            UDim2.fromOffset(
-                35,
-                0
-            ),
-
-        Size =
-            UDim2.new(
-                1,
-                -42,
-                1,
-                0
-            ),
-
-        Font =
-            Enum.Font.Gotham,
-
-        PlaceholderText =
-            "Search...",
-
-        PlaceholderColor3 =
-            Theme.SubText,
-
-        Text = "",
-
-        TextColor3 =
-            Theme.Text,
-
-        TextSize = 13,
-
-        ClearTextOnFocus = false,
-
-        TextXAlignment =
-            Enum.TextXAlignment.Left,
-
-        TextYAlignment =
-            Enum.TextYAlignment.Center,
-
-        ZIndex = 1003
-    })
-
-    local OptionsList = Create(
-        "ScrollingFrame",
-        {
+    local SearchBox =
+        Create("TextBox", {
             Name =
-                "Options",
+                "SearchBox",
 
             Parent =
-                DropdownFrame,
+                SearchFrame,
 
             BackgroundTransparency = 1,
 
-            BorderSizePixel = 0,
-
             Position =
                 UDim2.fromOffset(
-                    7,
-                    OPTIONS_TOP
+                    35,
+                    0
                 ),
 
             Size =
                 UDim2.new(
                     1,
-                    -14,
+                    -42,
                     1,
-                    -(
-                        OPTIONS_TOP
-                        + OPTIONS_BOTTOM
-                    )
-                ),
-
-            CanvasSize =
-                UDim2.fromOffset(
-                    0,
                     0
                 ),
 
-            ScrollBarThickness = 4,
+            Font =
+                Enum.Font.Gotham,
 
-            ScrollBarImageColor3 =
+            PlaceholderText =
+                "Search...",
+
+            PlaceholderColor3 =
                 Theme.SubText,
 
-            ScrollingDirection =
-                Enum.ScrollingDirection.Y,
+            Text = "",
 
-            ScrollingEnabled = true,
+            TextColor3 =
+                Theme.Text,
 
-            ClipsDescendants = true,
+            TextSize = 13,
 
-            ZIndex = 1002
-        }
-    )
+            ClearTextOnFocus = false,
+
+            TextXAlignment =
+                Enum.TextXAlignment.Left,
+
+            TextYAlignment =
+                Enum.TextYAlignment.Center,
+
+            ZIndex = 1003
+        })
+
+    local OptionsList =
+        Create(
+            "ScrollingFrame",
+            {
+                Name =
+                    "Options",
+
+                Parent =
+                    DropdownFrame,
+
+                BackgroundTransparency = 1,
+
+                BorderSizePixel = 0,
+
+                Position =
+                    UDim2.fromOffset(
+                        7,
+                        OPTIONS_TOP
+                    ),
+
+                Size =
+                    UDim2.new(
+                        1,
+                        -14,
+                        1,
+                        -(
+                            OPTIONS_TOP
+                            + OPTIONS_BOTTOM
+                        )
+                    ),
+
+                CanvasSize =
+                    UDim2.fromOffset(
+                        0,
+                        0
+                    ),
+
+                ScrollBarThickness = 4,
+
+                ScrollBarImageColor3 =
+                    Theme.Scrollbar
+                    or Theme.SubText,
+
+                ScrollingDirection =
+                    Enum.ScrollingDirection.Y,
+
+                ScrollingEnabled = true,
+
+                ClipsDescendants = true,
+
+                ZIndex = 1002
+            }
+        )
 
     Create("UIListLayout", {
         Parent =
@@ -773,15 +907,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
     local RenderConnection
 
     local Object = {}
-
-    local function GetTheme()
-
-        return OTC._Themes[
-            TabObject.Window.Theme
-        ]
-        or OTC._Themes.Default
-
-    end
 
     local function UpdateValueText()
 
@@ -933,7 +1058,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
             end
 
         end
-
     end
 
     local function GetVisibleCount()
@@ -945,15 +1069,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
         ) do
 
             if OptionObject.Button.Visible then
-
                 Count += 1
-
             end
 
         end
 
         return Count
-
     end
 
     local function UpdateCanvas()
@@ -989,7 +1110,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 0,
                 ContentHeight
             )
-
     end
 
     local function UpdateSize()
@@ -1035,7 +1155,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         task.defer(
             UpdateCanvas
         )
-
     end
 
     local function UpdatePosition()
@@ -1076,7 +1195,8 @@ function Dropdown.Create(TabObject, OTC, Settings)
             - DropdownSize.Y
             - OPEN_OFFSET
 
-        local Y = BelowY
+        local Y =
+            BelowY
 
         if X + DropdownSize.X
             > Viewport.X - 8 then
@@ -1095,7 +1215,8 @@ function Dropdown.Create(TabObject, OTC, Settings)
         if BelowY + DropdownSize.Y
             > Viewport.Y - 8 then
 
-            Y = AboveY
+            Y =
+                AboveY
 
         end
 
@@ -1108,7 +1229,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 math.floor(X),
                 math.floor(Y)
             )
-
     end
 
     local function RefreshOption(
@@ -1131,12 +1251,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
         Data.Label.TextColor3 =
             CurrentTheme.Text
 
+        Data.Check.TextColor3 =
+            CurrentTheme.Accent
+
         if MultiSelect then
 
             Data.Check.Visible = true
-
-            Data.Check.TextColor3 =
-                CurrentTheme.Text
 
             if IsSelected then
 
@@ -1144,14 +1264,16 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     "✓"
 
                 Data.Button.BackgroundColor3 =
-                    CurrentTheme.Hover
+                    CurrentTheme.DropdownSelected
+                    or CurrentTheme.Hover
 
             else
 
                 Data.Check.Text = ""
 
                 Data.Button.BackgroundColor3 =
-                    CurrentTheme.Element
+                    CurrentTheme.Dropdown
+                    or CurrentTheme.Element
 
             end
 
@@ -1162,12 +1284,14 @@ function Dropdown.Create(TabObject, OTC, Settings)
             if IsSelected then
 
                 Data.Button.BackgroundColor3 =
-                    CurrentTheme.Hover
+                    CurrentTheme.DropdownSelected
+                    or CurrentTheme.Hover
 
             else
 
                 Data.Button.BackgroundColor3 =
-                    CurrentTheme.Element
+                    CurrentTheme.Dropdown
+                    or CurrentTheme.Element
 
             end
 
@@ -1212,7 +1336,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
             false
 
         Arrow.Rotation = 0
-
     end
 
     function Object:Open()
@@ -1305,16 +1428,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
                 end
             )
-
     end
 
     OutsideButton.MouseButton1Click:Connect(
         function()
 
             if Open then
-
                 Object:Close()
-
             end
 
         end
@@ -1324,149 +1444,185 @@ function Dropdown.Create(TabObject, OTC, Settings)
         Option
     )
 
-        local OptionButton = Create(
-            "TextButton",
-            {
-                Name = "Option",
+        local CurrentTheme =
+            GetTheme()
 
+        local OptionButton =
+            Create(
+                "TextButton",
+                {
+                    Name = "Option",
+
+                    Parent =
+                        OptionsList,
+
+                    BackgroundColor3 =
+                        CurrentTheme.Dropdown
+                        or CurrentTheme.Element,
+
+                    BackgroundTransparency =
+                        CurrentTheme.Transparency
+                        and CurrentTheme.Transparency.Element
+                        or 0,
+
+                    BorderSizePixel = 0,
+
+                    Size =
+                        UDim2.new(
+                            1,
+                            -2,
+                            0,
+                            OPTION_HEIGHT
+                        ),
+
+                    Text = "",
+
+                    AutoButtonColor = false,
+
+                    ZIndex = 1003
+                }
+            )
+
+        local OptionCorner =
+            Create("UICorner", {
                 Parent =
-                    OptionsList,
+                    OptionButton,
 
-                BackgroundColor3 =
-                    GetTheme().Element,
-
-                BorderSizePixel = 0,
-
-                Size =
-                    UDim2.new(
-                        1,
-                        -2,
+                CornerRadius =
+                    UDim.new(
                         0,
-                        OPTION_HEIGHT
-                    ),
+                        CurrentTheme.Corners
+                        and CurrentTheme.Corners.Dropdown
+                        or 7
+                    )
+            })
 
-                Text = "",
-
-                AutoButtonColor =
-                    false,
-
-                ZIndex = 1003
-            }
-        )
-
-        Create("UICorner", {
-            Parent =
-                OptionButton,
-
-            CornerRadius =
-                UDim.new(
-                    0,
-                    5
-                )
-        })
-
-        local OptionLabel = Create(
-            "TextLabel",
-            {
-                Name = "Label",
-
+        local OptionStroke =
+            Create("UIStroke", {
                 Parent =
                     OptionButton,
 
-                BackgroundTransparency =
-                    1,
+                Color =
+                    CurrentTheme.Border,
 
-                Position =
-                    UDim2.fromOffset(
-                        10,
-                        0
-                    ),
+                Thickness =
+                    CurrentTheme.Stroke
+                    and CurrentTheme.Stroke.Thickness
+                    or 1,
 
-                Size =
-                    UDim2.new(
-                        1,
-                        -45,
-                        1,
-                        0
-                    ),
+                Transparency =
+                    CurrentTheme.Stroke
+                    and CurrentTheme.Stroke.Transparency
+                    or 0
+            })
 
-                Font =
-                    Enum.Font.Gotham,
+        if CurrentTheme.Stroke then
+            OptionStroke.Enabled =
+                CurrentTheme.Stroke.Enabled ~= false
+        end
 
-                Text =
-                    Option,
+        local OptionLabel =
+            Create(
+                "TextLabel",
+                {
+                    Name = "Label",
 
-                TextColor3 =
-                    GetTheme().Text,
+                    Parent =
+                        OptionButton,
 
-                TextSize = 13,
+                    BackgroundTransparency = 1,
 
-                TextXAlignment =
-                    Enum.TextXAlignment.Left,
+                    Position =
+                        UDim2.fromOffset(
+                            10,
+                            0
+                        ),
 
-                TextYAlignment =
-                    Enum.TextYAlignment.Center,
+                    Size =
+                        UDim2.new(
+                            1,
+                            -45,
+                                                       1,
+                            0
+                        ),
 
-                TextTruncate =
-                    Enum.TextTruncate.AtEnd,
+                    Font =
+                        Enum.Font.Gotham,
 
-                ZIndex = 1004
-            }
-        )
+                    Text =
+                        Option,
 
-        local Check = Create(
-            "TextLabel",
-            {
-                Name = "Check",
+                    TextColor3 =
+                        CurrentTheme.Text,
 
-                Parent =
-                    OptionButton,
+                    TextSize = 13,
 
-                BackgroundTransparency =
-                    1,
+                    TextXAlignment =
+                        Enum.TextXAlignment.Left,
 
-                AnchorPoint =
-                    Vector2.new(
-                        1,
-                        0.5
-                    ),
+                    TextYAlignment =
+                        Enum.TextYAlignment.Center,
 
-                Position =
-                    UDim2.new(
-                        1,
-                        -9,
-                        0.5,
-                        0
-                    ),
+                    TextTruncate =
+                        Enum.TextTruncate.AtEnd,
 
-                Size =
-                    UDim2.fromOffset(
-                        22,
-                        22
-                    ),
+                    ZIndex = 1004
+                }
+            )
 
-                Font =
-                    Enum.Font.GothamBold,
+        local Check =
+            Create(
+                "TextLabel",
+                {
+                    Name = "Check",
 
-                Text = "",
+                    Parent =
+                        OptionButton,
 
-                TextColor3 =
-                    GetTheme().Text,
+                    BackgroundTransparency = 1,
 
-                TextSize = 15,
+                    AnchorPoint =
+                        Vector2.new(
+                            1,
+                            0.5
+                        ),
 
-                TextXAlignment =
-                    Enum.TextXAlignment.Center,
+                    Position =
+                        UDim2.new(
+                            1,
+                            -9,
+                            0.5,
+                            0
+                        ),
 
-                TextYAlignment =
-                    Enum.TextYAlignment.Center,
+                    Size =
+                        UDim2.fromOffset(
+                            22,
+                            22
+                        ),
 
-                Visible =
-                    MultiSelect,
+                    Font =
+                        Enum.Font.GothamBold,
 
-                ZIndex = 1004
-            }
-        )
+                    Text = "",
+
+                    TextColor3 =
+                        CurrentTheme.Accent,
+
+                    TextSize = 15,
+
+                    TextXAlignment =
+                        Enum.TextXAlignment.Center,
+
+                    TextYAlignment =
+                        Enum.TextYAlignment.Center,
+
+                    Visible =
+                        MultiSelect,
+
+                    ZIndex = 1004
+                }
+            )
 
         local OptionObject = {
             Button =
@@ -1477,6 +1633,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
             Check =
                 Check,
+
+            Stroke =
+                OptionStroke,
+
+            Corner =
+                OptionCorner,
 
             Name =
                 Option
@@ -1492,7 +1654,13 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     GetTheme()
 
                 OptionButton.BackgroundColor3 =
-                    CurrentTheme.Hover
+                    CurrentTheme.DropdownHover
+                    or CurrentTheme.Hover
+
+                OptionStroke.Color =
+                    CurrentTheme.BorderHover
+                    or CurrentTheme.AccentDark
+                    or CurrentTheme.Border
 
             end
         )
@@ -1506,14 +1674,19 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 if Selected[Option] then
 
                     OptionButton.BackgroundColor3 =
-                        CurrentTheme.Hover
+                        CurrentTheme.DropdownSelected
+                        or CurrentTheme.Hover
 
                 else
 
                     OptionButton.BackgroundColor3 =
-                        CurrentTheme.Element
+                        CurrentTheme.Dropdown
+                        or CurrentTheme.Element
 
                 end
+
+                OptionStroke.Color =
+                    CurrentTheme.Border
 
             end
         )
@@ -1535,7 +1708,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     FireCallback()
 
                     return
-
                 end
 
                 for _, Existing in ipairs(
@@ -1589,7 +1761,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 Child:Destroy()
 
             end
-
         end
 
         OptionObjects = {}
@@ -1625,7 +1796,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 )
 
             end
-
         end
 
         UpdateValueText()
@@ -1641,7 +1811,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
             end
 
         end)
-
     end
 
     SearchBox:GetPropertyChangedSignal(
@@ -1667,17 +1836,35 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     0.08,
                     {
                         BackgroundColor3 =
-                            CurrentTheme.Hover
+                            CurrentTheme.DropdownHover
+                            or CurrentTheme.Hover
+                            or CurrentTheme.Element
+                    }
+                )
+
+                OTC:Tween(
+                    Stroke,
+                    0.08,
+                    {
+                        Color =
+                            CurrentTheme.BorderHover
+                            or CurrentTheme.AccentDark
+                            or CurrentTheme.Border
                     }
                 )
 
             else
 
                 Frame.BackgroundColor3 =
-                    CurrentTheme.Hover
+                    CurrentTheme.DropdownHover
+                    or CurrentTheme.Hover
+                    or CurrentTheme.Element
+
+                Stroke.Color =
+                    CurrentTheme.BorderHover
+                    or CurrentTheme.Border
 
             end
-
         end
     )
 
@@ -1694,17 +1881,30 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     0.08,
                     {
                         BackgroundColor3 =
-                            CurrentTheme.Element
+                            CurrentTheme.Dropdown
+                            or CurrentTheme.Element
+                    }
+                )
+
+                OTC:Tween(
+                    Stroke,
+                    0.08,
+                    {
+                        Color =
+                            CurrentTheme.Border
                     }
                 )
 
             else
 
                 Frame.BackgroundColor3 =
-                    CurrentTheme.Element
+                    CurrentTheme.Dropdown
+                    or CurrentTheme.Element
+
+                Stroke.Color =
+                    CurrentTheme.Border
 
             end
-
         end
     )
 
@@ -1720,7 +1920,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 Object:Open()
 
             end
-
         end
     )
 
@@ -1749,7 +1948,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     ] = true
 
                 end
-
             end
 
         else
@@ -1769,7 +1967,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 ] = true
 
             end
-
         end
 
         for _, Option in ipairs(
@@ -1785,7 +1982,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         UpdateValueText()
 
         FireCallback()
-
     end
 
     function Object:GetValue()
@@ -1806,11 +2002,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
                     )
 
                 end
-
             end
 
             return Values
-
         end
 
         for _, Option in ipairs(
@@ -1822,11 +2016,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 return Option
 
             end
-
         end
 
         return nil
-
     end
 
     function Object:SetOptions(
@@ -1851,7 +2043,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 ] = true
 
             end
-
         end
 
         Selected =
@@ -1868,7 +2059,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         end
 
         RebuildOptions()
-
     end
 
     function Object:AddOption(
@@ -1884,7 +2074,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         ) then
 
             return
-
         end
 
         table.insert(
@@ -1893,7 +2082,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         )
 
         RebuildOptions()
-
     end
 
     function Object:RemoveOption(
@@ -1915,7 +2103,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 Options,
                 Index
             )
-
         end
 
         Selected[
@@ -1923,7 +2110,6 @@ function Dropdown.Create(TabObject, OTC, Settings)
         ] = nil
 
         RebuildOptions()
-
     end
 
     function Object:SetName(
@@ -1935,21 +2121,18 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
         NameLabel.Text =
             Name
-
     end
 
     function Object:SetCallback(
         NewCallback
     )
 
-        if type(NewCallback) ==
-            "function" then
+        if type(NewCallback)
+            == "function" then
 
             Callback =
                 NewCallback
-
         end
-
     end
 
     function Object:ClearSearch()
@@ -1960,14 +2143,62 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     function Object:RefreshTheme()
 
+        if not Frame
+            or not Frame.Parent then
+            return
+        end
+
         local CurrentTheme =
             GetTheme()
 
+        local Transparency =
+            CurrentTheme.Transparency
+            or {}
+
+        local StrokeSettings =
+            CurrentTheme.Stroke
+            or {}
+
+        local Corners =
+            CurrentTheme.Corners
+            or {}
+
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
+        local Gradients =
+            CurrentTheme.Gradients
+            or {}
+
         Frame.BackgroundColor3 =
-            CurrentTheme.Element
+            CurrentTheme.Dropdown
+            or CurrentTheme.Element
+
+        Frame.BackgroundTransparency =
+            Transparency.Element
+            or 0
 
         Stroke.Color =
             CurrentTheme.Border
+
+        Stroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        Stroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        Stroke.Enabled =
+            StrokeSettings.Enabled ~= false
+
+        FrameCorner.CornerRadius =
+            UDim.new(
+                0,
+                Corners.Dropdown
+                or 7
+            )
 
         NameLabel.TextColor3 =
             CurrentTheme.Text
@@ -1979,16 +2210,63 @@ function Dropdown.Create(TabObject, OTC, Settings)
             CurrentTheme.SubText
 
         DropdownFrame.BackgroundColor3 =
-            CurrentTheme.Secondary
+            CurrentTheme.PopupBackground
+            or CurrentTheme.Secondary
+
+        DropdownFrame.BackgroundTransparency =
+            Transparency.Popup
+            or 0
 
         DropdownStroke.Color =
-            CurrentTheme.Border
+            CurrentTheme.PopupBorder
+            or CurrentTheme.Border
+
+        DropdownStroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        DropdownStroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        DropdownStroke.Enabled =
+            StrokeSettings.Enabled ~= false
+
+        DropdownCorner.CornerRadius =
+            UDim.new(
+                0,
+                Corners.Popup
+                or 10
+            )
 
         SearchFrame.BackgroundColor3 =
-            CurrentTheme.Element
+            CurrentTheme.Input
+            or CurrentTheme.Element
+
+        SearchFrame.BackgroundTransparency =
+            Transparency.Element
+            or 0
 
         SearchStroke.Color =
             CurrentTheme.Border
+
+        SearchStroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        SearchStroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        SearchStroke.Enabled =
+            StrokeSettings.Enabled ~= false
+
+        SearchCorner.CornerRadius =
+            UDim.new(
+                0,
+                Corners.Input
+                or 7
+            )
 
         SearchIcon.TextColor3 =
             CurrentTheme.SubText
@@ -2007,7 +2285,8 @@ function Dropdown.Create(TabObject, OTC, Settings)
             CurrentTheme.SubText
 
         OptionsList.ScrollBarImageColor3 =
-            CurrentTheme.SubText
+            CurrentTheme.Scrollbar
+            or CurrentTheme.SubText
 
         for Option, Data in pairs(
             OptionObjects
@@ -2017,22 +2296,65 @@ function Dropdown.Create(TabObject, OTC, Settings)
                 CurrentTheme.Text
 
             Data.Check.TextColor3 =
-                CurrentTheme.Text
+                CurrentTheme.Accent
 
-            if Selected[Option] then
+            Data.Button.BackgroundTransparency =
+                Transparency.Element
+                or 0
 
-                Data.Button.BackgroundColor3 =
-                    CurrentTheme.Hover
+            Data.Stroke.Color =
+                CurrentTheme.Border
 
-            else
+            Data.Stroke.Thickness =
+                StrokeSettings.Thickness
+                or 1
 
-                Data.Button.BackgroundColor3 =
-                    CurrentTheme.Element
+            Data.Stroke.Transparency =
+                StrokeSettings.Transparency
+                or 0
 
-            end
+            Data.Stroke.Enabled =
+                StrokeSettings.Enabled ~= false
 
+            Data.Corner.CornerRadius =
+                UDim.new(
+                    0,
+                    Corners.Dropdown
+                    or 7
+                )
+
+            RefreshOption(
+                Option
+            )
         end
 
+        if Effects.Gradient
+            and Gradients.Popup then
+
+            ApplyGradient(
+                DropdownFrame,
+                Gradients.Popup
+            )
+
+        elseif Effects.Gradient
+            and Gradients.Main then
+
+            ApplyGradient(
+                DropdownFrame,
+                Gradients.Main
+            )
+
+        else
+
+            local Existing =
+                DropdownFrame:FindFirstChild(
+                    "OTCGradient"
+                )
+
+            if Existing then
+                Existing:Destroy()
+            end
+        end
     end
 
     function Object:Destroy()
@@ -2040,18 +2362,16 @@ function Dropdown.Create(TabObject, OTC, Settings)
         Object:Close()
 
         if DropdownFrame then
-
             DropdownFrame:Destroy()
-
         end
 
         if Frame then
-
             Frame:Destroy()
-
         end
-
     end
+
+    Object.Type =
+        "Dropdown"
 
     Object.Instance =
         Frame
@@ -2073,6 +2393,12 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     Object.MultiSelect =
         MultiSelect
+
+    Object.Stroke =
+        Stroke
+
+    Object.DropdownStroke =
+        DropdownStroke
 
     TabObject:AddElement(
         Object
