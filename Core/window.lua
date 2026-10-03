@@ -168,10 +168,6 @@ function Window.Create(Settings, OTC)
     Object.ScreenGui =
         ScreenGui
 
-    --------------------------------------------------
-    -- MAIN
-    --------------------------------------------------
-
     local Main =
         Instance.new("Frame")
 
@@ -249,10 +245,6 @@ function Window.Create(Settings, OTC)
 
     Object.MainStroke =
         MainStroke
-
-    --------------------------------------------------
-    -- TOP BAR
-    --------------------------------------------------
 
     local TopBar =
         Instance.new("Frame")
@@ -418,10 +410,6 @@ function Window.Create(Settings, OTC)
     Subtitle.Parent =
         TopBar
 
-    --------------------------------------------------
-    -- MINIMIZE
-    --------------------------------------------------
-
     local MinimizeButton =
         Instance.new("TextButton")
 
@@ -486,10 +474,6 @@ function Window.Create(Settings, OTC)
 
     MinimizeCorner.Parent =
         MinimizeButton
-
-    --------------------------------------------------
-    -- CLOSE
-    --------------------------------------------------
 
     local CloseButton =
         Instance.new("TextButton")
@@ -556,10 +540,6 @@ function Window.Create(Settings, OTC)
     CloseCorner.Parent =
         CloseButton
 
-    --------------------------------------------------
-    -- SIDEBAR
-    --------------------------------------------------
-
     local Sidebar =
         Instance.new("Frame")
 
@@ -596,10 +576,6 @@ function Window.Create(Settings, OTC)
     Sidebar.Parent =
         Main
 
-    --------------------------------------------------
-    -- CONTENT
-    --------------------------------------------------
-
     local Content =
         Instance.new("Frame")
 
@@ -635,10 +611,6 @@ function Window.Create(Settings, OTC)
 
     Content.Parent =
         Main
-
-    --------------------------------------------------
-    -- TABS
-    --------------------------------------------------
 
     local TabsContainer =
         Instance.new("ScrollingFrame")
@@ -715,10 +687,6 @@ function Window.Create(Settings, OTC)
             )
 
     end)
-
-    --------------------------------------------------
-    -- USER CARD
-    --------------------------------------------------
 
     local UserCard =
         Instance.new("Frame")
@@ -919,10 +887,6 @@ function Window.Create(Settings, OTC)
 
     end)
 
-    --------------------------------------------------
-    -- MINI BUTTON
-    --------------------------------------------------
-
     local MiniButton =
         Instance.new("ImageButton")
 
@@ -969,10 +933,6 @@ function Window.Create(Settings, OTC)
     MiniButton.Parent =
         ScreenGui
 
-    --------------------------------------------------
-    -- REFERENCES
-    --------------------------------------------------
-
     Object.TopBar =
         TopBar
 
@@ -1014,10 +974,6 @@ function Window.Create(Settings, OTC)
 
     Object.MiniButton =
         MiniButton
-
-    --------------------------------------------------
-    -- DRAG MAIN
-    --------------------------------------------------
 
     local Dragging = false
     local DragStart
@@ -1078,10 +1034,6 @@ function Window.Create(Settings, OTC)
 
         end
     )
-
-    --------------------------------------------------
-    -- DRAG MINI
-    --------------------------------------------------
 
     local MiniDragging = false
     local MiniDragStart
@@ -1150,10 +1102,6 @@ function Window.Create(Settings, OTC)
         end
     )
 
-    --------------------------------------------------
-    -- THEME
-    --------------------------------------------------
-
     function Object:GetTheme()
 
         return self.OTC._Themes[
@@ -1182,10 +1130,6 @@ function Window.Create(Settings, OTC)
         return true
 
     end
-
-    --------------------------------------------------
-    -- TOGGLE
-    --------------------------------------------------
 
     function Object:Toggle()
 
@@ -1294,10 +1238,6 @@ function Window.Create(Settings, OTC)
 
     end
 
-    --------------------------------------------------
-    -- TABS
-    --------------------------------------------------
-
     function Object:AddTab(TabObject)
 
         table.insert(
@@ -1356,9 +1296,470 @@ function Window.Create(Settings, OTC)
 
     end
 
-    --------------------------------------------------
-    -- REFRESH THEME
-    --------------------------------------------------
+    local function CreateUnloadConfirmation()
+
+        if Object.UnloadConfirmation then
+            return
+        end
+
+        local CurrentTheme =
+            OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes[Object.Theme]
+            or OTC._Themes.Default
+
+        local Overlay =
+            Instance.new("Frame")
+
+        Overlay.Name =
+            "UnloadOverlay"
+
+        Overlay.Size =
+            UDim2.new(
+                1,
+                0,
+                1,
+                0
+            )
+
+        Overlay.Position =
+            UDim2.new(
+                0,
+                0,
+                0,
+                0
+            )
+
+        Overlay.BackgroundColor3 =
+            Color3.fromRGB(
+                0,
+                0,
+                0
+            )
+
+        Overlay.BackgroundTransparency =
+            0.45
+
+        Overlay.BorderSizePixel =
+            0
+
+        Overlay.ZIndex =
+            100
+
+        Overlay.Parent =
+            ScreenGui
+
+        local Popup =
+            Instance.new("Frame")
+
+        Popup.Name =
+            "UnloadConfirmation"
+
+        Popup.Size =
+            UDim2.new(
+                0,
+                360,
+                0,
+                190
+            )
+
+        Popup.Position =
+            UDim2.new(
+                0.5,
+                -180,
+                0.5,
+                -95
+            )
+
+        Popup.BackgroundColor3 =
+            CurrentTheme.PopupBackground
+            or CurrentTheme.Background
+
+        Popup.BackgroundTransparency =
+            CurrentTheme.Transparency
+            and CurrentTheme.Transparency.Popup
+            or 0
+
+        Popup.BorderSizePixel =
+            0
+
+        Popup.ZIndex =
+            101
+
+        Popup.Parent =
+            Overlay
+
+        local PopupCorner =
+            Instance.new("UICorner")
+
+        PopupCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Popup
+                or 10
+            )
+
+        PopupCorner.Parent =
+            Popup
+
+        local PopupStroke =
+            Instance.new("UIStroke")
+
+        PopupStroke.Color =
+            CurrentTheme.PopupBorder
+            or CurrentTheme.Border
+
+        PopupStroke.Thickness =
+            CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Thickness
+            or 1
+
+        PopupStroke.Transparency =
+            CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Transparency
+            or 0
+
+        PopupStroke.Parent =
+            Popup
+
+        local PopupTitle =
+            Instance.new("TextLabel")
+
+        PopupTitle.Name =
+            "Title"
+
+        PopupTitle.BackgroundTransparency =
+            1
+
+        PopupTitle.Position =
+            UDim2.new(
+                0,
+                20,
+                0,
+                18
+            )
+
+        PopupTitle.Size =
+            UDim2.new(
+                1,
+                -40,
+                0,
+                30
+            )
+
+        PopupTitle.Font =
+            Enum.Font.GothamBold
+
+        PopupTitle.Text =
+            "Unload OTC Hub?"
+
+        PopupTitle.TextColor3 =
+            CurrentTheme.Text
+
+        PopupTitle.TextSize =
+            20
+
+        PopupTitle.TextXAlignment =
+            Enum.TextXAlignment.Left
+
+        PopupTitle.ZIndex =
+            102
+
+        PopupTitle.Parent =
+            Popup
+
+        local PopupDescription =
+            Instance.new("TextLabel")
+
+        PopupDescription.Name =
+            "Description"
+
+        PopupDescription.BackgroundTransparency =
+            1
+
+        PopupDescription.Position =
+            UDim2.new(
+                0,
+                20,
+                0,
+                55
+            )
+
+        PopupDescription.Size =
+            UDim2.new(
+                1,
+                -40,
+                0,
+                45
+            )
+
+        PopupDescription.Font =
+            Enum.Font.Gotham
+
+        PopupDescription.Text =
+            "Are you sure you want to unload OTC Hub?"
+
+        PopupDescription.TextColor3 =
+            CurrentTheme.SubText
+
+        PopupDescription.TextSize =
+            14
+
+        PopupDescription.TextWrapped =
+            true
+
+        PopupDescription.TextXAlignment =
+            Enum.TextXAlignment.Left
+
+        PopupDescription.ZIndex =
+            102
+
+        PopupDescription.Parent =
+            Popup
+
+        local CancelButton =
+            Instance.new("TextButton")
+
+        CancelButton.Name =
+            "Cancel"
+
+        CancelButton.Size =
+            UDim2.new(
+                0,
+                145,
+                0,
+                42
+            )
+
+        CancelButton.Position =
+            UDim2.new(
+                0,
+                20,
+                1,
+                -62
+            )
+
+        CancelButton.BackgroundColor3 =
+            CurrentTheme.Button
+            or CurrentTheme.Element
+
+        CancelButton.BorderSizePixel =
+            0
+
+        CancelButton.AutoButtonColor =
+            false
+
+        CancelButton.Font =
+            Enum.Font.GothamSemibold
+
+        CancelButton.Text =
+            "Cancel"
+
+        CancelButton.TextColor3 =
+            CurrentTheme.Text
+
+        CancelButton.TextSize =
+            14
+
+        CancelButton.ZIndex =
+            102
+
+        CancelButton.Parent =
+            Popup
+
+        local CancelCorner =
+            Instance.new("UICorner")
+
+        CancelCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Button
+                or 7
+            )
+
+        CancelCorner.Parent =
+            CancelButton
+
+        local UnloadButton =
+            Instance.new("TextButton")
+
+        UnloadButton.Name =
+            "Unload"
+
+        UnloadButton.Size =
+            UDim2.new(
+                0,
+                145,
+                0,
+                42
+            )
+
+        UnloadButton.Position =
+            UDim2.new(
+                1,
+                -165,
+                1,
+                -62
+            )
+
+        UnloadButton.BackgroundColor3 =
+            CurrentTheme.Accent
+
+        UnloadButton.BorderSizePixel =
+            0
+
+        UnloadButton.AutoButtonColor =
+            false
+
+        UnloadButton.Font =
+            Enum.Font.GothamSemibold
+
+        UnloadButton.Text =
+            "Unload"
+
+        UnloadButton.TextColor3 =
+            CurrentTheme.AccentText
+            or CurrentTheme.Background
+
+        UnloadButton.TextSize =
+            14
+
+        UnloadButton.ZIndex =
+            102
+
+        UnloadButton.Parent =
+            Popup
+
+        local UnloadCorner =
+            Instance.new("UICorner")
+
+        UnloadCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Button
+                or 7
+            )
+
+        UnloadCorner.Parent =
+            UnloadButton
+
+        if CurrentTheme.Gradients
+            and CurrentTheme.Gradients.Main then
+
+            ApplyGradient(
+                Popup,
+                CurrentTheme.Gradients.Main
+            )
+
+        end
+
+        if CurrentTheme.Gradients
+            and CurrentTheme.Gradients.Accent then
+
+            ApplyGradient(
+                UnloadButton,
+                CurrentTheme.Gradients.Accent
+            )
+
+        end
+
+        CancelButton.MouseEnter:Connect(
+            function()
+
+                local Current =
+                    OTC._Themes[
+                        OTC.CurrentTheme
+                    ]
+                    or OTC._Themes.Default
+
+                CancelButton.BackgroundColor3 =
+                    Current.ButtonHover
+                    or Current.Hover
+                    or Current.Element
+
+            end
+        )
+
+        CancelButton.MouseLeave:Connect(
+            function()
+
+                local Current =
+                    OTC._Themes[
+                        OTC.CurrentTheme
+                    ]
+                    or OTC._Themes.Default
+
+                CancelButton.BackgroundColor3 =
+                    Current.Button
+                    or Current.Element
+
+            end
+        )
+
+        UnloadButton.MouseEnter:Connect(
+            function()
+
+                local Current =
+                    OTC._Themes[
+                        OTC.CurrentTheme
+                    ]
+                    or OTC._Themes.Default
+
+                UnloadButton.BackgroundColor3 =
+                    Current.AccentHover
+                    or Current.Accent
+
+            end
+        )
+
+        UnloadButton.MouseLeave:Connect(
+            function()
+
+                local Current =
+                    OTC._Themes[
+                        OTC.CurrentTheme
+                    ]
+                    or OTC._Themes.Default
+
+                UnloadButton.BackgroundColor3 =
+                    Current.Accent
+
+            end
+        )
+
+        CancelButton.MouseButton1Click:Connect(
+            function()
+
+                Overlay:Destroy()
+                Object.UnloadConfirmation =
+                    nil
+
+            end
+        )
+
+        UnloadButton.MouseButton1Click:Connect(
+            function()
+
+                Object:Unload()
+
+            end
+        )
+
+        Object.UnloadConfirmation = {
+            Overlay = Overlay,
+            Popup = Popup,
+            PopupStroke = PopupStroke,
+            Title = PopupTitle,
+            Description = PopupDescription,
+            CancelButton = CancelButton,
+            UnloadButton = UnloadButton
+        }
+
+        Object:RefreshTheme()
+
+    end
 
     function Object:RefreshTheme()
 
@@ -1399,10 +1800,6 @@ function Window.Create(Settings, OTC)
             NewTheme.Effects
             or {}
 
-        --------------------------------------------------
-        -- MAIN
-        --------------------------------------------------
-
         Main.BackgroundColor3 =
             NewTheme.Background
 
@@ -1426,10 +1823,6 @@ function Window.Create(Settings, OTC)
             Corners.Main or 10
         )
 
-        --------------------------------------------------
-        -- TOP BAR
-        --------------------------------------------------
-
         TopBar.Size =
             UDim2.new(
                 1,
@@ -1451,10 +1844,6 @@ function Window.Create(Settings, OTC)
 
         TopBar.BackgroundTransparency =
             Transparency.Secondary or 0
-
-        --------------------------------------------------
-        -- SIDEBAR
-        --------------------------------------------------
 
         Sidebar.Size =
             UDim2.new(
@@ -1478,10 +1867,6 @@ function Window.Create(Settings, OTC)
         Sidebar.BackgroundTransparency =
             Transparency.Secondary or 0
 
-        --------------------------------------------------
-        -- CONTENT
-        --------------------------------------------------
-
         Content.Size =
             UDim2.new(
                 1,
@@ -1504,10 +1889,6 @@ function Window.Create(Settings, OTC)
         Content.BackgroundTransparency =
             Transparency.Main or 0
 
-        --------------------------------------------------
-        -- LOGO / TEXT
-        --------------------------------------------------
-
         Logo.Image =
             LOGO_ASSET
 
@@ -1519,10 +1900,6 @@ function Window.Create(Settings, OTC)
 
         Subtitle.TextColor3 =
             NewTheme.SubText
-
-        --------------------------------------------------
-        -- BUTTONS
-        --------------------------------------------------
 
         MinimizeButton.BackgroundColor3 =
             NewTheme.Button
@@ -1554,17 +1931,9 @@ function Window.Create(Settings, OTC)
             Corners.Button or 7
         )
 
-        --------------------------------------------------
-        -- TABS
-        --------------------------------------------------
-
         TabsContainer.ScrollBarImageColor3 =
             NewTheme.Scrollbar
             or NewTheme.Border
-
-        --------------------------------------------------
-        -- USER CARD
-        --------------------------------------------------
 
         UserCard.Position =
             UDim2.new(
@@ -1610,10 +1979,6 @@ function Window.Create(Settings, OTC)
             999
         )
 
-        --------------------------------------------------
-        -- MINI BUTTON
-        --------------------------------------------------
-
         MiniButton.BackgroundTransparency =
             1
 
@@ -1622,10 +1987,6 @@ function Window.Create(Settings, OTC)
 
         MiniButton.ImageTransparency =
             0
-
-        --------------------------------------------------
-        -- GRADIENTS
-        --------------------------------------------------
 
         if Gradients.Main then
 
@@ -1684,10 +2045,6 @@ function Window.Create(Settings, OTC)
             NewTheme
         )
 
-        --------------------------------------------------
-        -- ANIMATED GRADIENT
-        --------------------------------------------------
-
         if Effects.AnimatedGradient then
 
             for _, GradientObject in pairs(
@@ -1723,9 +2080,85 @@ function Window.Create(Settings, OTC)
 
         end
 
-        --------------------------------------------------
-        -- REFRESH TABS
-        --------------------------------------------------
+        if self.UnloadConfirmation then
+
+            local Popup =
+                self.UnloadConfirmation
+
+            Popup.Popup.BackgroundColor3 =
+                NewTheme.PopupBackground
+                or NewTheme.Background
+
+            Popup.Popup.BackgroundTransparency =
+                Transparency.Popup or 0
+
+            Popup.PopupStroke.Color =
+                NewTheme.PopupBorder
+                or NewTheme.Border
+
+            Popup.PopupStroke.Thickness =
+                Stroke.Thickness or 1
+
+            Popup.PopupStroke.Transparency =
+                Stroke.Transparency or 0
+
+            Popup.PopupStroke.Enabled =
+                Stroke.Enabled ~= false
+
+            Popup.Title.TextColor3 =
+                NewTheme.Text
+
+            Popup.Description.TextColor3 =
+                NewTheme.SubText
+
+            Popup.CancelButton.BackgroundColor3 =
+                NewTheme.Button
+                or NewTheme.Element
+
+            Popup.CancelButton.TextColor3 =
+                NewTheme.Text
+
+            Popup.UnloadButton.BackgroundColor3 =
+                NewTheme.Accent
+
+            Popup.UnloadButton.TextColor3 =
+                NewTheme.AccentText
+                or NewTheme.Background
+
+            ApplyCorner(
+                Popup.Popup,
+                Corners.Popup or 10
+            )
+
+            ApplyCorner(
+                Popup.CancelButton,
+                Corners.Button or 7
+            )
+
+            ApplyCorner(
+                Popup.UnloadButton,
+                Corners.Button or 7
+            )
+
+            if Gradients.Main then
+
+                ApplyGradient(
+                    Popup.Popup,
+                    Gradients.Main
+                )
+
+            end
+
+            if Gradients.Accent then
+
+                ApplyGradient(
+                    Popup.UnloadButton,
+                    Gradients.Accent
+                )
+
+            end
+
+        end
 
         for _, TabObject in ipairs(
             self.Tabs
@@ -1745,35 +2178,29 @@ function Window.Create(Settings, OTC)
 
     end
 
-    --------------------------------------------------
-    -- CONNECTIONS
-    --------------------------------------------------
-
     CloseButton.MouseButton1Click:Connect(
         function()
 
-            if Object.Unload then
-                Object:Unload()
-            end
+            CreateUnloadConfirmation()
 
         end
     )
 
     MinimizeButton.MouseButton1Click:Connect(
         function()
+
             Object:Toggle()
+
         end
     )
 
     MiniButton.MouseButton1Click:Connect(
         function()
+
             Object:Toggle()
+
         end
     )
-
-    --------------------------------------------------
-    -- BUTTON HOVER
-    --------------------------------------------------
 
     MinimizeButton.MouseEnter:Connect(
         function()
@@ -1903,10 +2330,6 @@ function Window.Create(Settings, OTC)
         end
     )
 
-    --------------------------------------------------
-    -- UNLOAD
-    --------------------------------------------------
-
     function Object:Unload()
 
         if self.Closed then
@@ -1915,6 +2338,17 @@ function Window.Create(Settings, OTC)
 
         self.Closed =
             true
+
+        if self.UnloadConfirmation then
+
+            if self.UnloadConfirmation.Overlay then
+                self.UnloadConfirmation.Overlay:Destroy()
+            end
+
+            self.UnloadConfirmation =
+                nil
+
+        end
 
         if self.ScreenGui then
             self.ScreenGui:Destroy()
@@ -1931,10 +2365,6 @@ function Window.Create(Settings, OTC)
         end
 
     end
-
-    --------------------------------------------------
-    -- REGISTER WINDOW
-    --------------------------------------------------
 
     OTC._Windows[Object] =
         Object
