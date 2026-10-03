@@ -317,12 +317,19 @@ function Tab.Create(
 
             BorderSizePixel = 0,
 
+            -- MODIFICAT: spațiu egal stânga/dreapta
             Size =
                 UDim2.new(
                     1,
-                    0,
+                    -2,
                     0,
                     38
+                ),
+
+            Position =
+                UDim2.fromOffset(
+                    1,
+                    0
                 ),
 
             AutoButtonColor = false,
