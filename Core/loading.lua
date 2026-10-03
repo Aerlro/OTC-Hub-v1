@@ -3,16 +3,15 @@ local Loading = {}
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local ContentProvider = game:GetService("ContentProvider")
 local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
 local LOGO_ASSET = "rbxassetid://104463753775983"
 
-local BAT_ASSET = "rbxassetid://131729208129481"
-local PUMPKIN_ASSET = "rbxassetid://77640790921337"
-local GHOST_ASSET = "rbxassetid://121586241628401"
+local BAT_ASSET = "rbxassetid://137864586815122"
+local PUMPKIN_ASSET = "rbxassetid://102189125140178"
+local GHOST_ASSET = "rbxassetid://103854297771658"
 
 local function Tween(Object, Time, Properties, Style, Direction)
     local TweenObject = TweenService:Create(
@@ -101,7 +100,6 @@ local function CreateImage(
     Object.Image = Asset
     Object.ImageTransparency = Transparency or 0
     Object.ScaleType = Enum.ScaleType.Fit
-    Object.ResampleMode = Enum.ResamplerMode.Default
     Object.Parent = Parent
 
     return Object
@@ -460,7 +458,6 @@ function Loading.Create(Total)
         45
     )
 
-    --// Moon
     local Moon = Instance.new("Frame")
 
     Moon.Size = UDim2.fromOffset(
@@ -506,7 +503,6 @@ function Loading.Create(Total)
 
     Corner(MoonGlow, 999)
 
-    --// Clouds
     local Clouds = {}
 
     for Index = 1, 5 do
@@ -532,7 +528,6 @@ function Loading.Create(Total)
         )
     end
 
-    --// Haunted Houses
     local HouseContainer =
         Instance.new("Frame")
 
@@ -572,7 +567,6 @@ function Loading.Create(Total)
         0.65
     )
 
-    --// Cemetery
     local Cemetery = Instance.new("Frame")
 
     Cemetery.Size = UDim2.new(
@@ -664,7 +658,6 @@ function Loading.Create(Total)
         Cross2.Parent = Grave
     end
 
-    --// Halloween Decorations
     local DecorationContainer =
         Instance.new("Frame")
 
@@ -675,6 +668,7 @@ function Loading.Create(Total)
         UDim2.fromScale(1, 1)
 
     DecorationContainer.BackgroundTransparency = 1
+    DecorationContainer.ZIndex = 10
     DecorationContainer.Parent = Background
 
     local Bats = {}
@@ -692,6 +686,8 @@ function Loading.Create(Total)
             ),
             math.random(65, 110) / 100
         )
+
+        Bat.ZIndex = 10
 
         table.insert(
             Bats,
@@ -715,6 +711,8 @@ function Loading.Create(Total)
             math.random(70, 110) / 100
         )
 
+        Pumpkin.ZIndex = 10
+
         table.insert(
             Pumpkins,
             {
@@ -737,6 +735,8 @@ function Loading.Create(Total)
             math.random(65, 100) / 100
         )
 
+        Ghost.ZIndex = 10
+
         table.insert(
             Ghosts,
             {
@@ -747,7 +747,6 @@ function Loading.Create(Total)
         )
     end
 
-    --// Particles
     local ParticleContainer =
         Instance.new("Frame")
 
@@ -756,6 +755,7 @@ function Loading.Create(Total)
         UDim2.fromScale(1, 1)
 
     ParticleContainer.BackgroundTransparency = 1
+    ParticleContainer.ZIndex = 5
     ParticleContainer.Parent = Background
 
     local Particles = {}
@@ -813,7 +813,6 @@ function Loading.Create(Total)
         )
     end
 
-    --// Main Glow
     local Glow = Instance.new("Frame")
 
     Glow.Size =
@@ -872,7 +871,6 @@ function Loading.Create(Total)
 
     Corner(PurpleGlow, 999)
 
-    --// Main Card
     local Main = Instance.new("Frame")
 
     Main.Name = "Main"
@@ -900,6 +898,7 @@ function Loading.Create(Total)
 
     Main.BackgroundTransparency = 0.08
     Main.BorderSizePixel = 0
+    Main.ZIndex = 20
     Main.Parent = Background
 
     Corner(Main, 18)
@@ -937,7 +936,6 @@ function Loading.Create(Total)
         35
     )
 
-    --// Top Line
     local TopLine = Instance.new("Frame")
 
     TopLine.Size =
@@ -964,6 +962,7 @@ function Loading.Create(Total)
         )
 
     TopLine.BorderSizePixel = 0
+    TopLine.ZIndex = 21
     TopLine.Parent = Main
 
     Corner(TopLine, 999)
@@ -990,7 +989,6 @@ function Loading.Create(Total)
         0
     )
 
-    --// Rings
     local RingContainer =
         Instance.new("Frame")
 
@@ -1009,6 +1007,7 @@ function Loading.Create(Total)
         )
 
     RingContainer.BackgroundTransparency = 1
+    RingContainer.ZIndex = 22
     RingContainer.Parent = Main
 
     local Ring = Instance.new("Frame")
@@ -1028,6 +1027,7 @@ function Loading.Create(Total)
         )
 
     Ring.BackgroundTransparency = 1
+    Ring.ZIndex = 22
     Ring.Parent = RingContainer
 
     Stroke(
@@ -1060,6 +1060,7 @@ function Loading.Create(Total)
         )
 
     Ring2.BackgroundTransparency = 1
+    Ring2.ZIndex = 22
     Ring2.Parent = RingContainer
 
     Stroke(
@@ -1075,7 +1076,6 @@ function Loading.Create(Total)
 
     Corner(Ring2, 999)
 
-    --// Logo
     local LogoGlow = CreateImage(
         RingContainer,
         LOGO_ASSET,
@@ -1099,7 +1099,7 @@ function Loading.Create(Total)
             0
         )
 
-    LogoGlow.ZIndex = 1
+    LogoGlow.ZIndex = 23
 
     local Logo = CreateImage(
         RingContainer,
@@ -1117,9 +1117,8 @@ function Loading.Create(Total)
         0
     )
 
-    Logo.ZIndex = 3
+    Logo.ZIndex = 24
 
-    --// Text
     local Title = CreateText(
         Main,
         "OTC HUB",
@@ -1134,6 +1133,8 @@ function Loading.Create(Total)
         Enum.Font.GothamBold
     )
 
+    Title.ZIndex = 25
+
     local Version = CreateText(
         Main,
         "VERSION 1.0.1 • HALLOWEEN EDITION",
@@ -1147,6 +1148,8 @@ function Loading.Create(Total)
         ),
         Enum.Font.Gotham
     )
+
+    Version.ZIndex = 25
 
     local Status = CreateText(
         Main,
@@ -1165,6 +1168,8 @@ function Loading.Create(Total)
     Status.TextTruncate =
         Enum.TextTruncate.AtEnd
 
+    Status.ZIndex = 25
+
     local Percentage = CreateText(
         Main,
         "0%",
@@ -1182,7 +1187,8 @@ function Loading.Create(Total)
     Percentage.TextXAlignment =
         Enum.TextXAlignment.Right
 
-    --// Progress Bar
+    Percentage.ZIndex = 25
+
     local BarBackground =
         Instance.new("Frame")
 
@@ -1210,6 +1216,7 @@ function Loading.Create(Total)
         )
 
     BarBackground.BorderSizePixel = 0
+    BarBackground.ZIndex = 25
     BarBackground.Parent = Main
 
     Corner(
@@ -1235,6 +1242,7 @@ function Loading.Create(Total)
         )
 
     Bar.BorderSizePixel = 0
+    Bar.ZIndex = 26
     Bar.Parent = BarBackground
 
     Corner(Bar, 999)
@@ -1278,6 +1286,8 @@ function Loading.Create(Total)
     Detail.TextTruncate =
         Enum.TextTruncate.AtEnd
 
+    Detail.ZIndex = 25
+
     Object.Main = Main
     Object.Logo = Logo
     Object.LogoGlow = LogoGlow
@@ -1289,7 +1299,6 @@ function Loading.Create(Total)
     Object.Bar = Bar
     Object.BarBackground = BarBackground
 
-    --// Animation
     local RotationConnection
 
     RotationConnection =
@@ -1481,7 +1490,6 @@ function Loading.Create(Total)
     Object.RotationConnection =
         RotationConnection
 
-    --// Entrance
     Main.Size =
         UDim2.fromOffset(
             430,
@@ -1600,7 +1608,6 @@ function Loading.Create(Total)
         }
     )
 
-    --// Update
     function Object:Update(
         Current,
         StatusText,
@@ -1652,7 +1659,6 @@ function Loading.Create(Total)
         )
     end
 
-    --// Finish
     function Object:Finish()
         if self.Closed
             or self.Finishing then
@@ -1688,7 +1694,6 @@ function Loading.Create(Total)
         end
     end
 
-    --// Destroy
     function Object:Destroy()
         if self.Closed then
             return
