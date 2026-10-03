@@ -8,9 +8,7 @@ local Button = {}
 
 local TweenService = game:GetService("TweenService")
 
---// Create
 local function create(Class, Properties)
-
     local Object = Instance.new(Class)
 
     for Property, Value in pairs(Properties or {}) do
@@ -20,9 +18,7 @@ local function create(Class, Properties)
     return Object
 end
 
---// Tween
 local function tween(Object, Time, Properties)
-
     if not Object
         or not Object.Parent then
         return
@@ -43,7 +39,45 @@ local function tween(Object, Time, Properties)
     return Animation
 end
 
---// Create Button
+local function getGradient(Object)
+    if not Object then
+        return nil
+    end
+
+    return Object:FindFirstChild("OTCGradient")
+end
+
+local function applyGradient(Object, GradientData)
+    if not Object then
+        return
+    end
+
+    local Existing = getGradient(Object)
+
+    if Existing then
+        Existing:Destroy()
+    end
+
+    if not GradientData
+        or GradientData.Enabled ~= true then
+        return
+    end
+
+    if not GradientData.Colors then
+        return
+    end
+
+    local Gradient = Instance.new("UIGradient")
+
+    Gradient.Name = "OTCGradient"
+    Gradient.Color = GradientData.Colors
+    Gradient.Rotation = GradientData.Rotation or 0
+
+    Gradient.Parent = Object
+
+    return Gradient
+end
+
 function Button.Create(
     Tab,
     OTC,
@@ -64,28 +98,23 @@ function Button.Create(
         or function()
         end
 
-    --// Current Theme
     local function getTheme()
-
-        return OTC._Themes[Tab.Window.Theme]
+        return OTC._Themes[OTC.CurrentTheme]
+            or OTC._Themes[Tab.Window.Theme]
             or OTC._Themes.Default
-
     end
 
     local Theme =
         getTheme()
 
-    --// State
     local Hovered = false
     local Pressed = false
 
-    --// Height
     local FrameHeight =
         Description
         and 62
         or 48
 
-    --// Main Frame
     local Frame = create(
         "Frame",
         {
@@ -94,7 +123,13 @@ function Button.Create(
             Parent = Tab.Page,
 
             BackgroundColor3 =
-                Theme.Element,
+                Theme.Button
+                or Theme.Element,
+
+            BackgroundTransparency =
+                Theme.Transparency
+                and Theme.Transparency.Element
+                or 0,
 
             BorderSizePixel = 0,
 
@@ -116,12 +151,13 @@ function Button.Create(
             CornerRadius =
                 UDim.new(
                     0,
-                    8
+                    Theme.Corners
+                    and Theme.Corners.Button
+                    or 8
                 )
         }
     )
 
-    --// Stroke
     local Stroke = create(
         "UIStroke",
         {
@@ -130,11 +166,23 @@ function Button.Create(
             Color =
                 Theme.Border,
 
-            Thickness = 1
+            Thickness =
+                Theme.Stroke
+                and Theme.Stroke.Thickness
+                or 1,
+
+            Transparency =
+                Theme.Stroke
+                and Theme.Stroke.Transparency
+                or 0
         }
     )
 
-    --// Scale
+    if Theme.Stroke then
+        Stroke.Enabled =
+            Theme.Stroke.Enabled ~= false
+    end
+
     local Scale = create(
         "UIScale",
         {
@@ -144,7 +192,6 @@ function Button.Create(
         }
     )
 
-    --// Button
     local ButtonObject = create(
         "TextButton",
         {
@@ -168,7 +215,6 @@ function Button.Create(
         }
     )
 
-    --// Title
     local Title
 
     if Description then
@@ -272,7 +318,6 @@ function Button.Create(
         )
     end
 
-    --// Description
     local DescriptionLabel
 
     if Description then
@@ -324,7 +369,6 @@ function Button.Create(
         )
     end
 
-    --// Execute
     local Execute = create(
         "TextLabel",
         {
@@ -372,49 +416,71 @@ function Button.Create(
         }
     )
 
-    --// Apply State
+    local function getBackgroundColor(CurrentTheme)
+
+        if Pressed then
+            return CurrentTheme.ButtonPressed
+                or CurrentTheme.Pressed
+                or CurrentTheme.Hover
+                or CurrentTheme.Element
+
+        elseif Hovered then
+            return CurrentTheme.ButtonHover
+                or CurrentTheme.Hover
+                or CurrentTheme.Element
+
+        else
+            return CurrentTheme.Button
+                or CurrentTheme.Element
+        end
+    end
+
+    local function getStrokeColor(CurrentTheme)
+
+        if Pressed then
+            return CurrentTheme.Accent
+                or CurrentTheme.Border
+
+        elseif Hovered then
+            return CurrentTheme.BorderHover
+                or CurrentTheme.AccentDark
+                or CurrentTheme.Border
+
+        else
+            return CurrentTheme.Border
+        end
+    end
+
+    local function getExecuteColor(CurrentTheme)
+
+        if Pressed or Hovered then
+            return CurrentTheme.AccentHover
+                or CurrentTheme.Text
+                or CurrentTheme.Accent
+        end
+
+        return CurrentTheme.Accent
+    end
+
     local function applyState(Animated)
 
         local CurrentTheme =
             getTheme()
 
-        local BackgroundColor
-        local StrokeColor
-        local ExecuteColor
+        local BackgroundColor =
+            getBackgroundColor(
+                CurrentTheme
+            )
 
-        if Pressed then
+        local StrokeColor =
+            getStrokeColor(
+                CurrentTheme
+            )
 
-            BackgroundColor =
-                CurrentTheme.Hover
-
-            StrokeColor =
-                CurrentTheme.Accent
-
-            ExecuteColor =
-                CurrentTheme.Text
-
-        elseif Hovered then
-
-            BackgroundColor =
-                CurrentTheme.Hover
-
-            StrokeColor =
-                CurrentTheme.AccentDark
-
-            ExecuteColor =
-                CurrentTheme.Text
-
-        else
-
-            BackgroundColor =
-                CurrentTheme.Element
-
-            StrokeColor =
-                CurrentTheme.Border
-
-            ExecuteColor =
-                CurrentTheme.Accent
-        end
+        local ExecuteColor =
+            getExecuteColor(
+                CurrentTheme
+            )
 
         if Animated then
 
@@ -456,9 +522,59 @@ function Button.Create(
             Execute.TextColor3 =
                 ExecuteColor
         end
+
+        local GradientData
+
+        if Pressed then
+            GradientData =
+                CurrentTheme.Gradients
+                and CurrentTheme.Gradients.Accent
+
+        elseif Hovered then
+            GradientData =
+                CurrentTheme.Gradients
+                and CurrentTheme.Gradients.Element
+
+        else
+            GradientData =
+                CurrentTheme.Gradients
+                and CurrentTheme.Gradients.Element
+        end
+
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
+        if Effects.Gradient
+            and GradientData then
+
+            local Existing =
+                getGradient(Frame)
+
+            if Existing then
+                Existing.Color =
+                    GradientData.Colors
+
+                Existing.Rotation =
+                    GradientData.Rotation or 0
+            else
+                applyGradient(
+                    Frame,
+                    GradientData
+                )
+            end
+
+        else
+
+            local Existing =
+                getGradient(Frame)
+
+            if Existing then
+                Existing:Destroy()
+            end
+        end
     end
 
-    --// Mouse Enter
     ButtonObject.MouseEnter:Connect(
         function()
 
@@ -469,7 +585,6 @@ function Button.Create(
         end
     )
 
-    --// Mouse Leave
     ButtonObject.MouseLeave:Connect(
         function()
 
@@ -481,7 +596,6 @@ function Button.Create(
         end
     )
 
-    --// Mouse Down
     ButtonObject.MouseButton1Down:Connect(
         function()
 
@@ -500,7 +614,6 @@ function Button.Create(
         end
     )
 
-    --// Mouse Up
     ButtonObject.MouseButton1Up:Connect(
         function()
 
@@ -519,7 +632,6 @@ function Button.Create(
         end
     )
 
-    --// Click
     ButtonObject.MouseButton1Click:Connect(
         function()
 
@@ -566,7 +678,6 @@ function Button.Create(
         end
     )
 
-    --// Object
     local Object = {}
 
     Object.Type =
@@ -587,7 +698,12 @@ function Button.Create(
     Object.Execute =
         Execute
 
-    --// Set Name
+    Object.Stroke =
+        Stroke
+
+    Object.Scale =
+        Scale
+
     function Object:SetName(NewName)
 
         Name =
@@ -603,7 +719,6 @@ function Button.Create(
         end
     end
 
-    --// Set Description
     function Object:SetDescription(
         NewDescription
     )
@@ -621,7 +736,6 @@ function Button.Create(
         end
     end
 
-    --// Set Callback
     function Object:SetCallback(
         NewCallback
     )
@@ -634,7 +748,6 @@ function Button.Create(
         end
     end
 
-    --// Refresh Theme
     function Object:RefreshTheme()
 
         if not Frame
@@ -645,7 +758,22 @@ function Button.Create(
         local CurrentTheme =
             getTheme()
 
-        --// Title
+        local Transparency =
+            CurrentTheme.Transparency
+            or {}
+
+        local StrokeSettings =
+            CurrentTheme.Stroke
+            or {}
+
+        local Corners =
+            CurrentTheme.Corners
+            or {}
+
+        local Effects =
+            CurrentTheme.Effects
+            or {}
+
         if Title
             and Title.Parent then
 
@@ -653,7 +781,6 @@ function Button.Create(
                 CurrentTheme.Text
         end
 
-        --// Description
         if DescriptionLabel
             and DescriptionLabel.Parent then
 
@@ -661,21 +788,71 @@ function Button.Create(
                 CurrentTheme.SubText
         end
 
-        --// Execute
         if Execute
             and Execute.Parent then
 
             Execute.TextColor3 =
-                CurrentTheme.Accent
+                getExecuteColor(
+                    CurrentTheme
+                )
         end
 
-        --// Main colors
-        --// Respect current hover/pressed state
-        applyState(false)
+        Frame.BackgroundTransparency =
+            Transparency.Element
+            or 0
 
+        Stroke.Thickness =
+            StrokeSettings.Thickness
+            or 1
+
+        Stroke.Transparency =
+            StrokeSettings.Transparency
+            or 0
+
+        Stroke.Enabled =
+            StrokeSettings.Enabled ~= false
+
+        local Corner =
+            Frame:FindFirstChildOfClass(
+                "UICorner"
+            )
+
+        if Corner then
+
+            Corner.CornerRadius =
+                UDim.new(
+                    0,
+                    Corners.Button
+                    or 8
+                )
+        end
+
+        if Effects.Gradient then
+
+            local GradientData =
+                CurrentTheme.Gradients
+                and CurrentTheme.Gradients.Element
+
+            if GradientData then
+                applyGradient(
+                    Frame,
+                    GradientData
+                )
+            end
+
+        else
+
+            local Existing =
+                getGradient(Frame)
+
+            if Existing then
+                Existing:Destroy()
+            end
+        end
+
+        applyState(false)
     end
 
-    --// Destroy
     function Object:Destroy()
 
         if Frame
@@ -686,7 +863,6 @@ function Button.Create(
         end
     end
 
-    --// Register
     Tab:AddElement(
         Object
     )
