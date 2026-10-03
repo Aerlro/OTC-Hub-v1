@@ -54,7 +54,6 @@ local function applyGradient(Object, GradientData)
     Gradient.Name = "OTCGradient"
     Gradient.Color = GradientData.Colors
     Gradient.Rotation = GradientData.Rotation or 0
-
     Gradient.Parent = Object
 
     return Gradient
@@ -177,11 +176,10 @@ function Input.Create(Tab, OTC, Settings)
 
         BackgroundTransparency = 1,
 
-        -- CENTRAT VERTICAL
         Position =
             UDim2.fromOffset(
                 15,
-                Description and 17 or 24
+                Description and 25 or 31
             ),
 
         Size =
@@ -220,11 +218,10 @@ function Input.Create(Tab, OTC, Settings)
 
             BackgroundTransparency = 1,
 
-            -- CENTRAT SUB TITLU
             Position =
                 UDim2.fromOffset(
                     15,
-                    40
+                    48
                 ),
 
             Size =
@@ -359,8 +356,7 @@ function Input.Create(Tab, OTC, Settings)
         TextColor3 =
             Theme.Text,
 
-        -- PLACEHOLDER MAI MIC
-        TextSize = 10,
+        TextSize = 9,
 
         TextXAlignment =
             Enum.TextXAlignment.Left,
@@ -372,22 +368,18 @@ function Input.Create(Tab, OTC, Settings)
     local function sanitize(Text)
 
         if Numeric then
-
             Text = Text:gsub(
                 "[^%d%.%-]",
                 ""
             )
-
         end
 
         if MaxLength then
-
             Text = string.sub(
                 Text,
                 1,
                 MaxLength
             )
-
         end
 
         return Text
@@ -401,19 +393,15 @@ function Input.Create(Tab, OTC, Settings)
         local Color
 
         if TextBox:IsFocused() then
-
             Color =
                 CurrentTheme.InputFocus
                 or CurrentTheme.Accent
-
         else
-
             Color =
                 CurrentTheme.Border
         end
 
         if Animated then
-
             tween(
                 InputStroke,
                 0.15,
@@ -421,9 +409,7 @@ function Input.Create(Tab, OTC, Settings)
                     Color = Color
                 }
             )
-
         else
-
             InputStroke.Color =
                 Color
         end
@@ -495,7 +481,6 @@ function Input.Create(Tab, OTC, Settings)
                 InputFrame,
                 Gradients.Element
             )
-
         else
 
             local Existing =
@@ -509,7 +494,6 @@ function Input.Create(Tab, OTC, Settings)
         end
 
         if Flag then
-
             OTC:SetFlag(
                 Flag,
                 CurrentValue
@@ -523,7 +507,6 @@ function Input.Create(Tab, OTC, Settings)
             )
 
         if not Success then
-
             warn(
                 "[OTC Hub] Input callback error:",
                 Error
@@ -541,7 +524,6 @@ function Input.Create(Tab, OTC, Settings)
             )
 
         if Text ~= TextBox.Text then
-
             TextBox.Text =
                 Text
         end
@@ -590,7 +572,6 @@ function Input.Create(Tab, OTC, Settings)
     )
 
     if Flag then
-
         OTC:SetFlag(
             Flag,
             CurrentValue
@@ -634,7 +615,6 @@ function Input.Create(Tab, OTC, Settings)
             CurrentValue
 
         if Flag then
-
             OTC:SetFlag(
                 Flag,
                 CurrentValue
@@ -643,9 +623,7 @@ function Input.Create(Tab, OTC, Settings)
     end
 
     function Object:GetValue()
-
         return CurrentValue
-
     end
 
     function Object:SetPlaceholder(Value)
@@ -681,9 +659,7 @@ function Input.Create(Tab, OTC, Settings)
     end
 
     function Object:Focus()
-
         TextBox:CaptureFocus()
-
     end
 
     function Object:Clear()
@@ -693,7 +669,6 @@ function Input.Create(Tab, OTC, Settings)
         TextBox.Text = ""
 
         if Flag then
-
             OTC:SetFlag(
                 Flag,
                 ""
@@ -763,7 +738,6 @@ function Input.Create(Tab, OTC, Settings)
             CurrentTheme.Text
 
         if DescriptionLabel then
-
             DescriptionLabel.TextColor3 =
                 CurrentTheme.SubText
         end
@@ -812,7 +786,6 @@ function Input.Create(Tab, OTC, Settings)
                 InputFrame,
                 Gradients.Element
             )
-
         else
 
             local Existing =
