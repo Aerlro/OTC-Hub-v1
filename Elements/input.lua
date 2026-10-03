@@ -118,9 +118,10 @@ function Input.Create(Tab, OTC, Settings)
 
         Parent = Tab.Page,
 
+        -- MODIFICAT:
+        -- background-ul mare este acum ca restul elementelor
         BackgroundColor3 =
-            Theme.Input
-            or Theme.Element,
+            Theme.Element,
 
         BackgroundTransparency =
             Theme.Transparency
@@ -181,13 +182,15 @@ function Input.Create(Tab, OTC, Settings)
         Position =
             UDim2.fromOffset(
                 15,
-                8
+                Description and 9 or 24
             ),
 
+        -- MODIFICAT:
+        -- lasă loc pentru input-ul din dreapta
         Size =
             UDim2.new(
                 1,
-                -30,
+                -185,
                 0,
                 20
             ),
@@ -203,7 +206,10 @@ function Input.Create(Tab, OTC, Settings)
         TextSize = 13,
 
         TextXAlignment =
-            Enum.TextXAlignment.Left
+            Enum.TextXAlignment.Left,
+
+        TextYAlignment =
+            Enum.TextYAlignment.Center
     })
 
     local DescriptionLabel
@@ -220,13 +226,14 @@ function Input.Create(Tab, OTC, Settings)
             Position =
                 UDim2.fromOffset(
                     15,
-                    28
+                    30
                 ),
 
+            -- MODIFICAT:
             Size =
                 UDim2.new(
                     1,
-                    -30,
+                    -185,
                     0,
                     18
                 ),
@@ -242,15 +249,21 @@ function Input.Create(Tab, OTC, Settings)
             TextSize = 10,
 
             TextXAlignment =
-                Enum.TextXAlignment.Left
+                Enum.TextXAlignment.Left,
+
+            TextYAlignment =
+                Enum.TextYAlignment.Center
         })
     end
 
+    --// Input
     local InputFrame = create("Frame", {
         Name = "InputFrame",
 
         Parent = Frame,
 
+        -- MODIFICAT:
+        -- input-ul propriu-zis este mai scurt
         BackgroundColor3 =
             Theme.Input
             or Theme.Background,
@@ -262,18 +275,22 @@ function Input.Create(Tab, OTC, Settings)
 
         BorderSizePixel = 0,
 
+        -- MODIFICAT:
+        -- mutat în partea dreaptă și centrat vertical
         Position =
             UDim2.new(
-                0,
-                15,
                 1,
-                -40
+                -165,
+                0.5,
+                -16
             ),
 
+        -- MODIFICAT:
+        -- lățime scurtă
         Size =
             UDim2.new(
-                1,
-                -30,
+                0,
+                150,
                 0,
                 32
             )
@@ -723,9 +740,10 @@ function Input.Create(Tab, OTC, Settings)
             CurrentTheme.Gradients
             or {}
 
+        -- MODIFICAT:
+        -- outer background ca restul elementelor
         Frame.BackgroundColor3 =
-            CurrentTheme.Input
-            or CurrentTheme.Element
+            CurrentTheme.Element
 
         Frame.BackgroundTransparency =
             Transparency.Element
@@ -761,6 +779,7 @@ function Input.Create(Tab, OTC, Settings)
                 CurrentTheme.SubText
         end
 
+        -- input-ul mic din dreapta
         InputFrame.BackgroundColor3 =
             CurrentTheme.Input
             or CurrentTheme.Background
@@ -775,6 +794,9 @@ function Input.Create(Tab, OTC, Settings)
                 Corners.Input
                 or 6
             )
+
+        InputStroke.Color =
+            CurrentTheme.Border
 
         InputStroke.Thickness =
             StrokeSettings.Thickness
