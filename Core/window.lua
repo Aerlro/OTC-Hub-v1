@@ -410,6 +410,96 @@ function Window.Create(Settings, OTC)
     Subtitle.Parent =
         TopBar
 
+    local VersionTag =
+        Instance.new("TextLabel")
+
+    VersionTag.Name =
+        "VersionTag"
+
+    VersionTag.Size =
+        UDim2.new(
+            0,
+            62,
+            0,
+            22
+        )
+
+    VersionTag.Position =
+        UDim2.new(
+            1,
+            -150,
+            0.5,
+            -11
+        )
+
+    VersionTag.BackgroundColor3 =
+        Theme.Element
+
+    VersionTag.BackgroundTransparency =
+        Theme.Transparency
+        and Theme.Transparency.Element
+        or 0
+
+    VersionTag.BorderSizePixel =
+        0
+
+    VersionTag.Text =
+        "v" .. tostring(
+            OTC.Version or "1.0.0"
+        )
+
+    VersionTag.TextColor3 =
+        Theme.Text
+
+    VersionTag.TextSize =
+        10
+
+    VersionTag.Font =
+        Enum.Font.GothamBold
+
+    VersionTag.TextXAlignment =
+        Enum.TextXAlignment.Center
+
+    VersionTag.TextYAlignment =
+        Enum.TextYAlignment.Center
+
+    VersionTag.ZIndex =
+        10
+
+    VersionTag.Parent =
+        TopBar
+
+    local VersionCorner =
+        Instance.new("UICorner")
+
+    VersionCorner.CornerRadius =
+        UDim.new(
+            0,
+            7
+        )
+
+    VersionCorner.Parent =
+        VersionTag
+
+    local VersionStroke =
+        Instance.new("UIStroke")
+
+    VersionStroke.Color =
+        Theme.Border
+
+    VersionStroke.Thickness =
+        Theme.Stroke
+        and Theme.Stroke.Thickness
+        or 1
+
+    VersionStroke.Transparency =
+        Theme.Stroke
+        and Theme.Stroke.Transparency
+        or 0.3
+
+    VersionStroke.Parent =
+        VersionTag
+
     local MinimizeButton =
         Instance.new("TextButton")
 
@@ -944,6 +1034,12 @@ function Window.Create(Settings, OTC)
 
     Object.Subtitle =
         Subtitle
+
+    Object.VersionTag =
+        VersionTag
+
+    Object.VersionStroke =
+        VersionStroke
 
     Object.MinimizeButton =
         MinimizeButton
@@ -1900,6 +1996,37 @@ function Window.Create(Settings, OTC)
 
         Subtitle.TextColor3 =
             NewTheme.SubText
+
+        VersionTag.BackgroundColor3 =
+            NewTheme.Element
+
+        VersionTag.BackgroundTransparency =
+            Transparency.Element or 0
+
+        VersionTag.Text =
+            "v" .. tostring(
+                self.OTC.Version or "1.0.0"
+            )
+
+        VersionTag.TextColor3 =
+            NewTheme.Text
+
+        VersionStroke.Color =
+            NewTheme.Border
+
+        VersionStroke.Thickness =
+            Stroke.Thickness or 1
+
+        VersionStroke.Transparency =
+            Stroke.Transparency or 0.3
+
+        VersionStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        ApplyCorner(
+            VersionTag,
+            Corners.Button or 7
+        )
 
         MinimizeButton.BackgroundColor3 =
             NewTheme.Button
