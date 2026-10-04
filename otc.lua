@@ -6,7 +6,7 @@
 
 local OTC = {}
 
-OTC.Version = "v1.0.1"
+OTC.Version = "1.0.1"
 OTC.Name = "OTC Hub"
 
 local Players = game:GetService("Players")
