@@ -133,6 +133,7 @@ function Window.Create(Settings, OTC)
     Object.Minimized = false
     Object.Closed = false
     Object.UnloadConfirmation = nil
+    Object.VersionPopup = nil
     Object.ThemeGradients = {}
 
     local Theme =
@@ -411,7 +412,7 @@ function Window.Create(Settings, OTC)
         TopBar
 
     local VersionTag =
-        Instance.new("TextLabel")
+        Instance.new("TextButton")
 
     VersionTag.Name =
         "VersionTag"
@@ -442,6 +443,9 @@ function Window.Create(Settings, OTC)
 
     VersionTag.BorderSizePixel =
         0
+
+    VersionTag.AutoButtonColor =
+        false
 
     VersionTag.Text =
         "v" .. tostring(
@@ -499,6 +503,646 @@ function Window.Create(Settings, OTC)
 
     VersionStroke.Parent =
         VersionTag
+
+    local function CreateVersionPopup()
+
+        if Object.VersionPopup then
+            return
+        end
+
+        local CurrentTheme =
+            OTC._Themes[
+                OTC.CurrentTheme
+            ]
+            or OTC._Themes[
+                Object.Theme
+            ]
+            or OTC._Themes.Default
+
+        local Overlay =
+            Instance.new("Frame")
+
+        Overlay.Name =
+            "VersionOverlay"
+
+        Overlay.Size =
+            UDim2.new(
+                1,
+                0,
+                1,
+                0
+            )
+
+        Overlay.Position =
+            UDim2.new(
+                0,
+                0,
+                0,
+                0
+            )
+
+        Overlay.BackgroundColor3 =
+            Color3.fromRGB(
+                0,
+                0,
+                0
+            )
+
+        Overlay.BackgroundTransparency =
+            0.45
+
+        Overlay.BorderSizePixel =
+            0
+
+        Overlay.ZIndex =
+            200
+
+        Overlay.Parent =
+            ScreenGui
+
+        local Popup =
+            Instance.new("Frame")
+
+        Popup.Name =
+            "VersionPopup"
+
+        Popup.Size =
+            UDim2.new(
+                0,
+                390,
+                0,
+                270
+            )
+
+        Popup.Position =
+            UDim2.new(
+                0.5,
+                -195,
+                0.5,
+                -135
+            )
+
+        Popup.BackgroundColor3 =
+            CurrentTheme.PopupBackground
+            or CurrentTheme.Background
+
+        Popup.BackgroundTransparency =
+            CurrentTheme.Transparency
+            and CurrentTheme.Transparency.Popup
+            or 0
+
+        Popup.BorderSizePixel =
+            0
+
+        Popup.ZIndex =
+            201
+
+        Popup.Parent =
+            Overlay
+
+        local PopupCorner =
+            Instance.new("UICorner")
+
+        PopupCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Popup
+                or 12
+            )
+
+        PopupCorner.Parent =
+            Popup
+
+        local PopupStroke =
+            Instance.new("UIStroke")
+
+        PopupStroke.Color =
+            CurrentTheme.PopupBorder
+            or CurrentTheme.Border
+
+        PopupStroke.Thickness =
+            CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Thickness
+            or 1
+
+        PopupStroke.Transparency =
+            CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Transparency
+            or 0
+
+        PopupStroke.Parent =
+            Popup
+
+        local PopupTitle =
+            Instance.new("TextLabel")
+
+        PopupTitle.Name =
+            "Title"
+
+        PopupTitle.BackgroundTransparency =
+            1
+
+        PopupTitle.Position =
+            UDim2.new(
+                0,
+                20,
+                0,
+                16
+            )
+
+        PopupTitle.Size =
+            UDim2.new(
+                1,
+                -70,
+                0,
+                28
+            )
+
+        PopupTitle.Font =
+            Enum.Font.GothamBold
+
+        PopupTitle.Text =
+            "OTC Hub v"
+            .. tostring(
+                OTC.Version or "1.0.0"
+            )
+
+        PopupTitle.TextColor3 =
+            CurrentTheme.Text
+
+        PopupTitle.TextSize =
+            19
+
+        PopupTitle.TextXAlignment =
+            Enum.TextXAlignment.Left
+
+        PopupTitle.ZIndex =
+            202
+
+        PopupTitle.Parent =
+            Popup
+
+        local PopupSubtitle =
+            Instance.new("TextLabel")
+
+        PopupSubtitle.Name =
+            "Subtitle"
+
+        PopupSubtitle.BackgroundTransparency =
+            1
+
+        PopupSubtitle.Position =
+            UDim2.new(
+                0,
+                20,
+                0,
+                45
+            )
+
+        PopupSubtitle.Size =
+            UDim2.new(
+                1,
+                -40,
+                0,
+                20
+            )
+
+        PopupSubtitle.Font =
+            Enum.Font.Gotham
+
+        PopupSubtitle.Text =
+            "What's New"
+
+        PopupSubtitle.TextColor3 =
+            CurrentTheme.SubText
+
+        PopupSubtitle.TextSize =
+            12
+
+        PopupSubtitle.TextXAlignment =
+            Enum.TextXAlignment.Left
+
+        PopupSubtitle.ZIndex =
+            202
+
+        PopupSubtitle.Parent =
+            Popup
+
+        local CloseVersion =
+            Instance.new("TextButton")
+
+        CloseVersion.Name =
+            "Close"
+
+        CloseVersion.Size =
+            UDim2.new(
+                0,
+                30,
+                0,
+                30
+            )
+
+        CloseVersion.Position =
+            UDim2.new(
+                1,
+                -42,
+                0,
+                14
+            )
+
+        CloseVersion.BackgroundColor3 =
+            CurrentTheme.Element
+
+        CloseVersion.BorderSizePixel =
+            0
+
+        CloseVersion.AutoButtonColor =
+            false
+
+        CloseVersion.Text =
+            "×"
+
+        CloseVersion.TextColor3 =
+            CurrentTheme.Text
+
+        CloseVersion.TextSize =
+            19
+
+        CloseVersion.Font =
+            Enum.Font.GothamBold
+
+        CloseVersion.ZIndex =
+            203
+
+        CloseVersion.Parent =
+            Popup
+
+        local CloseCorner =
+            Instance.new("UICorner")
+
+        CloseCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Button
+                or 7
+            )
+
+        CloseCorner.Parent =
+            CloseVersion
+
+        local Updates =
+            Instance.new("ScrollingFrame")
+
+        Updates.Name =
+            "Updates"
+
+        Updates.Size =
+            UDim2.new(
+                1,
+                -40,
+                1,
+                -105
+            )
+
+        Updates.Position =
+            UDim2.new(
+                0,
+                20,
+                0,
+                75
+            )
+
+        Updates.BackgroundColor3 =
+            CurrentTheme.Element
+
+        Updates.BackgroundTransparency =
+            CurrentTheme.Transparency
+            and CurrentTheme.Transparency.Element
+            or 0
+
+        Updates.BorderSizePixel =
+            0
+
+        Updates.ScrollBarThickness =
+            3
+
+        Updates.ScrollBarImageColor3 =
+            CurrentTheme.Scrollbar
+            or CurrentTheme.Border
+
+        Updates.CanvasSize =
+            UDim2.new(
+                0,
+                0,
+                0,
+                0
+            )
+
+        Updates.ZIndex =
+            202
+
+        Updates.Parent =
+            Popup
+
+        local UpdatesCorner =
+            Instance.new("UICorner")
+
+        UpdatesCorner.CornerRadius =
+            UDim.new(
+                0,
+                CurrentTheme.Corners
+                and CurrentTheme.Corners.Element
+                or 8
+            )
+
+        UpdatesCorner.Parent =
+            Updates
+
+        local UpdatesPadding =
+            Instance.new("UIPadding")
+
+        UpdatesPadding.PaddingTop =
+            UDim.new(
+                0,
+                10
+            )
+
+        UpdatesPadding.PaddingBottom =
+            UDim.new(
+                0,
+                10
+            )
+
+        UpdatesPadding.PaddingLeft =
+            UDim.new(
+                0,
+                12
+            )
+
+        UpdatesPadding.PaddingRight =
+            UDim.new(
+                0,
+                12
+            )
+
+        UpdatesPadding.Parent =
+            Updates
+
+        local UpdatesLayout =
+            Instance.new("UIListLayout")
+
+        UpdatesLayout.Padding =
+            UDim.new(
+                0,
+                7
+            )
+
+        UpdatesLayout.SortOrder =
+            Enum.SortOrder.LayoutOrder
+
+        UpdatesLayout.Parent =
+            Updates
+
+        local Changelog =
+            OTC.Changelog
+            or {}
+
+        local CurrentUpdates =
+            Changelog[
+                OTC.Version
+            ]
+
+        if not CurrentUpdates then
+            CurrentUpdates = {
+                "No changelog available for this version."
+            }
+        end
+
+        for Index, UpdateText in ipairs(
+            CurrentUpdates
+        ) do
+
+            local Update =
+                Instance.new("TextLabel")
+
+            Update.Name =
+                "Update_" .. Index
+
+            Update.Size =
+                UDim2.new(
+                    1,
+                    0,
+                    0,
+                    24
+                )
+
+            Update.BackgroundTransparency =
+                1
+
+            Update.Font =
+                Enum.Font.Gotham
+
+            Update.Text =
+                "✓  " .. tostring(
+                    UpdateText
+                )
+
+            Update.TextColor3 =
+                CurrentTheme.Text
+
+            Update.TextSize =
+                12
+
+            Update.TextWrapped =
+                true
+
+            Update.TextXAlignment =
+                Enum.TextXAlignment.Left
+
+            Update.TextYAlignment =
+                Enum.TextYAlignment.Center
+
+            Update.ZIndex =
+                203
+
+            Update.Parent =
+                Updates
+
+        end
+
+        UpdatesLayout:GetPropertyChangedSignal(
+            "AbsoluteContentSize"
+        ):Connect(function()
+
+            Updates.CanvasSize =
+                UDim2.new(
+                    0,
+                    0,
+                    0,
+                    UpdatesLayout.AbsoluteContentSize.Y
+                    + 20
+                )
+
+        end)
+
+        if CurrentTheme.Gradients
+            and CurrentTheme.Gradients.Main then
+
+            ApplyGradient(
+                Popup,
+                CurrentTheme.Gradients.Main
+            )
+
+        end
+
+        CloseVersion.MouseEnter:Connect(
+            function()
+
+                CloseVersion.BackgroundColor3 =
+                    CurrentTheme.Hover
+                    or CurrentTheme.Element
+
+            end
+        )
+
+        CloseVersion.MouseLeave:Connect(
+            function()
+
+                CloseVersion.BackgroundColor3 =
+                    CurrentTheme.Element
+
+            end
+        )
+
+        CloseVersion.MouseButton1Click:Connect(
+            function()
+
+                if Object.VersionPopup
+                    and Object.VersionPopup.Overlay then
+
+                    Object.VersionPopup.Overlay:Destroy()
+
+                end
+
+                Object.VersionPopup =
+                    nil
+
+            end
+        )
+
+        Overlay.BackgroundTransparency =
+            1
+
+        Popup.Size =
+            UDim2.new(
+                0,
+                360,
+                0,
+                245
+            )
+
+        Tween(
+            Overlay,
+            TweenInfo.new(
+                0.18,
+                Enum.EasingStyle.Quad,
+                Enum.EasingDirection.Out
+            ),
+            {
+                BackgroundTransparency = 0.45
+            }
+        )
+
+        Tween(
+            Popup,
+            TweenInfo.new(
+                0.22,
+                Enum.EasingStyle.Back,
+                Enum.EasingDirection.Out
+            ),
+            {
+                Size =
+                    UDim2.new(
+                        0,
+                        390,
+                        0,
+                        270
+                    )
+            }
+        )
+
+        Object.VersionPopup = {
+            Overlay = Overlay,
+            Popup = Popup,
+            PopupStroke = PopupStroke,
+            Title = PopupTitle,
+            Subtitle = PopupSubtitle,
+            Close = CloseVersion,
+            Updates = Updates
+        }
+
+    end
+
+    VersionTag.MouseButton1Click:Connect(
+        function()
+
+            CreateVersionPopup()
+
+        end
+    )
+
+    VersionTag.MouseEnter:Connect(
+        function()
+
+            local Current =
+                OTC._Themes[
+                    OTC.CurrentTheme
+                ]
+                or OTC._Themes.Default
+
+            Tween(
+                VersionTag,
+                TweenInfo.new(
+                    0.12,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    BackgroundColor3 =
+                        Current.Hover
+                        or Current.Element
+                }
+            )
+
+        end
+    )
+
+    VersionTag.MouseLeave:Connect(
+        function()
+
+            local Current =
+                OTC._Themes[
+                    OTC.CurrentTheme
+                ]
+                or OTC._Themes.Default
+
+            Tween(
+                VersionTag,
+                TweenInfo.new(
+                    0.12,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    BackgroundColor3 =
+                        Current.Element
+                }
+            )
+
+        end
+    )
 
     local MinimizeButton =
         Instance.new("TextButton")
@@ -2287,6 +2931,92 @@ function Window.Create(Settings, OTC)
 
         end
 
+        if self.VersionPopup then
+
+            local Popup =
+                self.VersionPopup
+
+            Popup.Popup.BackgroundColor3 =
+                NewTheme.PopupBackground
+                or NewTheme.Background
+
+            Popup.Popup.BackgroundTransparency =
+                Transparency.Popup or 0
+
+            Popup.PopupStroke.Color =
+                NewTheme.PopupBorder
+                or NewTheme.Border
+
+            Popup.PopupStroke.Thickness =
+                Stroke.Thickness or 1
+
+            Popup.PopupStroke.Transparency =
+                Stroke.Transparency or 0
+
+            Popup.PopupStroke.Enabled =
+                Stroke.Enabled ~= false
+
+            Popup.Title.TextColor3 =
+                NewTheme.Text
+
+            Popup.Subtitle.TextColor3 =
+                NewTheme.SubText
+
+            Popup.Close.BackgroundColor3 =
+                NewTheme.Element
+
+            Popup.Close.TextColor3 =
+                NewTheme.Text
+
+            Popup.Updates.BackgroundColor3 =
+                NewTheme.Element
+
+            Popup.Updates.BackgroundTransparency =
+                Transparency.Element or 0
+
+            Popup.Updates.ScrollBarImageColor3 =
+                NewTheme.Scrollbar
+                or NewTheme.Border
+
+            for _, Child in ipairs(
+                Popup.Updates:GetChildren()
+            ) do
+
+                if Child:IsA("TextLabel") then
+
+                    Child.TextColor3 =
+                        NewTheme.Text
+
+                end
+
+            end
+
+            ApplyCorner(
+                Popup.Popup,
+                Corners.Popup or 12
+            )
+
+            ApplyCorner(
+                Popup.Close,
+                Corners.Button or 7
+            )
+
+            ApplyCorner(
+                Popup.Updates,
+                Corners.Element or 8
+            )
+
+            if Gradients.Main then
+
+                ApplyGradient(
+                    Popup.Popup,
+                    Gradients.Main
+                )
+
+            end
+
+        end
+
         for _, TabObject in ipairs(
             self.Tabs
         ) do
@@ -2473,6 +3203,17 @@ function Window.Create(Settings, OTC)
             end
 
             self.UnloadConfirmation =
+                nil
+
+        end
+
+        if self.VersionPopup then
+
+            if self.VersionPopup.Overlay then
+                self.VersionPopup.Overlay:Destroy()
+            end
+
+            self.VersionPopup =
                 nil
 
         end
