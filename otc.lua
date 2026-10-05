@@ -9,6 +9,19 @@ local OTC = {}
 OTC.Version = "1.0.1"
 OTC.Name = "OTC Hub"
 
+OTC.Changelog = {
+    ["1.0.1"] = {
+        "New Halloween loading screen",
+        "Animated Halloween decorations",
+        "Improved loading screen fade-out",
+        "Advanced Theme System improvements",
+        "Animated gradients",
+        "Version badge",
+        "Improved unload confirmation",
+        "Improved UI animations"
+    }
+}
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
