@@ -25,7 +25,19 @@ local function IsRomanReignsUser(Player)
         return false
     end
 
-    local Name = string.lower(Player.Name)
+    local Name
+
+    if typeof(Player) == "Instance" then
+        Name = Player.Name
+    elseif type(Player) == "string" then
+        Name = Player
+    end
+
+    if type(Name) ~= "string" or Name == "" then
+        return false
+    end
+
+    Name = string.lower(Name)
 
     return PRIVATE_THEME_USERS[Name] == true
 end
@@ -1029,6 +1041,8 @@ function Theme.IsAllowed(Name, Player)
     if not Theme.IsPrivate(Name) then
         return true
     end
+
+    Player = Player or Players.LocalPlayer
 
     return IsRomanReignsUser(Player)
 end
