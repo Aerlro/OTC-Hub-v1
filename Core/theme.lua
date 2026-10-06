@@ -1,114 +1,91 @@
-local Theme = {}
-
 local Players = game:GetService("Players")
 
+local Theme = {}
+
 local PRIVATE_THEME_USERS = {
-    ["romansmkboss"] = true,
-    ["Aerlro"] = true
+    ["aerlro"] = true,
+    ["romansmkboss"] = true
 }
 
-local function RGB(R, G, B)
-    return Color3.fromRGB(R, G, B)
-end
-
-local function Gradient(...)
-    local Colors = {...}
-
-    return {
-        Colors = Colors,
-        Rotation = 0
-    }
-end
-
 local function IsRomanReignsUser(Player)
+    Player = Player or Players.LocalPlayer
+
     if not Player then
         return false
     end
 
-    local Name
+    local Name = Player.Name
 
-    if typeof(Player) == "Instance" then
-        Name = Player.Name
-    elseif type(Player) == "string" then
-        Name = Player
-    end
-
-    if type(Name) ~= "string" or Name == "" then
+    if type(Name) ~= "string" then
         return false
     end
 
-    Name = string.lower(Name)
-
-    return PRIVATE_THEME_USERS[Name] == true
+    return PRIVATE_THEME_USERS[string.lower(Name)] == true
 end
 
 Theme.BuiltIn = {
+    Default = {
+        Name = "Default",
 
-    ["Default"] = {
+        Background = Color3.fromRGB(35, 35, 35),
+        Secondary = Color3.fromRGB(55, 55, 55),
+        Element = Color3.fromRGB(75, 75, 75),
+        Hover = Color3.fromRGB(100, 100, 100),
+        Pressed = Color3.fromRGB(120, 120, 120),
 
-        Background = RGB(35, 35, 35),
-        Secondary = RGB(55, 55, 55),
-        Element = RGB(75, 75, 75),
-        Hover = RGB(100, 100, 100),
-        Pressed = RGB(120, 120, 120),
+        Border = Color3.fromRGB(140, 140, 140),
+        BorderHover = Color3.fromRGB(180, 180, 180),
 
-        Border = RGB(140, 140, 140),
-        BorderHover = RGB(180, 180, 180),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(210, 210, 210),
+        MutedText = Color3.fromRGB(160, 160, 160),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(220, 220, 220),
-        MutedText = RGB(160, 160, 160),
+        Accent = Color3.fromRGB(255, 255, 255),
+        AccentDark = Color3.fromRGB(200, 200, 200),
+        AccentHover = Color3.fromRGB(255, 255, 255),
+        AccentText = Color3.fromRGB(25, 25, 25),
 
-        Accent = RGB(255, 255, 255),
-        AccentDark = RGB(200, 200, 200),
-        AccentHover = RGB(255, 255, 255),
-        AccentText = RGB(25, 25, 25),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(240, 180, 60),
+        Error = Color3.fromRGB(220, 70, 70),
+        Info = Color3.fromRGB(80, 160, 220),
 
-        Success = RGB(80, 200, 120),
-        Warning = RGB(240, 180, 70),
-        Error = RGB(220, 70, 70),
-        Info = RGB(80, 160, 220),
+        Tab = Color3.fromRGB(45, 45, 45),
+        TabHover = Color3.fromRGB(80, 80, 80),
+        TabSelected = Color3.fromRGB(110, 110, 110),
 
-        Tab = RGB(45, 45, 45),
-        TabHover = RGB(75, 75, 75),
-        TabSelected = RGB(100, 100, 100),
+        Button = Color3.fromRGB(75, 75, 75),
+        ButtonHover = Color3.fromRGB(100, 100, 100),
+        ButtonPressed = Color3.fromRGB(120, 120, 120),
 
-        Button = RGB(75, 75, 75),
-        ButtonHover = RGB(100, 100, 100),
-        ButtonPressed = RGB(120, 120, 120),
+        ToggleOff = Color3.fromRGB(55, 55, 55),
+        ToggleOn = Color3.fromRGB(255, 255, 255),
+        ToggleCircle = Color3.fromRGB(235, 235, 235),
 
-        ToggleOff = RGB(60, 60, 60),
-        ToggleOn = RGB(255, 255, 255),
-        ToggleCircle = RGB(35, 35, 35),
+        Input = Color3.fromRGB(40, 40, 40),
+        InputHover = Color3.fromRGB(65, 65, 65),
+        InputFocus = Color3.fromRGB(255, 255, 255),
 
-        Input = RGB(45, 45, 45),
-        InputHover = RGB(65, 65, 65),
-        InputFocus = RGB(255, 255, 255),
+        Dropdown = Color3.fromRGB(40, 40, 40),
+        DropdownHover = Color3.fromRGB(65, 65, 65),
+        DropdownSelected = Color3.fromRGB(255, 255, 255),
 
-        Dropdown = RGB(45, 45, 45),
-        DropdownHover = RGB(70, 70, 70),
-        DropdownSelected = RGB(255, 255, 255),
+        SliderBackground = Color3.fromRGB(55, 55, 55),
+        SliderFill = Color3.fromRGB(255, 255, 255),
+        SliderKnob = Color3.fromRGB(235, 235, 235),
 
-        SliderBackground = RGB(55, 55, 55),
-        SliderFill = RGB(255, 255, 255),
-        SliderKnob = RGB(255, 255, 255),
+        PopupBackground = Color3.fromRGB(30, 30, 30),
+        PopupBorder = Color3.fromRGB(140, 140, 140),
 
-        PopupBackground = RGB(40, 40, 40),
-        PopupBorder = RGB(120, 120, 120),
+        NotificationBackground = Color3.fromRGB(35, 35, 35),
+        NotificationBorder = Color3.fromRGB(255, 255, 255),
 
-        NotificationBackground = RGB(45, 45, 45),
-        NotificationBorder = RGB(255, 255, 255),
-
-        Scrollbar = RGB(180, 180, 180),
+        Scrollbar = Color3.fromRGB(255, 255, 255),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -137,100 +114,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(35, 35, 35),
-                RGB(55, 55, 55),
-                RGB(35, 35, 35)
-            ),
+            Main = {
+                Color3.fromRGB(45, 45, 45),
+                Color3.fromRGB(80, 80, 80),
+                Color3.fromRGB(120, 120, 120)
+            },
 
-            TopBar = Gradient(
-                RGB(45, 45, 45),
-                RGB(80, 80, 80),
-                RGB(45, 45, 45)
-            ),
+            TopBar = {
+                Color3.fromRGB(35, 35, 35),
+                Color3.fromRGB(75, 75, 75),
+                Color3.fromRGB(120, 120, 120)
+            },
 
-            Sidebar = Gradient(
-                RGB(30, 30, 30),
-                RGB(50, 50, 50)
-            ),
+            Sidebar = {
+                Color3.fromRGB(25, 25, 25),
+                Color3.fromRGB(50, 50, 50)
+            },
 
-            Element = Gradient(
-                RGB(65, 65, 65),
-                RGB(90, 90, 90)
-            ),
+            Element = {
+                Color3.fromRGB(65, 65, 65),
+                Color3.fromRGB(100, 100, 100)
+            },
 
-            Accent = Gradient(
-                RGB(255, 255, 255),
-                RGB(200, 200, 200),
-                RGB(255, 255, 255)
-            )
+            Accent = {
+                Color3.fromRGB(255, 255, 255),
+                Color3.fromRGB(200, 200, 200),
+                Color3.fromRGB(255, 255, 255)
+            }
         }
     },
 
-    ["Red"] = {
-        Background = RGB(75, 10, 15),
-        Secondary = RGB(115, 15, 22),
-        Element = RGB(150, 22, 30),
-        Hover = RGB(190, 30, 40),
-        Pressed = RGB(210, 40, 50),
+    Red = {
+        Name = "Red",
 
-        Border = RGB(230, 55, 65),
-        BorderHover = RGB(255, 80, 90),
+        Background = Color3.fromRGB(75, 10, 15),
+        Secondary = Color3.fromRGB(115, 15, 22),
+        Element = Color3.fromRGB(150, 22, 30),
+        Hover = Color3.fromRGB(190, 30, 40),
+        Pressed = Color3.fromRGB(210, 40, 50),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(240, 210, 210),
-        MutedText = RGB(190, 140, 140),
+        Border = Color3.fromRGB(230, 55, 65),
+        BorderHover = Color3.fromRGB(255, 80, 90),
 
-        Accent = RGB(255, 65, 75),
-        AccentDark = RGB(200, 30, 40),
-        AccentHover = RGB(255, 90, 100),
-        AccentText = RGB(40, 5, 5),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(235, 205, 205),
+        MutedText = Color3.fromRGB(190, 140, 140),
 
-        Success = RGB(80, 200, 120),
-        Warning = RGB(240, 180, 70),
-        Error = RGB(255, 70, 70),
-        Info = RGB(80, 160, 220),
+        Accent = Color3.fromRGB(255, 65, 75),
+        AccentDark = Color3.fromRGB(200, 30, 40),
+        AccentHover = Color3.fromRGB(255, 100, 110),
+        AccentText = Color3.fromRGB(45, 5, 8),
 
-        Tab = RGB(85, 12, 18),
-        TabHover = RGB(145, 22, 30),
-        TabSelected = RGB(190, 30, 40),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(240, 180, 60),
+        Error = Color3.fromRGB(255, 80, 80),
+        Info = Color3.fromRGB(80, 160, 220),
 
-        Button = RGB(150, 22, 30),
-        ButtonHover = RGB(190, 30, 40),
-        ButtonPressed = RGB(215, 40, 50),
+        Tab = Color3.fromRGB(90, 12, 18),
+        TabHover = Color3.fromRGB(145, 25, 32),
+        TabSelected = Color3.fromRGB(190, 35, 45),
 
-        ToggleOff = RGB(80, 15, 20),
-        ToggleOn = RGB(255, 65, 75),
-        ToggleCircle = RGB(255, 235, 235),
+        Button = Color3.fromRGB(150, 22, 30),
+        ButtonHover = Color3.fromRGB(190, 30, 40),
+        ButtonPressed = Color3.fromRGB(215, 40, 50),
 
-        Input = RGB(55, 8, 12),
-        InputHover = RGB(105, 15, 20),
-        InputFocus = RGB(255, 65, 75),
+        ToggleOff = Color3.fromRGB(90, 15, 20),
+        ToggleOn = Color3.fromRGB(255, 65, 75),
+        ToggleCircle = Color3.fromRGB(255, 220, 220),
 
-        Dropdown = RGB(55, 8, 12),
-        DropdownHover = RGB(115, 18, 25),
-        DropdownSelected = RGB(255, 65, 75),
+        Input = Color3.fromRGB(55, 8, 12),
+        InputHover = Color3.fromRGB(105, 15, 20),
+        InputFocus = Color3.fromRGB(255, 65, 75),
 
-        SliderBackground = RGB(90, 15, 20),
-        SliderFill = RGB(255, 65, 75),
-        SliderKnob = RGB(255, 100, 110),
+        Dropdown = Color3.fromRGB(55, 8, 12),
+        DropdownHover = Color3.fromRGB(110, 18, 25),
+        DropdownSelected = Color3.fromRGB(255, 65, 75),
 
-        PopupBackground = RGB(65, 8, 13),
-        PopupBorder = RGB(230, 55, 65),
+        SliderBackground = Color3.fromRGB(95, 15, 20),
+        SliderFill = Color3.fromRGB(255, 65, 75),
+        SliderKnob = Color3.fromRGB(255, 120, 125),
 
-        NotificationBackground = RGB(70, 10, 15),
-        NotificationBorder = RGB(255, 65, 75),
+        PopupBackground = Color3.fromRGB(50, 7, 12),
+        PopupBorder = Color3.fromRGB(230, 55, 65),
 
-        Scrollbar = RGB(255, 65, 75),
+        NotificationBackground = Color3.fromRGB(60, 8, 14),
+        NotificationBorder = Color3.fromRGB(255, 65, 75),
+
+        Scrollbar = Color3.fromRGB(255, 65, 75),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -259,100 +234,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(75, 10, 15),
-                RGB(120, 15, 25),
-                RGB(75, 10, 15)
-            ),
+            Main = {
+                Color3.fromRGB(75, 10, 15),
+                Color3.fromRGB(150, 22, 30),
+                Color3.fromRGB(230, 55, 65)
+            },
 
-            TopBar = Gradient(
-                RGB(100, 10, 18),
-                RGB(220, 35, 45),
-                RGB(100, 10, 18)
-            ),
+            TopBar = {
+                Color3.fromRGB(75, 10, 15),
+                Color3.fromRGB(150, 22, 30),
+                Color3.fromRGB(255, 65, 75)
+            },
 
-            Sidebar = Gradient(
-                RGB(55, 5, 10),
-                RGB(100, 12, 18)
-            ),
+            Sidebar = {
+                Color3.fromRGB(50, 5, 10),
+                Color3.fromRGB(100, 12, 18)
+            },
 
-            Element = Gradient(
-                RGB(130, 15, 25),
-                RGB(210, 35, 45)
-            ),
+            Element = {
+                Color3.fromRGB(115, 15, 22),
+                Color3.fromRGB(190, 30, 40)
+            },
 
-            Accent = Gradient(
-                RGB(255, 65, 75),
-                RGB(255, 110, 120),
-                RGB(200, 30, 40)
-            )
+            Accent = {
+                Color3.fromRGB(255, 65, 75),
+                Color3.fromRGB(255, 110, 115),
+                Color3.fromRGB(200, 30, 40)
+            }
         }
     },
 
-    ["Green"] = {
-        Background = RGB(8, 70, 30),
-        Secondary = RGB(10, 110, 45),
-        Element = RGB(15, 145, 58),
-        Hover = RGB(25, 185, 75),
-        Pressed = RGB(35, 205, 85),
+    Green = {
+        Name = "Green",
 
-        Border = RGB(55, 225, 105),
-        BorderHover = RGB(85, 255, 130),
+        Background = Color3.fromRGB(8, 70, 30),
+        Secondary = Color3.fromRGB(10, 110, 45),
+        Element = Color3.fromRGB(15, 145, 58),
+        Hover = Color3.fromRGB(25, 185, 75),
+        Pressed = Color3.fromRGB(35, 205, 90),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(205, 235, 215),
-        MutedText = RGB(145, 185, 155),
+        Border = Color3.fromRGB(55, 225, 105),
+        BorderHover = Color3.fromRGB(90, 255, 135),
 
-        Accent = RGB(70, 255, 120),
-        AccentDark = RGB(30, 195, 75),
-        AccentHover = RGB(100, 255, 145),
-        AccentText = RGB(5, 35, 15),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(205, 235, 215),
+        MutedText = Color3.fromRGB(145, 190, 155),
 
-        Success = RGB(70, 255, 120),
-        Warning = RGB(240, 180, 70),
-        Error = RGB(220, 70, 70),
-        Info = RGB(80, 180, 220),
+        Accent = Color3.fromRGB(70, 255, 120),
+        AccentDark = Color3.fromRGB(30, 195, 75),
+        AccentHover = Color3.fromRGB(110, 255, 150),
+        AccentText = Color3.fromRGB(5, 35, 15),
 
-        Tab = RGB(10, 80, 35),
-        TabHover = RGB(20, 150, 60),
-        TabSelected = RGB(25, 190, 75),
+        Success = Color3.fromRGB(80, 255, 130),
+        Warning = Color3.fromRGB(240, 180, 60),
+        Error = Color3.fromRGB(220, 70, 70),
+        Info = Color3.fromRGB(80, 160, 220),
 
-        Button = RGB(15, 145, 58),
-        ButtonHover = RGB(25, 185, 75),
-        ButtonPressed = RGB(35, 210, 85),
+        Tab = Color3.fromRGB(8, 85, 35),
+        TabHover = Color3.fromRGB(20, 150, 60),
+        TabSelected = Color3.fromRGB(30, 190, 75),
 
-        ToggleOff = RGB(10, 70, 30),
-        ToggleOn = RGB(70, 255, 120),
-        ToggleCircle = RGB(225, 255, 235),
+        Button = Color3.fromRGB(15, 145, 58),
+        ButtonHover = Color3.fromRGB(25, 185, 75),
+        ButtonPressed = Color3.fromRGB(35, 205, 90),
 
-        Input = RGB(5, 45, 20),
-        InputHover = RGB(10, 90, 35),
-        InputFocus = RGB(70, 255, 120),
+        ToggleOff = Color3.fromRGB(10, 90, 38),
+        ToggleOn = Color3.fromRGB(70, 255, 120),
+        ToggleCircle = Color3.fromRGB(220, 255, 230),
 
-        Dropdown = RGB(5, 45, 20),
-        DropdownHover = RGB(15, 110, 45),
-        DropdownSelected = RGB(70, 255, 120),
+        Input = Color3.fromRGB(5, 40, 18),
+        InputHover = Color3.fromRGB(12, 100, 40),
+        InputFocus = Color3.fromRGB(70, 255, 120),
 
-        SliderBackground = RGB(15, 90, 40),
-        SliderFill = RGB(70, 255, 120),
-        SliderKnob = RGB(110, 255, 155),
+        Dropdown = Color3.fromRGB(5, 40, 18),
+        DropdownHover = Color3.fromRGB(15, 110, 45),
+        DropdownSelected = Color3.fromRGB(70, 255, 120),
 
-        PopupBackground = RGB(7, 55, 25),
-        PopupBorder = RGB(55, 225, 105),
+        SliderBackground = Color3.fromRGB(12, 95, 40),
+        SliderFill = Color3.fromRGB(70, 255, 120),
+        SliderKnob = Color3.fromRGB(130, 255, 160),
 
-        NotificationBackground = RGB(8, 65, 30),
-        NotificationBorder = RGB(70, 255, 120),
+        PopupBackground = Color3.fromRGB(5, 35, 15),
+        PopupBorder = Color3.fromRGB(55, 225, 105),
 
-        Scrollbar = RGB(70, 255, 120),
+        NotificationBackground = Color3.fromRGB(7, 50, 20),
+        NotificationBorder = Color3.fromRGB(70, 255, 120),
+
+        Scrollbar = Color3.fromRGB(70, 255, 120),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -381,100 +354,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(8, 70, 30),
-                RGB(15, 120, 50),
-                RGB(8, 70, 30)
-            ),
+            Main = {
+                Color3.fromRGB(8, 70, 30),
+                Color3.fromRGB(15, 145, 58),
+                Color3.fromRGB(70, 255, 120)
+            },
 
-            TopBar = Gradient(
-                RGB(10, 100, 40),
-                RGB(50, 220, 100),
-                RGB(10, 100, 40)
-            ),
+            TopBar = {
+                Color3.fromRGB(8, 70, 30),
+                Color3.fromRGB(25, 185, 75),
+                Color3.fromRGB(70, 255, 120)
+            },
 
-            Sidebar = Gradient(
-                RGB(5, 50, 20),
-                RGB(10, 100, 40)
-            ),
+            Sidebar = {
+                Color3.fromRGB(5, 45, 20),
+                Color3.fromRGB(10, 90, 38)
+            },
 
-            Element = Gradient(
-                RGB(15, 135, 55),
-                RGB(30, 200, 80)
-            ),
+            Element = {
+                Color3.fromRGB(10, 110, 45),
+                Color3.fromRGB(25, 185, 75)
+            },
 
-            Accent = Gradient(
-                RGB(70, 255, 120),
-                RGB(130, 255, 165),
-                RGB(30, 195, 75)
-            )
+            Accent = {
+                Color3.fromRGB(70, 255, 120),
+                Color3.fromRGB(130, 255, 160),
+                Color3.fromRGB(30, 195, 75)
+            }
         }
     },
 
-    ["Blue"] = {
-        Background = RGB(8, 45, 100),
-        Secondary = RGB(10, 70, 145),
-        Element = RGB(15, 95, 185),
-        Hover = RGB(30, 125, 220),
-        Pressed = RGB(40, 145, 235),
+    Blue = {
+        Name = "Blue",
 
-        Border = RGB(70, 165, 255),
-        BorderHover = RGB(105, 195, 255),
+        Background = Color3.fromRGB(8, 45, 100),
+        Secondary = Color3.fromRGB(10, 70, 145),
+        Element = Color3.fromRGB(15, 95, 185),
+        Hover = Color3.fromRGB(30, 125, 220),
+        Pressed = Color3.fromRGB(45, 145, 240),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(205, 225, 245),
-        MutedText = RGB(145, 175, 210),
+        Border = Color3.fromRGB(70, 165, 255),
+        BorderHover = Color3.fromRGB(110, 195, 255),
 
-        Accent = RGB(75, 155, 255),
-        AccentDark = RGB(35, 105, 205),
-        AccentHover = RGB(105, 180, 255),
-        AccentText = RGB(5, 20, 45),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(205, 225, 245),
+        MutedText = Color3.fromRGB(140, 175, 215),
 
-        Success = RGB(80, 200, 120),
-        Warning = RGB(240, 180, 70),
-        Error = RGB(220, 70, 70),
-        Info = RGB(75, 155, 255),
+        Accent = Color3.fromRGB(75, 155, 255),
+        AccentDark = Color3.fromRGB(35, 105, 205),
+        AccentHover = Color3.fromRGB(115, 180, 255),
+        AccentText = Color3.fromRGB(5, 20, 45),
 
-        Tab = RGB(10, 55, 115),
-        TabHover = RGB(20, 100, 185),
-        TabSelected = RGB(30, 130, 220),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(240, 180, 60),
+        Error = Color3.fromRGB(220, 70, 70),
+        Info = Color3.fromRGB(80, 180, 255),
 
-        Button = RGB(15, 95, 185),
-        ButtonHover = RGB(30, 125, 220),
-        ButtonPressed = RGB(40, 145, 235),
+        Tab = Color3.fromRGB(8, 55, 115),
+        TabHover = Color3.fromRGB(20, 105, 190),
+        TabSelected = Color3.fromRGB(35, 135, 225),
 
-        ToggleOff = RGB(10, 55, 110),
-        ToggleOn = RGB(75, 155, 255),
-        ToggleCircle = RGB(225, 240, 255),
+        Button = Color3.fromRGB(15, 95, 185),
+        ButtonHover = Color3.fromRGB(30, 125, 220),
+        ButtonPressed = Color3.fromRGB(45, 145, 240),
 
-        Input = RGB(5, 30, 75),
-        InputHover = RGB(10, 70, 135),
-        InputFocus = RGB(75, 155, 255),
+        ToggleOff = Color3.fromRGB(10, 65, 125),
+        ToggleOn = Color3.fromRGB(75, 155, 255),
+        ToggleCircle = Color3.fromRGB(220, 240, 255),
 
-        Dropdown = RGB(5, 30, 75),
-        DropdownHover = RGB(15, 80, 150),
-        DropdownSelected = RGB(75, 155, 255),
+        Input = Color3.fromRGB(5, 30, 70),
+        InputHover = Color3.fromRGB(10, 75, 145),
+        InputFocus = Color3.fromRGB(75, 155, 255),
 
-        SliderBackground = RGB(15, 70, 135),
-        SliderFill = RGB(75, 155, 255),
-        SliderKnob = RGB(110, 190, 255),
+        Dropdown = Color3.fromRGB(5, 30, 70),
+        DropdownHover = Color3.fromRGB(12, 85, 160),
+        DropdownSelected = Color3.fromRGB(75, 155, 255),
 
-        PopupBackground = RGB(6, 35, 80),
-        PopupBorder = RGB(70, 165, 255),
+        SliderBackground = Color3.fromRGB(10, 70, 140),
+        SliderFill = Color3.fromRGB(75, 155, 255),
+        SliderKnob = Color3.fromRGB(120, 190, 255),
 
-        NotificationBackground = RGB(7, 45, 95),
-        NotificationBorder = RGB(75, 155, 255),
+        PopupBackground = Color3.fromRGB(5, 25, 60),
+        PopupBorder = Color3.fromRGB(70, 165, 255),
 
-        Scrollbar = RGB(75, 155, 255),
+        NotificationBackground = Color3.fromRGB(7, 35, 80),
+        NotificationBorder = Color3.fromRGB(75, 155, 255),
+
+        Scrollbar = Color3.fromRGB(75, 155, 255),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -503,100 +474,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(8, 45, 100),
-                RGB(15, 85, 170),
-                RGB(8, 45, 100)
-            ),
+            Main = {
+                Color3.fromRGB(8, 45, 100),
+                Color3.fromRGB(15, 95, 185),
+                Color3.fromRGB(75, 155, 255)
+            },
 
-            TopBar = Gradient(
-                RGB(10, 65, 135),
-                RGB(50, 145, 240),
-                RGB(10, 65, 135)
-            ),
+            TopBar = {
+                Color3.fromRGB(8, 45, 100),
+                Color3.fromRGB(30, 125, 220),
+                Color3.fromRGB(75, 155, 255)
+            },
 
-            Sidebar = Gradient(
-                RGB(5, 30, 70),
-                RGB(10, 70, 140)
-            ),
+            Sidebar = {
+                Color3.fromRGB(5, 30, 70),
+                Color3.fromRGB(10, 70, 140)
+            },
 
-            Element = Gradient(
-                RGB(15, 90, 180),
-                RGB(35, 140, 230)
-            ),
+            Element = {
+                Color3.fromRGB(10, 70, 145),
+                Color3.fromRGB(30, 125, 220)
+            },
 
-            Accent = Gradient(
-                RGB(75, 155, 255),
-                RGB(125, 195, 255),
-                RGB(35, 105, 205)
-            )
+            Accent = {
+                Color3.fromRGB(75, 155, 255),
+                Color3.fromRGB(120, 190, 255),
+                Color3.fromRGB(35, 105, 205)
+            }
         }
     },
 
-    ["Purple"] = {
-        Background = RGB(55, 10, 95),
-        Secondary = RGB(80, 15, 135),
-        Element = RGB(110, 25, 175),
-        Hover = RGB(145, 40, 220),
-        Pressed = RGB(165, 50, 235),
+    Purple = {
+        Name = "Purple",
 
-        Border = RGB(190, 75, 255),
-        BorderHover = RGB(220, 120, 255),
+        Background = Color3.fromRGB(55, 10, 95),
+        Secondary = Color3.fromRGB(80, 15, 135),
+        Element = Color3.fromRGB(110, 25, 175),
+        Hover = Color3.fromRGB(145, 40, 220),
+        Pressed = Color3.fromRGB(165, 50, 235),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(225, 205, 240),
-        MutedText = RGB(175, 140, 195),
+        Border = Color3.fromRGB(190, 75, 255),
+        BorderHover = Color3.fromRGB(220, 110, 255),
 
-        Accent = RGB(190, 90, 255),
-        AccentDark = RGB(130, 45, 200),
-        AccentHover = RGB(215, 125, 255),
-        AccentText = RGB(25, 5, 40),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(225, 205, 240),
+        MutedText = Color3.fromRGB(170, 135, 195),
 
-        Success = RGB(80, 200, 120),
-        Warning = RGB(240, 180, 70),
-        Error = RGB(220, 70, 70),
-        Info = RGB(120, 150, 240),
+        Accent = Color3.fromRGB(190, 90, 255),
+        AccentDark = Color3.fromRGB(130, 45, 200),
+        AccentHover = Color3.fromRGB(215, 125, 255),
+        AccentText = Color3.fromRGB(30, 8, 45),
 
-        Tab = RGB(65, 12, 110),
-        TabHover = RGB(115, 25, 175),
-        TabSelected = RGB(150, 40, 220),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(240, 180, 60),
+        Error = Color3.fromRGB(220, 70, 70),
+        Info = Color3.fromRGB(120, 160, 255),
 
-        Button = RGB(110, 25, 175),
-        ButtonHover = RGB(145, 40, 220),
-        ButtonPressed = RGB(170, 50, 235),
+        Tab = Color3.fromRGB(65, 10, 110),
+        TabHover = Color3.fromRGB(120, 25, 175),
+        TabSelected = Color3.fromRGB(155, 40, 220),
 
-        ToggleOff = RGB(65, 12, 110),
-        ToggleOn = RGB(190, 90, 255),
-        ToggleCircle = RGB(245, 225, 255),
+        Button = Color3.fromRGB(110, 25, 175),
+        ButtonHover = Color3.fromRGB(145, 40, 220),
+        ButtonPressed = Color3.fromRGB(165, 50, 235),
 
-        Input = RGB(35, 6, 65),
-        InputHover = RGB(80, 15, 125),
-        InputFocus = RGB(190, 90, 255),
+        ToggleOff = Color3.fromRGB(75, 12, 120),
+        ToggleOn = Color3.fromRGB(190, 90, 255),
+        ToggleCircle = Color3.fromRGB(240, 225, 255),
 
-        Dropdown = RGB(35, 6, 65),
-        DropdownHover = RGB(95, 20, 150),
-        DropdownSelected = RGB(190, 90, 255),
+        Input = Color3.fromRGB(35, 5, 65),
+        InputHover = Color3.fromRGB(90, 18, 145),
+        InputFocus = Color3.fromRGB(190, 90, 255),
 
-        SliderBackground = RGB(80, 20, 135),
-        SliderFill = RGB(190, 90, 255),
-        SliderKnob = RGB(220, 140, 255),
+        Dropdown = Color3.fromRGB(35, 5, 65),
+        DropdownHover = Color3.fromRGB(95, 20, 155),
+        DropdownSelected = Color3.fromRGB(190, 90, 255),
 
-        PopupBackground = RGB(45, 8, 80),
-        PopupBorder = RGB(190, 75, 255),
+        SliderBackground = Color3.fromRGB(75, 15, 125),
+        SliderFill = Color3.fromRGB(190, 90, 255),
+        SliderKnob = Color3.fromRGB(220, 140, 255),
 
-        NotificationBackground = RGB(55, 10, 95),
-        NotificationBorder = RGB(190, 90, 255),
+        PopupBackground = Color3.fromRGB(30, 5, 55),
+        PopupBorder = Color3.fromRGB(190, 75, 255),
 
-        Scrollbar = RGB(190, 90, 255),
+        NotificationBackground = Color3.fromRGB(40, 7, 70),
+        NotificationBorder = Color3.fromRGB(190, 90, 255),
+
+        Scrollbar = Color3.fromRGB(190, 90, 255),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -625,100 +594,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(55, 10, 95),
-                RGB(100, 20, 155),
-                RGB(55, 10, 95)
-            ),
+            Main = {
+                Color3.fromRGB(55, 10, 95),
+                Color3.fromRGB(110, 25, 175),
+                Color3.fromRGB(190, 90, 255)
+            },
 
-            TopBar = Gradient(
-                RGB(75, 12, 125),
-                RGB(175, 55, 235),
-                RGB(75, 12, 125)
-            ),
+            TopBar = {
+                Color3.fromRGB(55, 10, 95),
+                Color3.fromRGB(145, 40, 220),
+                Color3.fromRGB(190, 90, 255)
+            },
 
-            Sidebar = Gradient(
-                RGB(35, 5, 65),
-                RGB(75, 15, 120)
-            ),
+            Sidebar = {
+                Color3.fromRGB(30, 5, 55),
+                Color3.fromRGB(80, 15, 135)
+            },
 
-            Element = Gradient(
-                RGB(100, 20, 165),
-                RGB(160, 45, 225)
-            ),
+            Element = {
+                Color3.fromRGB(80, 15, 135),
+                Color3.fromRGB(145, 40, 220)
+            },
 
-            Accent = Gradient(
-                RGB(190, 90, 255),
-                RGB(230, 155, 255),
-                RGB(130, 45, 200)
-            )
+            Accent = {
+                Color3.fromRGB(190, 90, 255),
+                Color3.fromRGB(220, 140, 255),
+                Color3.fromRGB(130, 45, 200)
+            }
         }
     },
 
-    ["Orange"] = {
-        Background = RGB(100, 40, 5),
-        Secondary = RGB(145, 60, 8),
-        Element = RGB(185, 80, 10),
-        Hover = RGB(220, 105, 15),
-        Pressed = RGB(235, 120, 20),
+    Orange = {
+        Name = "Orange",
 
-        Border = RGB(255, 145, 35),
-        BorderHover = RGB(255, 175, 70),
+        Background = Color3.fromRGB(100, 40, 5),
+        Secondary = Color3.fromRGB(145, 60, 8),
+        Element = Color3.fromRGB(185, 80, 10),
+        Hover = Color3.fromRGB(220, 105, 15),
+        Pressed = Color3.fromRGB(235, 120, 20),
 
-        Text = RGB(255, 255, 255),
-        SubText = RGB(245, 220, 195),
-        MutedText = RGB(195, 150, 115),
+        Border = Color3.fromRGB(255, 145, 35),
+        BorderHover = Color3.fromRGB(255, 180, 75),
 
-        Accent = RGB(255, 155, 50),
-        AccentDark = RGB(205, 100, 25),
-        AccentHover = RGB(255, 180, 85),
-        AccentText = RGB(45, 18, 3),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(245, 220, 195),
+        MutedText = Color3.fromRGB(205, 160, 115),
 
-        Success = RGB(80, 200, 120),
-        Warning = RGB(255, 180, 50),
-        Error = RGB(220, 70, 70),
-        Info = RGB(80, 160, 220),
+        Accent = Color3.fromRGB(255, 155, 50),
+        AccentDark = Color3.fromRGB(205, 100, 25),
+        AccentHover = Color3.fromRGB(255, 185, 90),
+        AccentText = Color3.fromRGB(50, 20, 5),
 
-        Tab = RGB(110, 42, 5),
-        TabHover = RGB(175, 75, 10),
-        TabSelected = RGB(220, 105, 15),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(255, 190, 60),
+        Error = Color3.fromRGB(220, 70, 70),
+        Info = Color3.fromRGB(80, 160, 220),
 
-        Button = RGB(185, 80, 10),
-        ButtonHover = RGB(220, 105, 15),
-        ButtonPressed = RGB(235, 120, 20),
+        Tab = Color3.fromRGB(115, 45, 5),
+        TabHover = Color3.fromRGB(180, 75, 10),
+        TabSelected = Color3.fromRGB(220, 105, 15),
 
-        ToggleOff = RGB(90, 30, 5),
-        ToggleOn = RGB(255, 155, 50),
-        ToggleCircle = RGB(255, 240, 215),
+        Button = Color3.fromRGB(185, 80, 10),
+        ButtonHover = Color3.fromRGB(220, 105, 15),
+        ButtonPressed = Color3.fromRGB(235, 120, 20),
 
-        Input = RGB(55, 20, 3),
-        InputHover = RGB(115, 45, 7),
-        InputFocus = RGB(255, 155, 50),
+        ToggleOff = Color3.fromRGB(115, 45, 5),
+        ToggleOn = Color3.fromRGB(255, 155, 50),
+        ToggleCircle = Color3.fromRGB(255, 235, 205),
 
-        Dropdown = RGB(55, 20, 3),
-        DropdownHover = RGB(135, 55, 8),
-        DropdownSelected = RGB(255, 155, 50),
+        Input = Color3.fromRGB(55, 20, 5),
+        InputHover = Color3.fromRGB(125, 50, 8),
+        InputFocus = Color3.fromRGB(255, 155, 50),
 
-        SliderBackground = RGB(120, 50, 8),
-        SliderFill = RGB(255, 155, 50),
-        SliderKnob = RGB(255, 195, 100),
+        Dropdown = Color3.fromRGB(55, 20, 5),
+        DropdownHover = Color3.fromRGB(135, 55, 8),
+        DropdownSelected = Color3.fromRGB(255, 155, 50),
 
-        PopupBackground = RGB(75, 28, 4),
-        PopupBorder = RGB(255, 145, 35),
+        SliderBackground = Color3.fromRGB(120, 50, 8),
+        SliderFill = Color3.fromRGB(255, 155, 50),
+        SliderKnob = Color3.fromRGB(255, 190, 90),
 
-        NotificationBackground = RGB(90, 35, 5),
-        NotificationBorder = RGB(255, 155, 50),
+        PopupBackground = Color3.fromRGB(45, 15, 3),
+        PopupBorder = Color3.fromRGB(255, 145, 35),
 
-        Scrollbar = RGB(255, 155, 50),
+        NotificationBackground = Color3.fromRGB(65, 25, 4),
+        NotificationBorder = Color3.fromRGB(255, 155, 50),
+
+        Scrollbar = Color3.fromRGB(255, 155, 50),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -747,100 +714,98 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(100, 40, 5),
-                RGB(175, 70, 10),
-                RGB(100, 40, 5)
-            ),
+            Main = {
+                Color3.fromRGB(100, 40, 5),
+                Color3.fromRGB(185, 80, 10),
+                Color3.fromRGB(255, 155, 50)
+            },
 
-            TopBar = Gradient(
-                RGB(120, 45, 5),
-                RGB(240, 115, 20),
-                RGB(120, 45, 5)
-            ),
+            TopBar = {
+                Color3.fromRGB(100, 40, 5),
+                Color3.fromRGB(220, 105, 15),
+                Color3.fromRGB(255, 155, 50)
+            },
 
-            Sidebar = Gradient(
-                RGB(60, 20, 3),
-                RGB(120, 45, 5)
-            ),
+            Sidebar = {
+                Color3.fromRGB(55, 20, 5),
+                Color3.fromRGB(120, 50, 8)
+            },
 
-            Element = Gradient(
-                RGB(175, 70, 8),
-                RGB(225, 115, 20)
-            ),
+            Element = {
+                Color3.fromRGB(145, 60, 8),
+                Color3.fromRGB(220, 105, 15)
+            },
 
-            Accent = Gradient(
-                RGB(255, 155, 50),
-                RGB(255, 205, 120),
-                RGB(205, 100, 25)
-            )
+            Accent = {
+                Color3.fromRGB(255, 155, 50),
+                Color3.fromRGB(255, 200, 100),
+                Color3.fromRGB(205, 100, 25)
+            }
         }
     },
 
-    ["Halloween"] = {
-        Background = RGB(20, 7, 25),
-        Secondary = RGB(40, 10, 48),
-        Element = RGB(68, 17, 72),
-        Hover = RGB(105, 25, 95),
-        Pressed = RGB(135, 35, 115),
+    Halloween = {
+        Name = "Halloween",
 
-        Border = RGB(145, 45, 155),
-        BorderHover = RGB(200, 70, 200),
+        Background = Color3.fromRGB(20, 7, 25),
+        Secondary = Color3.fromRGB(40, 10, 48),
+        Element = Color3.fromRGB(68, 17, 72),
+        Hover = Color3.fromRGB(105, 25, 95),
+        Pressed = Color3.fromRGB(135, 35, 115),
 
-        Text = RGB(255, 245, 225),
-        SubText = RGB(225, 195, 215),
-        MutedText = RGB(170, 135, 165),
+        Border = Color3.fromRGB(145, 45, 155),
+        BorderHover = Color3.fromRGB(200, 70, 200),
 
-        Accent = RGB(255, 115, 0),
-        AccentDark = RGB(195, 55, 0),
-        AccentHover = RGB(255, 155, 20),
-        AccentText = RGB(35, 10, 5),
+        Text = Color3.fromRGB(255, 245, 225),
+        SubText = Color3.fromRGB(225, 195, 215),
+        MutedText = Color3.fromRGB(170, 135, 165),
 
-        Success = RGB(100, 220, 110),
-        Warning = RGB(255, 150, 0),
-        Error = RGB(230, 60, 70),
-        Info = RGB(150, 80, 220),
+        Accent = Color3.fromRGB(255, 115, 0),
+        AccentDark = Color3.fromRGB(195, 55, 0),
+        AccentHover = Color3.fromRGB(255, 155, 20),
+        AccentText = Color3.fromRGB(35, 10, 5),
 
-        Tab = RGB(38, 10, 45),
-        TabHover = RGB(80, 20, 80),
-        TabSelected = RGB(120, 30, 105),
+        Success = Color3.fromRGB(100, 210, 120),
+        Warning = Color3.fromRGB(255, 175, 50),
+        Error = Color3.fromRGB(220, 65, 60),
+        Info = Color3.fromRGB(120, 100, 220),
 
-        Button = RGB(68, 17, 72),
-        ButtonHover = RGB(105, 25, 95),
-        ButtonPressed = RGB(140, 35, 115),
+        Tab = Color3.fromRGB(38, 10, 45),
+        TabHover = Color3.fromRGB(80, 20, 80),
+        TabSelected = Color3.fromRGB(120, 30, 105),
 
-        ToggleOff = RGB(45, 10, 48),
-        ToggleOn = RGB(255, 115, 0),
-        ToggleCircle = RGB(255, 240, 210),
+        Button = Color3.fromRGB(68, 17, 72),
+        ButtonHover = Color3.fromRGB(105, 25, 95),
+        ButtonPressed = Color3.fromRGB(140, 35, 115),
 
-        Input = RGB(28, 8, 34),
-        InputHover = RGB(55, 13, 60),
-        InputFocus = RGB(255, 115, 0),
+        ToggleOff = Color3.fromRGB(45, 10, 48),
+        ToggleOn = Color3.fromRGB(255, 115, 0),
+        ToggleCircle = Color3.fromRGB(255, 240, 210),
 
-        Dropdown = RGB(28, 8, 34),
-        DropdownHover = RGB(70, 18, 72),
-        DropdownSelected = RGB(255, 115, 0),
+        Input = Color3.fromRGB(28, 8, 34),
+        InputHover = Color3.fromRGB(55, 13, 60),
+        InputFocus = Color3.fromRGB(255, 115, 0),
 
-        SliderBackground = RGB(48, 12, 52),
-        SliderFill = RGB(255, 115, 0),
-        SliderKnob = RGB(255, 165, 30),
+        Dropdown = Color3.fromRGB(28, 8, 34),
+        DropdownHover = Color3.fromRGB(70, 18, 72),
+        DropdownSelected = Color3.fromRGB(255, 115, 0),
 
-        PopupBackground = RGB(25, 7, 30),
-        PopupBorder = RGB(180, 55, 150),
+        SliderBackground = Color3.fromRGB(48, 12, 52),
+        SliderFill = Color3.fromRGB(255, 115, 0),
+        SliderKnob = Color3.fromRGB(255, 165, 30),
 
-        NotificationBackground = RGB(30, 8, 36),
-        NotificationBorder = RGB(255, 115, 0),
+        PopupBackground = Color3.fromRGB(25, 7, 30),
+        PopupBorder = Color3.fromRGB(180, 55, 150),
 
-        Scrollbar = RGB(255, 115, 0),
+        NotificationBackground = Color3.fromRGB(30, 8, 36),
+        NotificationBorder = Color3.fromRGB(255, 115, 0),
+
+        Scrollbar = Color3.fromRGB(255, 115, 0),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -869,101 +834,99 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(20, 7, 25),
-                RGB(55, 12, 60),
-                RGB(20, 7, 25)
-            ),
+            Main = {
+                Color3.fromRGB(38, 10, 45),
+                Color3.fromRGB(120, 30, 105),
+                Color3.fromRGB(255, 115, 0)
+            },
 
-            TopBar = Gradient(
-                RGB(40, 8, 48),
-                RGB(130, 25, 100),
-                RGB(255, 115, 0)
-            ),
+            TopBar = {
+                Color3.fromRGB(45, 10, 55),
+                Color3.fromRGB(150, 35, 120),
+                Color3.fromRGB(255, 115, 0)
+            },
 
-            Sidebar = Gradient(
-                RGB(20, 5, 28),
-                RGB(65, 12, 70)
-            ),
+            Sidebar = {
+                Color3.fromRGB(20, 7, 25),
+                Color3.fromRGB(68, 17, 72)
+            },
 
-            Element = Gradient(
-                RGB(68, 17, 72),
-                RGB(130, 30, 105),
-                RGB(210, 65, 20)
-            ),
+            Element = {
+                Color3.fromRGB(68, 17, 72),
+                Color3.fromRGB(140, 35, 115),
+                Color3.fromRGB(255, 115, 0)
+            },
 
-            Accent = Gradient(
-                RGB(255, 115, 0),
-                RGB(255, 180, 25),
-                RGB(150, 30, 150)
-            )
+            Accent = {
+                Color3.fromRGB(255, 165, 30),
+                Color3.fromRGB(255, 115, 0),
+                Color3.fromRGB(170, 35, 140)
+            }
         }
     },
 
     ["Roman Reigns"] = {
-        Background = RGB(5, 9, 10),
-        Secondary = RGB(8, 25, 24),
-        Element = RGB(12, 47, 43),
-        Hover = RGB(20, 70, 64),
-        Pressed = RGB(27, 88, 79),
+        Name = "Roman Reigns",
 
-        Border = RGB(52, 110, 98),
-        BorderHover = RGB(82, 145, 125),
+        Background = Color3.fromRGB(5, 9, 10),
+        Secondary = Color3.fromRGB(8, 25, 24),
+        Element = Color3.fromRGB(12, 47, 43),
+        Hover = Color3.fromRGB(20, 70, 64),
+        Pressed = Color3.fromRGB(27, 88, 79),
 
-        Text = RGB(245, 245, 240),
-        SubText = RGB(190, 202, 197),
-        MutedText = RGB(125, 145, 140),
+        Border = Color3.fromRGB(52, 110, 98),
+        BorderHover = Color3.fromRGB(82, 145, 125),
 
-        Accent = RGB(215, 178, 75),
-        AccentDark = RGB(150, 115, 38),
-        AccentHover = RGB(240, 205, 105),
-        AccentText = RGB(20, 18, 10),
+        Text = Color3.fromRGB(245, 245, 240),
+        SubText = Color3.fromRGB(190, 202, 197),
+        MutedText = Color3.fromRGB(125, 145, 140),
 
-        Success = RGB(80, 190, 125),
-        Warning = RGB(230, 175, 60),
-        Error = RGB(190, 55, 50),
-        Info = RGB(70, 145, 160),
+        Accent = Color3.fromRGB(215, 178, 75),
+        AccentDark = Color3.fromRGB(150, 115, 38),
+        AccentHover = Color3.fromRGB(240, 205, 105),
+        AccentText = Color3.fromRGB(20, 18, 10),
 
-        Tab = RGB(7, 27, 26),
-        TabHover = RGB(16, 58, 53),
-        TabSelected = RGB(28, 82, 73),
+        Success = Color3.fromRGB(80, 190, 125),
+        Warning = Color3.fromRGB(230, 175, 60),
+        Error = Color3.fromRGB(190, 55, 50),
+        Info = Color3.fromRGB(70, 145, 160),
 
-        Button = RGB(12, 47, 43),
-        ButtonHover = RGB(20, 70, 64),
-        ButtonPressed = RGB(27, 88, 79),
+        Tab = Color3.fromRGB(7, 27, 26),
+        TabHover = Color3.fromRGB(16, 58, 53),
+        TabSelected = Color3.fromRGB(28, 82, 73),
 
-        ToggleOff = RGB(8, 35, 33),
-        ToggleOn = RGB(215, 178, 75),
-        ToggleCircle = RGB(245, 235, 200),
+        Button = Color3.fromRGB(12, 47, 43),
+        ButtonHover = Color3.fromRGB(20, 70, 64),
+        ButtonPressed = Color3.fromRGB(27, 88, 79),
 
-        Input = RGB(4, 17, 18),
-        InputHover = RGB(10, 40, 38),
-        InputFocus = RGB(215, 178, 75),
+        ToggleOff = Color3.fromRGB(8, 35, 33),
+        ToggleOn = Color3.fromRGB(215, 178, 75),
+        ToggleCircle = Color3.fromRGB(245, 235, 200),
 
-        Dropdown = RGB(4, 17, 18),
-        DropdownHover = RGB(12, 48, 45),
-        DropdownSelected = RGB(215, 178, 75),
+        Input = Color3.fromRGB(4, 17, 18),
+        InputHover = Color3.fromRGB(10, 40, 38),
+        InputFocus = Color3.fromRGB(215, 178, 75),
 
-        SliderBackground = RGB(10, 38, 36),
-        SliderFill = RGB(215, 178, 75),
-        SliderKnob = RGB(240, 205, 105),
+        Dropdown = Color3.fromRGB(4, 17, 18),
+        DropdownHover = Color3.fromRGB(12, 48, 45),
+        DropdownSelected = Color3.fromRGB(215, 178, 75),
 
-        PopupBackground = RGB(5, 14, 15),
-        PopupBorder = RGB(52, 110, 98),
+        SliderBackground = Color3.fromRGB(10, 38, 36),
+        SliderFill = Color3.fromRGB(215, 178, 75),
+        SliderKnob = Color3.fromRGB(240, 205, 105),
 
-        NotificationBackground = RGB(7, 22, 22),
-        NotificationBorder = RGB(215, 178, 75),
+        PopupBackground = Color3.fromRGB(5, 14, 15),
+        PopupBorder = Color3.fromRGB(52, 110, 98),
 
-        Scrollbar = RGB(215, 178, 75),
+        NotificationBackground = Color3.fromRGB(7, 22, 22),
+        NotificationBorder = Color3.fromRGB(215, 178, 75),
+
+        Scrollbar = Color3.fromRGB(215, 178, 75),
 
         Transparency = {
             Main = 0,
-            TopBar = 0,
-            Sidebar = 0,
+            Secondary = 0,
             Element = 0,
-            Button = 0,
-            Input = 0,
-            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -992,34 +955,34 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
-            Main = Gradient(
-                RGB(5, 9, 10),
-                RGB(8, 35, 32),
-                RGB(5, 9, 10)
-            ),
+            Main = {
+                Color3.fromRGB(5, 9, 10),
+                Color3.fromRGB(12, 47, 43),
+                Color3.fromRGB(215, 178, 75)
+            },
 
-            TopBar = Gradient(
-                RGB(7, 27, 26),
-                RGB(28, 82, 73),
-                RGB(215, 178, 75)
-            ),
+            TopBar = {
+                Color3.fromRGB(5, 20, 20),
+                Color3.fromRGB(20, 70, 64),
+                Color3.fromRGB(215, 178, 75)
+            },
 
-            Sidebar = Gradient(
-                RGB(4, 17, 18),
-                RGB(10, 45, 40)
-            ),
+            Sidebar = {
+                Color3.fromRGB(5, 14, 15),
+                Color3.fromRGB(8, 35, 33)
+            },
 
-            Element = Gradient(
-                RGB(12, 47, 43),
-                RGB(28, 82, 73),
-                RGB(150, 115, 38)
-            ),
+            Element = {
+                Color3.fromRGB(12, 47, 43),
+                Color3.fromRGB(20, 70, 64),
+                Color3.fromRGB(215, 178, 75)
+            },
 
-            Accent = Gradient(
-                RGB(215, 178, 75),
-                RGB(240, 205, 105),
-                RGB(150, 115, 38)
-            )
+            Accent = {
+                Color3.fromRGB(240, 205, 105),
+                Color3.fromRGB(215, 178, 75),
+                Color3.fromRGB(150, 115, 38)
+            }
         },
 
         Artwork = {
@@ -1042,71 +1005,15 @@ function Theme.IsAllowed(Name, Player)
         return true
     end
 
-    Player = Player or Players.LocalPlayer
-
-    return IsRomanReignsUser(Player)
-end
-
-function Theme.GetAccessMessage(Name)
-    if Name == "Roman Reigns" then
-        return "The Roman Reigns theme is private."
-    end
-
-    return nil
+    return IsRomanReignsUser(Player or Players.LocalPlayer)
 end
 
 function Theme.Get(Name, Player)
-    local SelectedTheme = Theme.BuiltIn[Name]
-
-    if not SelectedTheme then
-        return nil
+    if not Theme.IsAllowed(Name, Player) then
+        return Theme.BuiltIn.Default
     end
 
-    if not Theme.IsAllowed(Name, Player or Players.LocalPlayer) then
-        return nil
-    end
-
-    return SelectedTheme
-end
-
-function Theme.Exists(Name)
-    return Theme.BuiltIn[Name] ~= nil
-end
-
-function Theme.Register(Name, Data)
-    if type(Name) ~= "string" then
-        return false
-    end
-
-    if type(Data) ~= "table" then
-        return false
-    end
-
-    if Theme.IsPrivate(Name) then
-        return false
-    end
-
-    Theme.BuiltIn[Name] = Data
-
-    return true
-end
-
-function Theme.Remove(Name)
-    if Name == "Default" then
-        return false
-    end
-
-    if Theme.IsPrivate(Name) then
-        return false
-    end
-
-    if not Theme.BuiltIn[Name] then
-        return false
-    end
-
-    Theme.BuiltIn[Name] = nil
-
-    return true
+    return Theme.BuiltIn[Name]
 end
 
 function Theme.List(Player)
@@ -1120,79 +1027,28 @@ function Theme.List(Player)
         end
     end
 
-    table.sort(List)
+    table.sort(List, function(A, B)
+        if A == "Default" then
+            return true
+        end
+
+        if B == "Default" then
+            return false
+        end
+
+        return A < B
+    end)
 
     return List
 end
 
-function Theme.GetGradient(Name, GradientName, Player)
-    local SelectedTheme = Theme.Get(Name, Player)
-
-    if not SelectedTheme then
-        return nil
-    end
-
-    if not SelectedTheme.Gradients then
-        return nil
-    end
-
-    return SelectedTheme.Gradients[GradientName]
+function Theme.Exists(Name, Player)
+    return Theme.BuiltIn[Name] ~= nil
+        and Theme.IsAllowed(Name, Player)
 end
 
-function Theme.HasGradient(Name, GradientName, Player)
-    return Theme.GetGradient(Name, GradientName, Player) ~= nil
-end
-
-function Theme.GetColor(Name, ColorName, Player)
-    local SelectedTheme = Theme.Get(Name, Player)
-
-    if not SelectedTheme then
-        return nil
-    end
-
-    return SelectedTheme[ColorName]
-end
-
-function Theme.GetTransparency(Name, ObjectName, Player)
-    local SelectedTheme = Theme.Get(Name, Player)
-
-    if not SelectedTheme then
-        return nil
-    end
-
-    if not SelectedTheme.Transparency then
-        return nil
-    end
-
-    return SelectedTheme.Transparency[ObjectName]
-end
-
-function Theme.GetCorner(Name, ObjectName, Player)
-    local SelectedTheme = Theme.Get(Name, Player)
-
-    if not SelectedTheme then
-        return nil
-    end
-
-    if not SelectedTheme.Corners then
-        return nil
-    end
-
-    return SelectedTheme.Corners[ObjectName]
-end
-
-function Theme.GetEffect(Name, EffectName, Player)
-    local SelectedTheme = Theme.Get(Name, Player)
-
-    if not SelectedTheme then
-        return nil
-    end
-
-    if not SelectedTheme.Effects then
-        return nil
-    end
-
-    return SelectedTheme.Effects[EffectName]
+function Theme.GetNames(Player)
+    return Theme.List(Player)
 end
 
 return Theme
