@@ -100,7 +100,7 @@ Theme.BuiltIn = {
 
         SliderBackground = RGB(55, 55, 55),
         SliderFill = RGB(255, 255, 255),
-        SliderKnob = RGB(255, 255, 255),
+        SliderKnob = RGB(255, 255, 255, 255),
 
         PopupBackground = RGB(35, 35, 35),
         PopupBorder = RGB(140, 140, 140),
@@ -860,20 +860,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 45,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(20, 7, 25)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.45,
-                        RGB(65, 10, 65)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(110, 28, 5)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(20, 7, 25)),
+                    ColorSequenceKeypoint.new(0.45, RGB(65, 10, 65)),
+                    ColorSequenceKeypoint.new(1, RGB(110, 28, 5))
                 })
             },
 
@@ -881,20 +870,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 0,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(65, 12, 75)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(120, 25, 100)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(220, 70, 0)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(65, 12, 75)),
+                    ColorSequenceKeypoint.new(0.5, RGB(120, 25, 100)),
+                    ColorSequenceKeypoint.new(1, RGB(220, 70, 0))
                 })
             },
 
@@ -902,20 +880,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 90,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(30, 7, 38)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(70, 12, 75)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(100, 25, 65)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(30, 7, 38)),
+                    ColorSequenceKeypoint.new(0.5, RGB(70, 12, 75)),
+                    ColorSequenceKeypoint.new(1, RGB(100, 25, 65))
                 })
             },
 
@@ -923,20 +890,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 45,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(65, 15, 70)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(115, 25, 100)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(180, 55, 10)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(65, 15, 70)),
+                    ColorSequenceKeypoint.new(0.5, RGB(115, 25, 100)),
+                    ColorSequenceKeypoint.new(1, RGB(180, 55, 10))
                 })
             },
 
@@ -944,20 +900,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 90,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(255, 185, 40)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(255, 105, 0)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(160, 30, 150)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(255, 185, 40)),
+                    ColorSequenceKeypoint.new(0.5, RGB(255, 105, 0)),
+                    ColorSequenceKeypoint.new(1, RGB(160, 30, 150))
                 })
             }
         }
@@ -1059,20 +1004,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 45,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(5, 9, 10)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.45,
-                        RGB(8, 35, 32)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(18, 55, 48)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(5, 9, 10)),
+                    ColorSequenceKeypoint.new(0.45, RGB(8, 35, 32)),
+                    ColorSequenceKeypoint.new(1, RGB(18, 55, 48))
                 })
             },
 
@@ -1080,20 +1014,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 0,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(8, 25, 24)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(70, 55, 20)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(215, 178, 75)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(8, 25, 24)),
+                    ColorSequenceKeypoint.new(0.5, RGB(70, 55, 20)),
+                    ColorSequenceKeypoint.new(1, RGB(215, 178, 75))
                 })
             },
 
@@ -1101,15 +1024,8 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 90,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(5, 18, 18)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(10, 45, 41)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(5, 18, 18)),
+                    ColorSequenceKeypoint.new(1, RGB(10, 45, 41))
                 })
             },
 
@@ -1117,20 +1033,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 45,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(12, 47, 43)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(35, 85, 73)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(150, 115, 38)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(12, 47, 43)),
+                    ColorSequenceKeypoint.new(0.5, RGB(35, 85, 73)),
+                    ColorSequenceKeypoint.new(1, RGB(150, 115, 38))
                 })
             },
 
@@ -1138,20 +1043,9 @@ Theme.BuiltIn = {
                 Enabled = true,
                 Rotation = 90,
                 Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(
-                        0,
-                        RGB(240, 205, 105)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        0.5,
-                        RGB(215, 178, 75)
-                    ),
-
-                    ColorSequenceKeypoint.new(
-                        1,
-                        RGB(150, 115, 38)
-                    )
+                    ColorSequenceKeypoint.new(0, RGB(240, 205, 105)),
+                    ColorSequenceKeypoint.new(0.5, RGB(215, 178, 75)),
+                    ColorSequenceKeypoint.new(1, RGB(150, 115, 38))
                 })
             }
         },
@@ -1216,7 +1110,9 @@ function Theme:Register(Name, Data)
         "Theme data must be a table"
     )
 
-    if Name == "Roman Reigns" and not IsRomanReignsUser() then
+    if Name == "Roman Reigns"
+        and not IsRomanReignsUser(Players.LocalPlayer) then
+
         warn(
             "[OTC Hub] Roman Reigns theme is private."
         )
@@ -1231,6 +1127,7 @@ end
 
 function Theme:Remove(Name)
     if Name == "Roman Reigns" then
+
         warn(
             "[OTC Hub] The Roman Reigns theme is private."
         )
@@ -1243,6 +1140,7 @@ function Theme:Remove(Name)
     end
 
     if Name == "Default" then
+
         warn(
             "[OTC Hub] The Default theme cannot be removed."
         )
@@ -1261,7 +1159,9 @@ function Theme:List(Player)
     Player = Player or Players.LocalPlayer
 
     for Name in pairs(self.BuiltIn) do
+
         if self:IsAllowed(Name, Player) then
+
             table.insert(
                 Themes,
                 Name
@@ -1314,6 +1214,7 @@ function Theme:GetTransparency(Name, ObjectName, Player)
 
     if not ThemeData
         or not ThemeData.Transparency then
+
         return 0
     end
 
@@ -1325,6 +1226,7 @@ function Theme:GetCorner(Name, ObjectName, Player)
 
     if not ThemeData
         or not ThemeData.Corners then
+
         return 8
     end
 
@@ -1336,6 +1238,7 @@ function Theme:GetEffect(Name, EffectName, Player)
 
     if not ThemeData
         or not ThemeData.Effects then
+
         return false
     end
 
