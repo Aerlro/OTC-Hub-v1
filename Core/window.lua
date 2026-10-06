@@ -9,12 +9,116 @@ local LocalPlayer = Players.LocalPlayer
 
 local LOGO_ASSET = "rbxassetid://104463753775983"
 
-local function Tween(Object, Info, Properties)
-    local TweenObject = TweenService:Create(
-        Object,
-        Info,
-        Properties
+local ROMAN_REIGNS_IMAGE =
+    "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/Owner/db009abe18bb20e9192664f442bcb41a.jpg"
+
+local ROMAN_REIGNS_USERNAME =
+    "romansmkboss"
+
+local function IsRomanReignsTheme(Name)
+    return Name == "Roman Reigns"
+end
+
+local function IsRomanReignsAllowed()
+    if not LocalPlayer then
+        return false
+    end
+
+    return string.lower(
+        LocalPlayer.Name
+    ) == string.lower(
+        ROMAN_REIGNS_USERNAME
     )
+end
+
+local function GetRomanReignsAsset()
+
+    if not IsRomanReignsAllowed() then
+        return nil
+    end
+
+    if not writefile
+        or not isfile
+        or not getcustomasset then
+
+        return nil
+    end
+
+    local Folder =
+        "OTC-Hub-v1"
+
+    local File =
+        Folder .. "/roman_reigns.jpg"
+
+    pcall(function()
+
+        if isfolder
+            and not isfolder(Folder) then
+
+            makefolder(Folder)
+
+        end
+
+    end)
+
+    if not isfile(File) then
+
+        local Success, Data =
+            pcall(function()
+
+                return game:HttpGet(
+                    ROMAN_REIGNS_IMAGE
+                )
+
+            end)
+
+        if not Success
+            or not Data
+            or Data == "" then
+
+            return nil
+        end
+
+        local WriteSuccess =
+            pcall(function()
+
+                writefile(
+                    File,
+                    Data
+                )
+
+            end)
+
+        if not WriteSuccess then
+            return nil
+        end
+
+    end
+
+    local Success, Asset =
+        pcall(function()
+
+            return getcustomasset(
+                File
+            )
+
+        end)
+
+    if Success then
+        return Asset
+    end
+
+    return nil
+end
+
+local function Tween(Object, Info, Properties)
+
+    local TweenObject =
+        TweenService:Create(
+            Object,
+            Info,
+            Properties
+        )
 
     TweenObject:Play()
 
@@ -22,18 +126,29 @@ local function Tween(Object, Info, Properties)
 end
 
 local function GetTheme(Object)
-    return Object.OTC._Themes[Object.OTC.CurrentTheme]
-        or Object.OTC._Themes[Object.Theme]
-        or Object.OTC._Themes.Default
+
+    return Object.OTC._Themes[
+        Object.OTC.CurrentTheme
+    ]
+
+    or Object.OTC._Themes[
+        Object.Theme
+    ]
+
+    or Object.OTC._Themes.Default
+
 end
 
 local function ApplyGradient(Object, GradientData)
+
     if not Object or not GradientData then
         return nil
     end
 
     local Existing =
-        Object:FindFirstChild("OTCGradient")
+        Object:FindFirstChild(
+            "OTCGradient"
+        )
 
     if Existing then
         Existing:Destroy()
@@ -65,7 +180,10 @@ local function ApplyGradient(Object, GradientData)
 end
 
 local function ApplyCorner(Object, Radius)
-    if not Object or Radius == nil then
+
+    if not Object
+        or Radius == nil then
+
         return
     end
 
@@ -75,17 +193,24 @@ local function ApplyCorner(Object, Radius)
         )
 
     if Corner then
+
         Corner.CornerRadius =
             UDim.new(
                 0,
                 Radius
             )
+
     end
 end
 
-local function ApplyStroke(StrokeObject, ThemeData)
+local function ApplyStroke(
+    StrokeObject,
+    ThemeData
+)
+
     if not StrokeObject
         or not ThemeData then
+
         return
     end
 
@@ -106,9 +231,13 @@ local function ApplyStroke(StrokeObject, ThemeData)
         Stroke.Transparency or 0
 end
 
-function Window.Create(Settings, OTC)
+function Window.Create(
+    Settings,
+    OTC
+)
 
-    Settings = Settings or {}
+    Settings =
+        Settings or {}
 
     local ThemeName =
         Settings.Theme
@@ -119,22 +248,46 @@ function Window.Create(Settings, OTC)
         ThemeName = "Default"
     end
 
+    if IsRomanReignsTheme(
+        ThemeName
+    ) and not IsRomanReignsAllowed() then
+
+        ThemeName =
+            "Default"
+
+    end
+
     local Object = {}
 
-    Object.OTC = OTC
-    Object.Theme = ThemeName
+    Object.OTC =
+        OTC
+
+    Object.Theme =
+        ThemeName
 
     Object.ToggleKey =
         Settings.ToggleKey
         or Enum.KeyCode.RightControl
 
     Object.Tabs = {}
-    Object.SelectedTab = nil
-    Object.Minimized = false
-    Object.Closed = false
-    Object.UnloadConfirmation = nil
-    Object.VersionPopup = nil
-    Object.ThemeGradients = {}
+
+    Object.SelectedTab =
+        nil
+
+    Object.Minimized =
+        false
+
+    Object.Closed =
+        false
+
+    Object.UnloadConfirmation =
+        nil
+
+    Object.VersionPopup =
+        nil
+
+    Object.ThemeGradients =
+        {}
 
     local Theme =
         GetTheme(Object)
@@ -155,15 +308,19 @@ function Window.Create(Settings, OTC)
         true
 
     pcall(function()
+
         ScreenGui.Parent =
             CoreGui
+
     end)
 
     if not ScreenGui.Parent then
+
         ScreenGui.Parent =
             LocalPlayer:WaitForChild(
                 "PlayerGui"
             )
+
     end
 
     Object.ScreenGui =
@@ -246,6 +403,66 @@ function Window.Create(Settings, OTC)
 
     Object.MainStroke =
         MainStroke
+
+    local RomanArtwork =
+        Instance.new("ImageLabel")
+
+    RomanArtwork.Name =
+        "RomanReignsArtwork"
+
+    RomanArtwork.Size =
+        UDim2.new(
+            0,
+            300,
+            0,
+            300
+        )
+
+    RomanArtwork.Position =
+        UDim2.new(
+            1,
+            -315,
+            1,
+            -315
+        )
+
+    RomanArtwork.BackgroundTransparency =
+        1
+
+    RomanArtwork.BorderSizePixel =
+        0
+
+    RomanArtwork.ImageTransparency =
+        0.72
+
+    RomanArtwork.ScaleType =
+        Enum.ScaleType.Fit
+
+    RomanArtwork.Active =
+        false
+
+    RomanArtwork.Selectable =
+        false
+
+    RomanArtwork.Visible =
+        false
+
+    RomanArtwork.ZIndex =
+        1
+
+    RomanArtwork.Parent =
+        Main
+
+    local RomanAsset =
+        GetRomanReignsAsset()
+
+    if RomanAsset then
+        RomanArtwork.Image =
+            RomanAsset
+    end
+
+    Object.RomanArtwork =
+        RomanArtwork
 
     local TopBar =
         Instance.new("Frame")
@@ -915,9 +1132,11 @@ function Window.Create(Settings, OTC)
             ]
 
         if not CurrentUpdates then
+
             CurrentUpdates = {
                 "No changelog available for this version."
             }
+
         end
 
         for Index, UpdateText in ipairs(
@@ -1087,9 +1306,7 @@ function Window.Create(Settings, OTC)
 
     VersionTag.MouseButton1Click:Connect(
         function()
-
             CreateVersionPopup()
-
         end
     )
 
@@ -1715,35 +1932,47 @@ function Window.Create(Settings, OTC)
     Object.MiniButton =
         MiniButton
 
-    local Dragging = false
+    local Dragging =
+        false
+
     local DragStart
     local StartPosition
 
-    TopBar.InputBegan:Connect(function(Input)
+    TopBar.InputBegan:Connect(
+        function(Input)
 
-        if Input.UserInputType ==
-            Enum.UserInputType.MouseButton1
-            or Input.UserInputType ==
-            Enum.UserInputType.Touch then
+            if Input.UserInputType ==
+                Enum.UserInputType.MouseButton1
+                or Input.UserInputType ==
+                Enum.UserInputType.Touch then
 
-            Dragging = true
-            DragStart = Input.Position
-            StartPosition = Main.Position
+                Dragging =
+                    true
 
-            Input.Changed:Connect(function()
+                DragStart =
+                    Input.Position
 
-                if Input.UserInputState ==
-                    Enum.UserInputState.End then
+                StartPosition =
+                    Main.Position
 
-                    Dragging = false
+                Input.Changed:Connect(
+                    function()
 
-                end
+                        if Input.UserInputState ==
+                            Enum.UserInputState.End then
 
-            end)
+                            Dragging =
+                                false
+
+                        end
+
+                    end
+                )
+
+            end
 
         end
-
-    end)
+    )
 
     UserInputService.InputChanged:Connect(
         function(Input)
@@ -1775,7 +2004,9 @@ function Window.Create(Settings, OTC)
         end
     )
 
-    local MiniDragging = false
+    local MiniDragging =
+        false
+
     local MiniDragStart
     local MiniStartPosition
 
@@ -1787,7 +2018,9 @@ function Window.Create(Settings, OTC)
                 or Input.UserInputType ==
                 Enum.UserInputType.Touch then
 
-                MiniDragging = true
+                MiniDragging =
+                    true
+
                 MiniDragStart =
                     Input.Position
 
@@ -1800,7 +2033,8 @@ function Window.Create(Settings, OTC)
                         if Input.UserInputState ==
                             Enum.UserInputState.End then
 
-                            MiniDragging = false
+                            MiniDragging =
+                                false
 
                         end
 
@@ -1862,7 +2096,20 @@ function Window.Create(Settings, OTC)
             return false
         end
 
+        if IsRomanReignsTheme(Name)
+            and not IsRomanReignsAllowed() then
+
+            warn(
+                "[OTC Hub] You don't have permission to use the Roman Reigns theme."
+            )
+
+            return false
+        end
+
         self.Theme =
+            Name
+
+        self.OTC.CurrentTheme =
             Name
 
         self:RefreshTheme()
@@ -1989,9 +2236,11 @@ function Window.Create(Settings, OTC)
             TabsContainer
 
         if not self.SelectedTab then
+
             self:SelectTab(
                 TabObject
             )
+
         end
 
     end
@@ -2016,8 +2265,10 @@ function Window.Create(Settings, OTC)
             TabObject
 
         if TabObject.Page then
+
             TabObject.Page.Visible =
                 true
+
         end
 
         for _, Tab in ipairs(
@@ -2043,8 +2294,12 @@ function Window.Create(Settings, OTC)
         end
 
         local CurrentTheme =
-            OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[Object.Theme]
+            OTC._Themes[
+                OTC.CurrentTheme
+            ]
+            or OTC._Themes[
+                Object.Theme
+            ]
             or OTC._Themes.Default
 
         local Overlay =
@@ -2473,6 +2728,7 @@ function Window.Create(Settings, OTC)
             function()
 
                 Overlay:Destroy()
+
                 Object.UnloadConfirmation =
                     nil
 
@@ -2505,6 +2761,18 @@ function Window.Create(Settings, OTC)
 
         local ThemeName =
             self.OTC.CurrentTheme
+
+        if IsRomanReignsTheme(
+            ThemeName
+        ) and not IsRomanReignsAllowed() then
+
+            ThemeName =
+                "Default"
+
+            self.OTC.CurrentTheme =
+                "Default"
+
+        end
 
         local NewTheme =
             self.OTC._Themes[
@@ -2758,6 +3026,65 @@ function Window.Create(Settings, OTC)
 
         MiniButton.ImageTransparency =
             0
+
+        if IsRomanReignsTheme(
+            ThemeName
+        ) and IsRomanReignsAllowed() then
+
+            local RomanAsset =
+                GetRomanReignsAsset()
+
+            if RomanAsset then
+
+                RomanArtwork.Image =
+                    RomanAsset
+
+                local Artwork =
+                    NewTheme.Artwork
+                    or {}
+
+                RomanArtwork.ImageTransparency =
+                    Artwork.ImageTransparency
+                    or 0.72
+
+                RomanArtwork.Size =
+                    Artwork.Size
+                    or UDim2.new(
+                        0,
+                        300,
+                        0,
+                        300
+                    )
+
+                RomanArtwork.Position =
+                    Artwork.Position
+                    or UDim2.new(
+                        1,
+                        -315,
+                        1,
+                        -315
+                    )
+
+                RomanArtwork.ZIndex =
+                    Artwork.ZIndex
+                    or 1
+
+                RomanArtwork.Visible =
+                    Artwork.Enabled ~= false
+
+            else
+
+                RomanArtwork.Visible =
+                    false
+
+            end
+
+        else
+
+            RomanArtwork.Visible =
+                false
+
+        end
 
         if Gradients.Main then
 
@@ -3199,7 +3526,9 @@ function Window.Create(Settings, OTC)
         if self.UnloadConfirmation then
 
             if self.UnloadConfirmation.Overlay then
+
                 self.UnloadConfirmation.Overlay:Destroy()
+
             end
 
             self.UnloadConfirmation =
@@ -3210,7 +3539,9 @@ function Window.Create(Settings, OTC)
         if self.VersionPopup then
 
             if self.VersionPopup.Overlay then
+
                 self.VersionPopup.Overlay:Destroy()
+
             end
 
             self.VersionPopup =
@@ -3218,8 +3549,19 @@ function Window.Create(Settings, OTC)
 
         end
 
+        if self.RomanArtwork then
+
+            self.RomanArtwork:Destroy()
+
+            self.RomanArtwork =
+                nil
+
+        end
+
         if self.ScreenGui then
+
             self.ScreenGui:Destroy()
+
         end
 
         for Index, WindowObject in pairs(
@@ -3227,7 +3569,10 @@ function Window.Create(Settings, OTC)
         ) do
 
             if WindowObject == self then
-                OTC._Windows[Index] = nil
+
+                OTC._Windows[Index] =
+                    nil
+
             end
 
         end
@@ -3238,7 +3583,9 @@ function Window.Create(Settings, OTC)
         Object
 
     if OTC._InitializeInput then
+
         OTC._InitializeInput()
+
     end
 
     if OTC._Animation
