@@ -7,8 +7,18 @@ local PRIVATE_THEME_USERS = {
     ["romansmkboss"] = true
 }
 
+local function GetCurrentPlayer()
+    local Player = Players.LocalPlayer
+
+    if Player then
+        return Player
+    end
+
+    return nil
+end
+
 local function IsRomanReignsUser(Player)
-    Player = Player or Players.LocalPlayer
+    Player = Player or GetCurrentPlayer()
 
     if not Player then
         return false
@@ -1005,7 +1015,9 @@ function Theme.IsAllowed(Name, Player)
         return true
     end
 
-    return IsRomanReignsUser(Player or Players.LocalPlayer)
+    Player = Player or GetCurrentPlayer()
+
+    return IsRomanReignsUser(Player)
 end
 
 function Theme.Get(Name, Player)
@@ -1017,12 +1029,15 @@ function Theme.Get(Name, Player)
 end
 
 function Theme.List(Player)
-    Player = Player or Players.LocalPlayer
+    Player = Player or GetCurrentPlayer()
+
+    print("[OTC DEBUG] LocalPlayer:", Players.LocalPlayer)
+    print("[OTC DEBUG] LocalPlayer.Name:", Players.LocalPlayer and Players.LocalPlayer.Name)
+    print("[OTC DEBUG] Player argument:", Player)
+    print("[OTC DEBUG] Player.Name:", Player and Player.Name)
+    print("[OTC DEBUG] Roman allowed:", Theme.IsAllowed("Roman Reigns", Player))
 
     local List = {}
-
-    print("[OTC DEBUG] Player:", Player.Name)
-    print("[OTC DEBUG] Roman exists:", Theme.BuiltIn["Roman Reigns"] ~= nil)
 
     for Name in pairs(Theme.BuiltIn) do
         print("[OTC DEBUG] Theme:", Name, "Allowed:", Theme.IsAllowed(Name, Player))
