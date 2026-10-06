@@ -1,14 +1,11 @@
---[[
-    OTC Hub v1
-    Advanced Theme System
-    by Aerlro
-]]
-
 local Theme = {}
 
 local Players = game:GetService("Players")
 
-local PRIVATE_THEME_USER = "romansmkboss"
+local PRIVATE_THEME_USERS = {
+    ["romansmkboss"] = true,
+    ["aerlro"] = true
+}
 
 local function RGB(R, G, B)
     return Color3.fromRGB(R, G, B)
@@ -16,48 +13,30 @@ end
 
 local function Gradient(...)
     local Colors = {...}
-    local Keypoints = {}
-
-    local Count = #Colors
-
-    for Index, Color in ipairs(Colors) do
-        local Position = (Index - 1) / math.max(Count - 1, 1)
-
-        table.insert(
-            Keypoints,
-            ColorSequenceKeypoint.new(
-                Position,
-                Color
-            )
-        )
-    end
 
     return {
-        Colors = ColorSequence.new(Keypoints),
-        Rotation = 0,
-        Enabled = true
+        Colors = Colors,
+        Rotation = 0
     }
 end
 
 local function IsRomanReignsUser(Player)
-    Player = Player or Players.LocalPlayer
-
     if not Player then
         return false
     end
 
-    return string.lower(Player.Name) == string.lower(PRIVATE_THEME_USER)
+    local Name = string.lower(Player.Name)
+
+    return PRIVATE_THEME_USERS[Name] == true
 end
 
 Theme.BuiltIn = {
 
-    --// DEFAULT
-    Default = {
+    ["Default"] = {
 
         Background = RGB(35, 35, 35),
         Secondary = RGB(55, 55, 55),
         Element = RGB(75, 75, 75),
-
         Hover = RGB(100, 100, 100),
         Pressed = RGB(120, 120, 120),
 
@@ -66,32 +45,32 @@ Theme.BuiltIn = {
 
         Text = RGB(255, 255, 255),
         SubText = RGB(220, 220, 220),
-        MutedText = RGB(165, 165, 165),
+        MutedText = RGB(160, 160, 160),
 
         Accent = RGB(255, 255, 255),
-        AccentDark = RGB(190, 190, 190),
+        AccentDark = RGB(200, 200, 200),
         AccentHover = RGB(255, 255, 255),
-        AccentText = RGB(30, 30, 30),
+        AccentText = RGB(25, 25, 25),
 
-        Success = RGB(80, 220, 120),
-        Warning = RGB(255, 190, 70),
-        Error = RGB(255, 75, 75),
-        Info = RGB(80, 160, 255),
+        Success = RGB(80, 200, 120),
+        Warning = RGB(240, 180, 70),
+        Error = RGB(220, 70, 70),
+        Info = RGB(80, 160, 220),
 
-        Tab = RGB(55, 55, 55),
-        TabHover = RGB(85, 85, 85),
+        Tab = RGB(45, 45, 45),
+        TabHover = RGB(75, 75, 75),
         TabSelected = RGB(100, 100, 100),
 
         Button = RGB(75, 75, 75),
         ButtonHover = RGB(100, 100, 100),
         ButtonPressed = RGB(120, 120, 120),
 
-        ToggleOff = RGB(55, 55, 55),
+        ToggleOff = RGB(60, 60, 60),
         ToggleOn = RGB(255, 255, 255),
-        ToggleCircle = RGB(240, 240, 240),
+        ToggleCircle = RGB(35, 35, 35),
 
         Input = RGB(45, 45, 45),
-        InputHover = RGB(60, 60, 60),
+        InputHover = RGB(65, 65, 65),
         InputFocus = RGB(255, 255, 255),
 
         Dropdown = RGB(45, 45, 45),
@@ -100,513 +79,530 @@ Theme.BuiltIn = {
 
         SliderBackground = RGB(55, 55, 55),
         SliderFill = RGB(255, 255, 255),
-        SliderKnob = RGB(255, 255, 255, 255),
+        SliderKnob = RGB(255, 255, 255),
 
-        PopupBackground = RGB(35, 35, 35),
-        PopupBorder = RGB(140, 140, 140),
+        PopupBackground = RGB(40, 40, 40),
+        PopupBorder = RGB(120, 120, 120),
 
         NotificationBackground = RGB(45, 45, 45),
-        NotificationBorder = RGB(140, 140, 140),
+        NotificationBorder = RGB(255, 255, 255),
 
-        Scrollbar = RGB(140, 140, 140),
+        Scrollbar = RGB(180, 180, 180),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
-            Glow = false,
+            Glow = true,
             Shadow = true,
-            Gradient = false,
-            AnimatedGradient = false
+            Gradient = true,
+            AnimatedGradient = true
         },
 
         Gradients = {
             Main = Gradient(
                 RGB(35, 35, 35),
-                RGB(55, 55, 55)
+                RGB(55, 55, 55),
+                RGB(35, 35, 35)
             ),
 
             TopBar = Gradient(
-                RGB(55, 55, 55),
-                RGB(75, 75, 75)
+                RGB(45, 45, 45),
+                RGB(80, 80, 80),
+                RGB(45, 45, 45)
             ),
 
             Sidebar = Gradient(
-                RGB(45, 45, 45),
-                RGB(60, 60, 60)
+                RGB(30, 30, 30),
+                RGB(50, 50, 50)
             ),
 
             Element = Gradient(
-                RGB(70, 70, 70),
+                RGB(65, 65, 65),
                 RGB(90, 90, 90)
             ),
 
             Accent = Gradient(
                 RGB(255, 255, 255),
-                RGB(190, 190, 190)
+                RGB(200, 200, 200),
+                RGB(255, 255, 255)
             )
         }
     },
 
-    --// RED
-    Red = {
-
+    ["Red"] = {
         Background = RGB(75, 10, 15),
         Secondary = RGB(115, 15, 22),
         Element = RGB(150, 22, 30),
-
         Hover = RGB(190, 30, 40),
-        Pressed = RGB(220, 45, 55),
+        Pressed = RGB(210, 40, 50),
 
         Border = RGB(230, 55, 65),
-        BorderHover = RGB(255, 90, 100),
+        BorderHover = RGB(255, 80, 90),
 
         Text = RGB(255, 255, 255),
-        SubText = RGB(255, 205, 205),
-        MutedText = RGB(220, 145, 145),
+        SubText = RGB(240, 210, 210),
+        MutedText = RGB(190, 140, 140),
 
         Accent = RGB(255, 65, 75),
         AccentDark = RGB(200, 30, 40),
-        AccentHover = RGB(255, 95, 105),
-        AccentText = RGB(255, 255, 255),
+        AccentHover = RGB(255, 90, 100),
+        AccentText = RGB(40, 5, 5),
 
-        Success = RGB(80, 230, 120),
-        Warning = RGB(255, 190, 60),
+        Success = RGB(80, 200, 120),
+        Warning = RGB(240, 180, 70),
         Error = RGB(255, 70, 70),
-        Info = RGB(90, 160, 255),
+        Info = RGB(80, 160, 220),
 
-        Tab = RGB(100, 12, 20),
-        TabHover = RGB(160, 20, 30),
-        TabSelected = RGB(200, 35, 45),
+        Tab = RGB(85, 12, 18),
+        TabHover = RGB(145, 22, 30),
+        TabSelected = RGB(190, 30, 40),
 
         Button = RGB(150, 22, 30),
         ButtonHover = RGB(190, 30, 40),
-        ButtonPressed = RGB(220, 45, 55),
+        ButtonPressed = RGB(215, 40, 50),
 
         ToggleOff = RGB(80, 15, 20),
         ToggleOn = RGB(255, 65, 75),
-        ToggleCircle = RGB(255, 240, 240),
+        ToggleCircle = RGB(255, 235, 235),
 
-        Input = RGB(55, 10, 15),
-        InputHover = RGB(85, 15, 22),
+        Input = RGB(55, 8, 12),
+        InputHover = RGB(105, 15, 20),
         InputFocus = RGB(255, 65, 75),
 
-        Dropdown = RGB(55, 10, 15),
-        DropdownHover = RGB(105, 15, 25),
+        Dropdown = RGB(55, 8, 12),
+        DropdownHover = RGB(115, 18, 25),
         DropdownSelected = RGB(255, 65, 75),
 
-        SliderBackground = RGB(80, 15, 20),
+        SliderBackground = RGB(90, 15, 20),
         SliderFill = RGB(255, 65, 75),
-        SliderKnob = RGB(255, 100, 105),
+        SliderKnob = RGB(255, 100, 110),
 
-        PopupBackground = RGB(65, 8, 14),
+        PopupBackground = RGB(65, 8, 13),
         PopupBorder = RGB(230, 55, 65),
 
-        NotificationBackground = RGB(75, 10, 15),
-        NotificationBorder = RGB(230, 55, 65),
+        NotificationBackground = RGB(70, 10, 15),
+        NotificationBorder = RGB(255, 65, 75),
 
-        Scrollbar = RGB(230, 55, 65),
+        Scrollbar = RGB(255, 65, 75),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
             Glow = true,
             Shadow = true,
             Gradient = true,
-            AnimatedGradient = false
+            AnimatedGradient = true
         },
 
         Gradients = {
             Main = Gradient(
                 RGB(75, 10, 15),
-                RGB(125, 15, 25),
-                RGB(65, 5, 10)
+                RGB(120, 15, 25),
+                RGB(75, 10, 15)
             ),
 
             TopBar = Gradient(
-                RGB(125, 15, 22),
-                RGB(190, 30, 40)
+                RGB(100, 10, 18),
+                RGB(220, 35, 45),
+                RGB(100, 10, 18)
             ),
 
             Sidebar = Gradient(
-                RGB(80, 10, 16),
-                RGB(130, 18, 25)
+                RGB(55, 5, 10),
+                RGB(100, 12, 18)
             ),
 
             Element = Gradient(
-                RGB(150, 22, 30),
-                RGB(200, 35, 45)
+                RGB(130, 15, 25),
+                RGB(210, 35, 45)
             ),
 
             Accent = Gradient(
-                RGB(255, 100, 110),
-                RGB(255, 40, 55)
+                RGB(255, 65, 75),
+                RGB(255, 110, 120),
+                RGB(200, 30, 40)
             )
         }
     },
 
-    --// GREEN
-    Green = {
-
+    ["Green"] = {
         Background = RGB(8, 70, 30),
         Secondary = RGB(10, 110, 45),
         Element = RGB(15, 145, 58),
-
         Hover = RGB(25, 185, 75),
-        Pressed = RGB(35, 215, 90),
+        Pressed = RGB(35, 205, 85),
 
         Border = RGB(55, 225, 105),
-        BorderHover = RGB(90, 255, 135),
+        BorderHover = RGB(85, 255, 130),
 
         Text = RGB(255, 255, 255),
-        SubText = RGB(200, 255, 215),
-        MutedText = RGB(140, 215, 165),
+        SubText = RGB(205, 235, 215),
+        MutedText = RGB(145, 185, 155),
 
         Accent = RGB(70, 255, 120),
         AccentDark = RGB(30, 195, 75),
         AccentHover = RGB(100, 255, 145),
-        AccentText = RGB(5, 45, 20),
+        AccentText = RGB(5, 35, 15),
 
-        Success = RGB(80, 255, 130),
-        Warning = RGB(255, 200, 60),
-        Error = RGB(255, 75, 75),
-        Info = RGB(80, 170, 255),
+        Success = RGB(70, 255, 120),
+        Warning = RGB(240, 180, 70),
+        Error = RGB(220, 70, 70),
+        Info = RGB(80, 180, 220),
 
-        Tab = RGB(10, 90, 38),
-        TabHover = RGB(20, 145, 60),
-        TabSelected = RGB(35, 190, 80),
+        Tab = RGB(10, 80, 35),
+        TabHover = RGB(20, 150, 60),
+        TabSelected = RGB(25, 190, 75),
 
         Button = RGB(15, 145, 58),
         ButtonHover = RGB(25, 185, 75),
-        ButtonPressed = RGB(35, 215, 90),
+        ButtonPressed = RGB(35, 210, 85),
 
-        ToggleOff = RGB(10, 80, 35),
+        ToggleOff = RGB(10, 70, 30),
         ToggleOn = RGB(70, 255, 120),
-        ToggleCircle = RGB(230, 255, 235),
+        ToggleCircle = RGB(225, 255, 235),
 
-        Input = RGB(6, 55, 25),
-        InputHover = RGB(10, 90, 38),
+        Input = RGB(5, 45, 20),
+        InputHover = RGB(10, 90, 35),
         InputFocus = RGB(70, 255, 120),
 
-        Dropdown = RGB(6, 55, 25),
-        DropdownHover = RGB(15, 100, 42),
+        Dropdown = RGB(5, 45, 20),
+        DropdownHover = RGB(15, 110, 45),
         DropdownSelected = RGB(70, 255, 120),
 
-        SliderBackground = RGB(10, 90, 38),
+        SliderBackground = RGB(15, 90, 40),
         SliderFill = RGB(70, 255, 120),
-        SliderKnob = RGB(110, 255, 150),
+        SliderKnob = RGB(110, 255, 155),
 
-        PopupBackground = RGB(7, 60, 26),
+        PopupBackground = RGB(7, 55, 25),
         PopupBorder = RGB(55, 225, 105),
 
-        NotificationBackground = RGB(8, 70, 30),
-        NotificationBorder = RGB(55, 225, 105),
+        NotificationBackground = RGB(8, 65, 30),
+        NotificationBorder = RGB(70, 255, 120),
 
-        Scrollbar = RGB(55, 225, 105),
+        Scrollbar = RGB(70, 255, 120),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
             Glow = true,
             Shadow = true,
             Gradient = true,
-            AnimatedGradient = false
+            AnimatedGradient = true
         },
 
         Gradients = {
             Main = Gradient(
                 RGB(8, 70, 30),
-                RGB(10, 120, 45),
-                RGB(5, 60, 25)
+                RGB(15, 120, 50),
+                RGB(8, 70, 30)
             ),
 
             TopBar = Gradient(
-                RGB(10, 110, 45),
-                RGB(25, 185, 75)
+                RGB(10, 100, 40),
+                RGB(50, 220, 100),
+                RGB(10, 100, 40)
             ),
 
             Sidebar = Gradient(
-                RGB(8, 80, 35),
-                RGB(12, 135, 55)
+                RGB(5, 50, 20),
+                RGB(10, 100, 40)
             ),
 
             Element = Gradient(
-                RGB(15, 145, 58),
-                RGB(35, 205, 85)
+                RGB(15, 135, 55),
+                RGB(30, 200, 80)
             ),
 
             Accent = Gradient(
-                RGB(110, 255, 150),
-                RGB(40, 225, 95)
+                RGB(70, 255, 120),
+                RGB(130, 255, 165),
+                RGB(30, 195, 75)
             )
         }
     },
 
-    --// BLUE
-    Blue = {
-
+    ["Blue"] = {
         Background = RGB(8, 45, 100),
         Secondary = RGB(10, 70, 145),
         Element = RGB(15, 95, 185),
-
         Hover = RGB(30, 125, 220),
-        Pressed = RGB(45, 150, 245),
+        Pressed = RGB(40, 145, 235),
 
         Border = RGB(70, 165, 255),
-        BorderHover = RGB(110, 195, 255),
+        BorderHover = RGB(105, 195, 255),
 
         Text = RGB(255, 255, 255),
-        SubText = RGB(200, 225, 255),
-        MutedText = RGB(145, 185, 230),
+        SubText = RGB(205, 225, 245),
+        MutedText = RGB(145, 175, 210),
 
         Accent = RGB(75, 155, 255),
         AccentDark = RGB(35, 105, 205),
         AccentHover = RGB(105, 180, 255),
-        AccentText = RGB(255, 255, 255),
+        AccentText = RGB(5, 20, 45),
 
-        Success = RGB(80, 230, 140),
-        Warning = RGB(255, 195, 60),
-        Error = RGB(255, 75, 75),
-        Info = RGB(80, 175, 255),
+        Success = RGB(80, 200, 120),
+        Warning = RGB(240, 180, 70),
+        Error = RGB(220, 70, 70),
+        Info = RGB(75, 155, 255),
 
-        Tab = RGB(10, 60, 120),
-        TabHover = RGB(20, 105, 190),
-        TabSelected = RGB(35, 135, 225),
+        Tab = RGB(10, 55, 115),
+        TabHover = RGB(20, 100, 185),
+        TabSelected = RGB(30, 130, 220),
 
         Button = RGB(15, 95, 185),
         ButtonHover = RGB(30, 125, 220),
-        ButtonPressed = RGB(45, 150, 245),
+        ButtonPressed = RGB(40, 145, 235),
 
-        ToggleOff = RGB(10, 65, 130),
+        ToggleOff = RGB(10, 55, 110),
         ToggleOn = RGB(75, 155, 255),
-        ToggleCircle = RGB(235, 245, 255),
+        ToggleCircle = RGB(225, 240, 255),
 
-        Input = RGB(6, 35, 80),
-        InputHover = RGB(10, 65, 130),
+        Input = RGB(5, 30, 75),
+        InputHover = RGB(10, 70, 135),
         InputFocus = RGB(75, 155, 255),
 
-        Dropdown = RGB(6, 35, 80),
-        DropdownHover = RGB(15, 75, 145),
+        Dropdown = RGB(5, 30, 75),
+        DropdownHover = RGB(15, 80, 150),
         DropdownSelected = RGB(75, 155, 255),
 
-        SliderBackground = RGB(10, 65, 130),
+        SliderBackground = RGB(15, 70, 135),
         SliderFill = RGB(75, 155, 255),
         SliderKnob = RGB(110, 190, 255),
 
-        PopupBackground = RGB(7, 40, 90),
+        PopupBackground = RGB(6, 35, 80),
         PopupBorder = RGB(70, 165, 255),
 
-        NotificationBackground = RGB(8, 45, 100),
-        NotificationBorder = RGB(70, 165, 255),
+        NotificationBackground = RGB(7, 45, 95),
+        NotificationBorder = RGB(75, 155, 255),
 
-        Scrollbar = RGB(70, 165, 255),
+        Scrollbar = RGB(75, 155, 255),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
             Glow = true,
             Shadow = true,
             Gradient = true,
-            AnimatedGradient = false
+            AnimatedGradient = true
         },
 
         Gradients = {
             Main = Gradient(
                 RGB(8, 45, 100),
-                RGB(12, 80, 165),
-                RGB(5, 35, 80)
+                RGB(15, 85, 170),
+                RGB(8, 45, 100)
             ),
 
             TopBar = Gradient(
-                RGB(10, 70, 145),
-                RGB(30, 125, 220)
+                RGB(10, 65, 135),
+                RGB(50, 145, 240),
+                RGB(10, 65, 135)
             ),
 
             Sidebar = Gradient(
-                RGB(8, 55, 115),
-                RGB(15, 95, 175)
+                RGB(5, 30, 70),
+                RGB(10, 70, 140)
             ),
 
             Element = Gradient(
-                RGB(15, 95, 185),
-                RGB(40, 140, 230)
+                RGB(15, 90, 180),
+                RGB(35, 140, 230)
             ),
 
             Accent = Gradient(
-                RGB(110, 190, 255),
-                RGB(55, 125, 255)
+                RGB(75, 155, 255),
+                RGB(125, 195, 255),
+                RGB(35, 105, 205)
             )
         }
     },
 
-    --// PURPLE
-    Purple = {
-
+    ["Purple"] = {
         Background = RGB(55, 10, 95),
         Secondary = RGB(80, 15, 135),
         Element = RGB(110, 25, 175),
-
         Hover = RGB(145, 40, 220),
-        Pressed = RGB(175, 55, 245),
+        Pressed = RGB(165, 50, 235),
 
         Border = RGB(190, 75, 255),
         BorderHover = RGB(220, 120, 255),
 
         Text = RGB(255, 255, 255),
-        SubText = RGB(230, 205, 255),
-        MutedText = RGB(175, 135, 215),
+        SubText = RGB(225, 205, 240),
+        MutedText = RGB(175, 140, 195),
 
         Accent = RGB(190, 90, 255),
         AccentDark = RGB(130, 45, 200),
         AccentHover = RGB(215, 125, 255),
-        AccentText = RGB(255, 255, 255),
+        AccentText = RGB(25, 5, 40),
 
-        Success = RGB(90, 230, 140),
-        Warning = RGB(255, 190, 60),
-        Error = RGB(255, 75, 100),
-        Info = RGB(120, 150, 255),
+        Success = RGB(80, 200, 120),
+        Warning = RGB(240, 180, 70),
+        Error = RGB(220, 70, 70),
+        Info = RGB(120, 150, 240),
 
-        Tab = RGB(70, 12, 115),
-        TabHover = RGB(120, 25, 170),
-        TabSelected = RGB(155, 45, 215),
+        Tab = RGB(65, 12, 110),
+        TabHover = RGB(115, 25, 175),
+        TabSelected = RGB(150, 40, 220),
 
         Button = RGB(110, 25, 175),
         ButtonHover = RGB(145, 40, 220),
-        ButtonPressed = RGB(175, 55, 245),
+        ButtonPressed = RGB(170, 50, 235),
 
-        ToggleOff = RGB(70, 15, 115),
+        ToggleOff = RGB(65, 12, 110),
         ToggleOn = RGB(190, 90, 255),
-        ToggleCircle = RGB(245, 235, 255),
+        ToggleCircle = RGB(245, 225, 255),
 
-        Input = RGB(40, 8, 70),
-        InputHover = RGB(70, 15, 115),
+        Input = RGB(35, 6, 65),
+        InputHover = RGB(80, 15, 125),
         InputFocus = RGB(190, 90, 255),
 
-        Dropdown = RGB(40, 8, 70),
-        DropdownHover = RGB(85, 20, 130),
+        Dropdown = RGB(35, 6, 65),
+        DropdownHover = RGB(95, 20, 150),
         DropdownSelected = RGB(190, 90, 255),
 
-        SliderBackground = RGB(70, 15, 115),
+        SliderBackground = RGB(80, 20, 135),
         SliderFill = RGB(190, 90, 255),
-        SliderKnob = RGB(220, 135, 255),
+        SliderKnob = RGB(220, 140, 255),
 
         PopupBackground = RGB(45, 8, 80),
         PopupBorder = RGB(190, 75, 255),
 
         NotificationBackground = RGB(55, 10, 95),
-        NotificationBorder = RGB(190, 75, 255),
+        NotificationBorder = RGB(190, 90, 255),
 
-        Scrollbar = RGB(190, 75, 255),
+        Scrollbar = RGB(190, 90, 255),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
@@ -619,158 +615,160 @@ Theme.BuiltIn = {
         Gradients = {
             Main = Gradient(
                 RGB(55, 10, 95),
-                RGB(100, 15, 155),
-                RGB(40, 5, 75)
+                RGB(100, 20, 155),
+                RGB(55, 10, 95)
             ),
 
             TopBar = Gradient(
-                RGB(80, 15, 135),
-                RGB(145, 40, 220)
+                RGB(75, 12, 125),
+                RGB(175, 55, 235),
+                RGB(75, 12, 125)
             ),
 
             Sidebar = Gradient(
-                RGB(65, 10, 110),
-                RGB(110, 25, 165)
+                RGB(35, 5, 65),
+                RGB(75, 15, 120)
             ),
 
             Element = Gradient(
-                RGB(110, 25, 175),
-                RGB(165, 50, 230)
+                RGB(100, 20, 165),
+                RGB(160, 45, 225)
             ),
 
             Accent = Gradient(
-                RGB(225, 135, 255),
-                RGB(170, 65, 255)
+                RGB(190, 90, 255),
+                RGB(230, 155, 255),
+                RGB(130, 45, 200)
             )
         }
     },
 
-    --// ORANGE
-    Orange = {
-
+    ["Orange"] = {
         Background = RGB(100, 40, 5),
         Secondary = RGB(145, 60, 8),
         Element = RGB(185, 80, 10),
-
         Hover = RGB(220, 105, 15),
-        Pressed = RGB(245, 125, 20),
+        Pressed = RGB(235, 120, 20),
 
         Border = RGB(255, 145, 35),
-        BorderHover = RGB(255, 180, 75),
+        BorderHover = RGB(255, 175, 70),
 
         Text = RGB(255, 255, 255),
-        SubText = RGB(255, 225, 190),
-        MutedText = RGB(220, 165, 105),
+        SubText = RGB(245, 220, 195),
+        MutedText = RGB(195, 150, 115),
 
         Accent = RGB(255, 155, 50),
         AccentDark = RGB(205, 100, 25),
-        AccentHover = RGB(255, 185, 85),
-        AccentText = RGB(55, 20, 5),
+        AccentHover = RGB(255, 180, 85),
+        AccentText = RGB(45, 18, 3),
 
-        Success = RGB(90, 230, 120),
-        Warning = RGB(255, 200, 60),
-        Error = RGB(255, 70, 50),
-        Info = RGB(80, 165, 255),
+        Success = RGB(80, 200, 120),
+        Warning = RGB(255, 180, 50),
+        Error = RGB(220, 70, 70),
+        Info = RGB(80, 160, 220),
 
-        Tab = RGB(120, 45, 5),
-        TabHover = RGB(175, 70, 10),
+        Tab = RGB(110, 42, 5),
+        TabHover = RGB(175, 75, 10),
         TabSelected = RGB(220, 105, 15),
 
         Button = RGB(185, 80, 10),
         ButtonHover = RGB(220, 105, 15),
-        ButtonPressed = RGB(245, 125, 20),
+        ButtonPressed = RGB(235, 120, 20),
 
-        ToggleOff = RGB(100, 35, 5),
+        ToggleOff = RGB(90, 30, 5),
         ToggleOn = RGB(255, 155, 50),
-        ToggleCircle = RGB(255, 245, 225),
+        ToggleCircle = RGB(255, 240, 215),
 
-        Input = RGB(65, 25, 4),
-        InputHover = RGB(105, 40, 5),
+        Input = RGB(55, 20, 3),
+        InputHover = RGB(115, 45, 7),
         InputFocus = RGB(255, 155, 50),
 
-        Dropdown = RGB(65, 25, 4),
-        DropdownHover = RGB(120, 45, 5),
+        Dropdown = RGB(55, 20, 3),
+        DropdownHover = RGB(135, 55, 8),
         DropdownSelected = RGB(255, 155, 50),
 
-        SliderBackground = RGB(110, 40, 5),
+        SliderBackground = RGB(120, 50, 8),
         SliderFill = RGB(255, 155, 50),
-        SliderKnob = RGB(255, 195, 90),
+        SliderKnob = RGB(255, 195, 100),
 
-        PopupBackground = RGB(85, 30, 4),
+        PopupBackground = RGB(75, 28, 4),
         PopupBorder = RGB(255, 145, 35),
 
-        NotificationBackground = RGB(100, 40, 5),
-        NotificationBorder = RGB(255, 145, 35),
+        NotificationBackground = RGB(90, 35, 5),
+        NotificationBorder = RGB(255, 155, 50),
 
-        Scrollbar = RGB(255, 145, 35),
+        Scrollbar = RGB(255, 155, 50),
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
 
         Stroke = {
             Enabled = true,
-            Thickness = 1,
+            Thickness = 1.5,
             Transparency = 0
         },
 
         Corners = {
-            Main = 10,
-            Element = 7,
-            Button = 7,
-            Input = 7,
-            Dropdown = 7,
-            Popup = 10,
-            Notification = 8
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
         },
 
         Effects = {
             Glow = true,
             Shadow = true,
             Gradient = true,
-            AnimatedGradient = false
+            AnimatedGradient = true
         },
 
         Gradients = {
             Main = Gradient(
                 RGB(100, 40, 5),
-                RGB(165, 65, 8),
-                RGB(80, 25, 3)
+                RGB(175, 70, 10),
+                RGB(100, 40, 5)
             ),
 
             TopBar = Gradient(
-                RGB(145, 60, 8),
-                RGB(220, 105, 15)
+                RGB(120, 45, 5),
+                RGB(240, 115, 20),
+                RGB(120, 45, 5)
             ),
 
             Sidebar = Gradient(
-                RGB(110, 40, 5),
-                RGB(175, 70, 10)
+                RGB(60, 20, 3),
+                RGB(120, 45, 5)
             ),
 
             Element = Gradient(
-                RGB(185, 80, 10),
-                RGB(235, 115, 20)
+                RGB(175, 70, 8),
+                RGB(225, 115, 20)
             ),
 
             Accent = Gradient(
-                RGB(255, 200, 90),
-                RGB(255, 120, 25)
+                RGB(255, 155, 50),
+                RGB(255, 205, 120),
+                RGB(205, 100, 25)
             )
         }
     },
 
-    --// HALLOWEEN
-    Halloween = {
-
+    ["Halloween"] = {
         Background = RGB(20, 7, 25),
         Secondary = RGB(40, 10, 48),
         Element = RGB(68, 17, 72),
-
         Hover = RGB(105, 25, 95),
         Pressed = RGB(135, 35, 115),
 
@@ -786,10 +784,10 @@ Theme.BuiltIn = {
         AccentHover = RGB(255, 155, 20),
         AccentText = RGB(35, 10, 5),
 
-        Success = RGB(100, 255, 110),
-        Warning = RGB(255, 175, 35),
-        Error = RGB(255, 55, 55),
-        Info = RGB(175, 90, 255),
+        Success = RGB(100, 220, 110),
+        Warning = RGB(255, 150, 0),
+        Error = RGB(230, 60, 70),
+        Info = RGB(150, 80, 220),
 
         Tab = RGB(38, 10, 45),
         TabHover = RGB(80, 20, 80),
@@ -825,8 +823,12 @@ Theme.BuiltIn = {
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -855,66 +857,41 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
+            Main = Gradient(
+                RGB(20, 7, 25),
+                RGB(55, 12, 60),
+                RGB(20, 7, 25)
+            ),
 
-            Main = {
-                Enabled = true,
-                Rotation = 45,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(20, 7, 25)),
-                    ColorSequenceKeypoint.new(0.45, RGB(65, 10, 65)),
-                    ColorSequenceKeypoint.new(1, RGB(110, 28, 5))
-                })
-            },
+            TopBar = Gradient(
+                RGB(40, 8, 48),
+                RGB(130, 25, 100),
+                RGB(255, 115, 0)
+            ),
 
-            TopBar = {
-                Enabled = true,
-                Rotation = 0,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(65, 12, 75)),
-                    ColorSequenceKeypoint.new(0.5, RGB(120, 25, 100)),
-                    ColorSequenceKeypoint.new(1, RGB(220, 70, 0))
-                })
-            },
+            Sidebar = Gradient(
+                RGB(20, 5, 28),
+                RGB(65, 12, 70)
+            ),
 
-            Sidebar = {
-                Enabled = true,
-                Rotation = 90,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(30, 7, 38)),
-                    ColorSequenceKeypoint.new(0.5, RGB(70, 12, 75)),
-                    ColorSequenceKeypoint.new(1, RGB(100, 25, 65))
-                })
-            },
+            Element = Gradient(
+                RGB(68, 17, 72),
+                RGB(130, 30, 105),
+                RGB(210, 65, 20)
+            ),
 
-            Element = {
-                Enabled = true,
-                Rotation = 45,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(65, 15, 70)),
-                    ColorSequenceKeypoint.new(0.5, RGB(115, 25, 100)),
-                    ColorSequenceKeypoint.new(1, RGB(180, 55, 10))
-                })
-            },
-
-            Accent = {
-                Enabled = true,
-                Rotation = 90,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(255, 185, 40)),
-                    ColorSequenceKeypoint.new(0.5, RGB(255, 105, 0)),
-                    ColorSequenceKeypoint.new(1, RGB(160, 30, 150))
-                })
-            }
+            Accent = Gradient(
+                RGB(255, 115, 0),
+                RGB(255, 180, 25),
+                RGB(150, 30, 150)
+            )
         }
     },
 
-    --// ROMAN REIGNS - PRIVATE
     ["Roman Reigns"] = {
-
         Background = RGB(5, 9, 10),
         Secondary = RGB(8, 25, 24),
         Element = RGB(12, 47, 43),
-
         Hover = RGB(20, 70, 64),
         Pressed = RGB(27, 88, 79),
 
@@ -969,8 +946,12 @@ Theme.BuiltIn = {
 
         Transparency = {
             Main = 0,
-            Secondary = 0,
+            TopBar = 0,
+            Sidebar = 0,
             Element = 0,
+            Button = 0,
+            Input = 0,
+            Dropdown = 0,
             Popup = 0,
             Notification = 0
         },
@@ -999,55 +980,34 @@ Theme.BuiltIn = {
         },
 
         Gradients = {
+            Main = Gradient(
+                RGB(5, 9, 10),
+                RGB(8, 35, 32),
+                RGB(5, 9, 10)
+            ),
 
-            Main = {
-                Enabled = true,
-                Rotation = 45,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(5, 9, 10)),
-                    ColorSequenceKeypoint.new(0.45, RGB(8, 35, 32)),
-                    ColorSequenceKeypoint.new(1, RGB(18, 55, 48))
-                })
-            },
+            TopBar = Gradient(
+                RGB(7, 27, 26),
+                RGB(28, 82, 73),
+                RGB(215, 178, 75)
+            ),
 
-            TopBar = {
-                Enabled = true,
-                Rotation = 0,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(8, 25, 24)),
-                    ColorSequenceKeypoint.new(0.5, RGB(70, 55, 20)),
-                    ColorSequenceKeypoint.new(1, RGB(215, 178, 75))
-                })
-            },
+            Sidebar = Gradient(
+                RGB(4, 17, 18),
+                RGB(10, 45, 40)
+            ),
 
-            Sidebar = {
-                Enabled = true,
-                Rotation = 90,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(5, 18, 18)),
-                    ColorSequenceKeypoint.new(1, RGB(10, 45, 41))
-                })
-            },
+            Element = Gradient(
+                RGB(12, 47, 43),
+                RGB(28, 82, 73),
+                RGB(150, 115, 38)
+            ),
 
-            Element = {
-                Enabled = true,
-                Rotation = 45,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(12, 47, 43)),
-                    ColorSequenceKeypoint.new(0.5, RGB(35, 85, 73)),
-                    ColorSequenceKeypoint.new(1, RGB(150, 115, 38))
-                })
-            },
-
-            Accent = {
-                Enabled = true,
-                Rotation = 90,
-                Colors = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, RGB(240, 205, 105)),
-                    ColorSequenceKeypoint.new(0.5, RGB(215, 178, 75)),
-                    ColorSequenceKeypoint.new(1, RGB(150, 115, 38))
-                })
-            }
+            Accent = Gradient(
+                RGB(215, 178, 75),
+                RGB(240, 205, 105),
+                RGB(150, 115, 38)
+            )
         },
 
         Artwork = {
@@ -1061,188 +1021,164 @@ Theme.BuiltIn = {
     }
 }
 
-function Theme:IsPrivate(Name)
+function Theme.IsPrivate(Name)
     return Name == "Roman Reigns"
 end
 
-function Theme:IsAllowed(Name, Player)
-    if not self:IsPrivate(Name) then
+function Theme.IsAllowed(Name, Player)
+    if not Theme.IsPrivate(Name) then
         return true
     end
 
     return IsRomanReignsUser(Player)
 end
 
-function Theme:GetAccessMessage(Name)
+function Theme.GetAccessMessage(Name)
     if Name == "Roman Reigns" then
-        return "Roman Reigns theme is private."
+        return "The Roman Reigns theme is private."
     end
 
-    return "You don't have permission to use this theme."
+    return nil
 end
 
-function Theme:Get(Name, Player)
-    Name = Name or "Default"
+function Theme.Get(Name, Player)
+    local SelectedTheme = Theme.BuiltIn[Name]
 
-    if not self:IsAllowed(Name, Player) then
+    if not SelectedTheme then
         return nil
     end
 
-    return self.BuiltIn[Name]
-end
-
-function Theme:Exists(Name, Player)
-    if not self:IsAllowed(Name, Player) then
-        return false
-    end
-
-    return self.BuiltIn[Name] ~= nil
-end
-
-function Theme:Register(Name, Data)
-    assert(
-        type(Name) == "string",
-        "Theme name must be a string"
-    )
-
-    assert(
-        type(Data) == "table",
-        "Theme data must be a table"
-    )
-
-    if Name == "Roman Reigns"
-        and not IsRomanReignsUser(Players.LocalPlayer) then
-
-        warn(
-            "[OTC Hub] Roman Reigns theme is private."
-        )
-
+    if not Theme.IsAllowed(Name, Player or Players.LocalPlayer) then
         return nil
     end
 
-    self.BuiltIn[Name] = Data
-
-    return Data
+    return SelectedTheme
 end
 
-function Theme:Remove(Name)
-    if Name == "Roman Reigns" then
+function Theme.Exists(Name)
+    return Theme.BuiltIn[Name] ~= nil
+end
 
-        warn(
-            "[OTC Hub] The Roman Reigns theme is private."
-        )
-
+function Theme.Register(Name, Data)
+    if type(Name) ~= "string" then
         return false
     end
 
-    if self.BuiltIn[Name] == nil then
+    if type(Data) ~= "table" then
         return false
     end
 
-    if Name == "Default" then
-
-        warn(
-            "[OTC Hub] The Default theme cannot be removed."
-        )
-
+    if Theme.IsPrivate(Name) then
         return false
     end
 
-    self.BuiltIn[Name] = nil
+    Theme.BuiltIn[Name] = Data
 
     return true
 end
 
-function Theme:List(Player)
-    local Themes = {}
-
-    Player = Player or Players.LocalPlayer
-
-    for Name in pairs(self.BuiltIn) do
-
-        if self:IsAllowed(Name, Player) then
-
-            table.insert(
-                Themes,
-                Name
-            )
-        end
-    end
-
-    table.sort(Themes)
-
-    return Themes
-end
-
-function Theme:GetGradient(Name, GradientName, Player)
-    local ThemeData = self:Get(Name, Player)
-
-    if not ThemeData then
-        return nil
-    end
-
-    if not ThemeData.Gradients then
-        return nil
-    end
-
-    return ThemeData.Gradients[GradientName]
-end
-
-function Theme:HasGradient(Name, GradientName, Player)
-    local GradientData = self:GetGradient(
-        Name,
-        GradientName,
-        Player
-    )
-
-    return GradientData ~= nil
-        and GradientData.Enabled == true
-end
-
-function Theme:GetColor(Name, ColorName, Player)
-    local ThemeData = self:Get(Name, Player)
-
-    if not ThemeData then
-        return nil
-    end
-
-    return ThemeData[ColorName]
-end
-
-function Theme:GetTransparency(Name, ObjectName, Player)
-    local ThemeData = self:Get(Name, Player)
-
-    if not ThemeData
-        or not ThemeData.Transparency then
-
-        return 0
-    end
-
-    return ThemeData.Transparency[ObjectName] or 0
-end
-
-function Theme:GetCorner(Name, ObjectName, Player)
-    local ThemeData = self:Get(Name, Player)
-
-    if not ThemeData
-        or not ThemeData.Corners then
-
-        return 8
-    end
-
-    return ThemeData.Corners[ObjectName] or 8
-end
-
-function Theme:GetEffect(Name, EffectName, Player)
-    local ThemeData = self:Get(Name, Player)
-
-    if not ThemeData
-        or not ThemeData.Effects then
-
+function Theme.Remove(Name)
+    if Name == "Default" then
         return false
     end
 
-    return ThemeData.Effects[EffectName] == true
+    if Theme.IsPrivate(Name) then
+        return false
+    end
+
+    if not Theme.BuiltIn[Name] then
+        return false
+    end
+
+    Theme.BuiltIn[Name] = nil
+
+    return true
+end
+
+function Theme.List(Player)
+    Player = Player or Players.LocalPlayer
+
+    local List = {}
+
+    for Name in pairs(Theme.BuiltIn) do
+        if Theme.IsAllowed(Name, Player) then
+            table.insert(List, Name)
+        end
+    end
+
+    table.sort(List)
+
+    return List
+end
+
+function Theme.GetGradient(Name, GradientName, Player)
+    local SelectedTheme = Theme.Get(Name, Player)
+
+    if not SelectedTheme then
+        return nil
+    end
+
+    if not SelectedTheme.Gradients then
+        return nil
+    end
+
+    return SelectedTheme.Gradients[GradientName]
+end
+
+function Theme.HasGradient(Name, GradientName, Player)
+    return Theme.GetGradient(Name, GradientName, Player) ~= nil
+end
+
+function Theme.GetColor(Name, ColorName, Player)
+    local SelectedTheme = Theme.Get(Name, Player)
+
+    if not SelectedTheme then
+        return nil
+    end
+
+    return SelectedTheme[ColorName]
+end
+
+function Theme.GetTransparency(Name, ObjectName, Player)
+    local SelectedTheme = Theme.Get(Name, Player)
+
+    if not SelectedTheme then
+        return nil
+    end
+
+    if not SelectedTheme.Transparency then
+        return nil
+    end
+
+    return SelectedTheme.Transparency[ObjectName]
+end
+
+function Theme.GetCorner(Name, ObjectName, Player)
+    local SelectedTheme = Theme.Get(Name, Player)
+
+    if not SelectedTheme then
+        return nil
+    end
+
+    if not SelectedTheme.Corners then
+        return nil
+    end
+
+    return SelectedTheme.Corners[ObjectName]
+end
+
+function Theme.GetEffect(Name, EffectName, Player)
+    local SelectedTheme = Theme.Get(Name, Player)
+
+    if not SelectedTheme then
+        return nil
+    end
+
+    if not SelectedTheme.Effects then
+        return nil
+    end
+
+    return SelectedTheme.Effects[EffectName]
 end
 
 return Theme
