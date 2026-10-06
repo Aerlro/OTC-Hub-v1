@@ -12,8 +12,10 @@ local LOGO_ASSET = "rbxassetid://104463753775983"
 local ROMAN_REIGNS_IMAGE =
     "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/Owner/db009abe18bb20e9192664f442bcb41a.jpg"
 
-local ROMAN_REIGNS_USERNAME =
-    "romansmkboss"
+local ROMAN_REIGNS_USERS = {
+    ["romansmkboss"] = true,
+    ["Aerlro"] = true
+}
 
 local function IsRomanReignsTheme(Name)
     return Name == "Roman Reigns"
@@ -24,11 +26,9 @@ local function IsRomanReignsAllowed()
         return false
     end
 
-    return string.lower(
-        LocalPlayer.Name
-    ) == string.lower(
-        ROMAN_REIGNS_USERNAME
-    )
+    return ROMAN_REIGNS_USERS[
+        string.lower(LocalPlayer.Name)
+    ] == true
 end
 
 local function GetRomanReignsAsset()
