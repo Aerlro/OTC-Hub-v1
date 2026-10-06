@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 
 local PRIVATE_THEME_USERS = {
     ["romansmkboss"] = true,
-    ["aerlro"] = true
+    ["Aerlro"] = true
 }
 
 local function RGB(R, G, B)
