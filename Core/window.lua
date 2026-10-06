@@ -3044,7 +3044,7 @@ function Window.Create(
 
                 RomanArtwork.ImageTransparency =
                     Artwork.ImageTransparency
-                    or 0.72
+                    or 0.35
 
                 RomanArtwork.Size =
                     Artwork.Size
