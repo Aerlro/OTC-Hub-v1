@@ -6,6 +6,10 @@
 
 local Theme = {}
 
+local Players = game:GetService("Players")
+
+local PRIVATE_THEME_USER = "romansmkboss"
+
 local function RGB(R, G, B)
     return Color3.fromRGB(R, G, B)
 end
@@ -33,6 +37,16 @@ local function Gradient(...)
         Rotation = 0,
         Enabled = true
     }
+end
+
+local function IsRomanReignsUser(Player)
+    Player = Player or Players.LocalPlayer
+
+    if not Player then
+        return false
+    end
+
+    return string.lower(Player.Name) == string.lower(PRIVATE_THEME_USER)
 end
 
 Theme.BuiltIn = {
@@ -947,14 +961,247 @@ Theme.BuiltIn = {
                 })
             }
         }
+    },
+
+    --// ROMAN REIGNS - PRIVATE
+    ["Roman Reigns"] = {
+
+        Background = RGB(5, 9, 10),
+        Secondary = RGB(8, 25, 24),
+        Element = RGB(12, 47, 43),
+
+        Hover = RGB(20, 70, 64),
+        Pressed = RGB(27, 88, 79),
+
+        Border = RGB(52, 110, 98),
+        BorderHover = RGB(82, 145, 125),
+
+        Text = RGB(245, 245, 240),
+        SubText = RGB(190, 202, 197),
+        MutedText = RGB(125, 145, 140),
+
+        Accent = RGB(215, 178, 75),
+        AccentDark = RGB(150, 115, 38),
+        AccentHover = RGB(240, 205, 105),
+        AccentText = RGB(20, 18, 10),
+
+        Success = RGB(80, 190, 125),
+        Warning = RGB(230, 175, 60),
+        Error = RGB(190, 55, 50),
+        Info = RGB(70, 145, 160),
+
+        Tab = RGB(7, 27, 26),
+        TabHover = RGB(16, 58, 53),
+        TabSelected = RGB(28, 82, 73),
+
+        Button = RGB(12, 47, 43),
+        ButtonHover = RGB(20, 70, 64),
+        ButtonPressed = RGB(27, 88, 79),
+
+        ToggleOff = RGB(8, 35, 33),
+        ToggleOn = RGB(215, 178, 75),
+        ToggleCircle = RGB(245, 235, 200),
+
+        Input = RGB(4, 17, 18),
+        InputHover = RGB(10, 40, 38),
+        InputFocus = RGB(215, 178, 75),
+
+        Dropdown = RGB(4, 17, 18),
+        DropdownHover = RGB(12, 48, 45),
+        DropdownSelected = RGB(215, 178, 75),
+
+        SliderBackground = RGB(10, 38, 36),
+        SliderFill = RGB(215, 178, 75),
+        SliderKnob = RGB(240, 205, 105),
+
+        PopupBackground = RGB(5, 14, 15),
+        PopupBorder = RGB(52, 110, 98),
+
+        NotificationBackground = RGB(7, 22, 22),
+        NotificationBorder = RGB(215, 178, 75),
+
+        Scrollbar = RGB(215, 178, 75),
+
+        Transparency = {
+            Main = 0,
+            Secondary = 0,
+            Element = 0,
+            Popup = 0,
+            Notification = 0
+        },
+
+        Stroke = {
+            Enabled = true,
+            Thickness = 1.5,
+            Transparency = 0
+        },
+
+        Corners = {
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
+        },
+
+        Effects = {
+            Glow = true,
+            Shadow = true,
+            Gradient = true,
+            AnimatedGradient = true
+        },
+
+        Gradients = {
+
+            Main = {
+                Enabled = true,
+                Rotation = 45,
+                Colors = ColorSequence.new({
+                    ColorSequenceKeypoint.new(
+                        0,
+                        RGB(5, 9, 10)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        0.45,
+                        RGB(8, 35, 32)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        1,
+                        RGB(18, 55, 48)
+                    )
+                })
+            },
+
+            TopBar = {
+                Enabled = true,
+                Rotation = 0,
+                Colors = ColorSequence.new({
+                    ColorSequenceKeypoint.new(
+                        0,
+                        RGB(8, 25, 24)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        0.5,
+                        RGB(70, 55, 20)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        1,
+                        RGB(215, 178, 75)
+                    )
+                })
+            },
+
+            Sidebar = {
+                Enabled = true,
+                Rotation = 90,
+                Colors = ColorSequence.new({
+                    ColorSequenceKeypoint.new(
+                        0,
+                        RGB(5, 18, 18)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        1,
+                        RGB(10, 45, 41)
+                    )
+                })
+            },
+
+            Element = {
+                Enabled = true,
+                Rotation = 45,
+                Colors = ColorSequence.new({
+                    ColorSequenceKeypoint.new(
+                        0,
+                        RGB(12, 47, 43)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        0.5,
+                        RGB(35, 85, 73)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        1,
+                        RGB(150, 115, 38)
+                    )
+                })
+            },
+
+            Accent = {
+                Enabled = true,
+                Rotation = 90,
+                Colors = ColorSequence.new({
+                    ColorSequenceKeypoint.new(
+                        0,
+                        RGB(240, 205, 105)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        0.5,
+                        RGB(215, 178, 75)
+                    ),
+
+                    ColorSequenceKeypoint.new(
+                        1,
+                        RGB(150, 115, 38)
+                    )
+                })
+            }
+        },
+
+        Artwork = {
+            Enabled = true,
+            Image = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/Owner/db009abe18bb20e9192664f442bcb41a.jpg",
+            ImageTransparency = 0.72,
+            Size = UDim2.new(0, 300, 0, 300),
+            Position = UDim2.new(1, -315, 1, -315),
+            ZIndex = 1
+        }
     }
 }
 
-function Theme:Get(Name)
-    return self.BuiltIn[Name or "Default"]
+function Theme:IsPrivate(Name)
+    return Name == "Roman Reigns"
 end
 
-function Theme:Exists(Name)
+function Theme:IsAllowed(Name, Player)
+    if not self:IsPrivate(Name) then
+        return true
+    end
+
+    return IsRomanReignsUser(Player)
+end
+
+function Theme:GetAccessMessage(Name)
+    if Name == "Roman Reigns" then
+        return "Roman Reigns theme is private."
+    end
+
+    return "You don't have permission to use this theme."
+end
+
+function Theme:Get(Name, Player)
+    Name = Name or "Default"
+
+    if not self:IsAllowed(Name, Player) then
+        return nil
+    end
+
+    return self.BuiltIn[Name]
+end
+
+function Theme:Exists(Name, Player)
+    if not self:IsAllowed(Name, Player) then
+        return false
+    end
+
     return self.BuiltIn[Name] ~= nil
 end
 
@@ -969,12 +1216,28 @@ function Theme:Register(Name, Data)
         "Theme data must be a table"
     )
 
+    if Name == "Roman Reigns" and not IsRomanReignsUser() then
+        warn(
+            "[OTC Hub] Roman Reigns theme is private."
+        )
+
+        return nil
+    end
+
     self.BuiltIn[Name] = Data
 
     return Data
 end
 
 function Theme:Remove(Name)
+    if Name == "Roman Reigns" then
+        warn(
+            "[OTC Hub] The Roman Reigns theme is private."
+        )
+
+        return false
+    end
+
     if self.BuiltIn[Name] == nil then
         return false
     end
@@ -992,14 +1255,18 @@ function Theme:Remove(Name)
     return true
 end
 
-function Theme:List()
+function Theme:List(Player)
     local Themes = {}
 
+    Player = Player or Players.LocalPlayer
+
     for Name in pairs(self.BuiltIn) do
-        table.insert(
-            Themes,
-            Name
-        )
+        if self:IsAllowed(Name, Player) then
+            table.insert(
+                Themes,
+                Name
+            )
+        end
     end
 
     table.sort(Themes)
@@ -1007,8 +1274,8 @@ function Theme:List()
     return Themes
 end
 
-function Theme:GetGradient(Name, GradientName)
-    local ThemeData = self:Get(Name)
+function Theme:GetGradient(Name, GradientName, Player)
+    local ThemeData = self:Get(Name, Player)
 
     if not ThemeData then
         return nil
@@ -1021,18 +1288,19 @@ function Theme:GetGradient(Name, GradientName)
     return ThemeData.Gradients[GradientName]
 end
 
-function Theme:HasGradient(Name, GradientName)
+function Theme:HasGradient(Name, GradientName, Player)
     local GradientData = self:GetGradient(
         Name,
-        GradientName
+        GradientName,
+        Player
     )
 
     return GradientData ~= nil
         and GradientData.Enabled == true
 end
 
-function Theme:GetColor(Name, ColorName)
-    local ThemeData = self:Get(Name)
+function Theme:GetColor(Name, ColorName, Player)
+    local ThemeData = self:Get(Name, Player)
 
     if not ThemeData then
         return nil
@@ -1041,8 +1309,8 @@ function Theme:GetColor(Name, ColorName)
     return ThemeData[ColorName]
 end
 
-function Theme:GetTransparency(Name, ObjectName)
-    local ThemeData = self:Get(Name)
+function Theme:GetTransparency(Name, ObjectName, Player)
+    local ThemeData = self:Get(Name, Player)
 
     if not ThemeData
         or not ThemeData.Transparency then
@@ -1052,8 +1320,8 @@ function Theme:GetTransparency(Name, ObjectName)
     return ThemeData.Transparency[ObjectName] or 0
 end
 
-function Theme:GetCorner(Name, ObjectName)
-    local ThemeData = self:Get(Name)
+function Theme:GetCorner(Name, ObjectName, Player)
+    local ThemeData = self:Get(Name, Player)
 
     if not ThemeData
         or not ThemeData.Corners then
@@ -1063,8 +1331,8 @@ function Theme:GetCorner(Name, ObjectName)
     return ThemeData.Corners[ObjectName] or 8
 end
 
-function Theme:GetEffect(Name, EffectName)
-    local ThemeData = self:Get(Name)
+function Theme:GetEffect(Name, EffectName, Player)
+    local ThemeData = self:Get(Name, Player)
 
     if not ThemeData
         or not ThemeData.Effects then
