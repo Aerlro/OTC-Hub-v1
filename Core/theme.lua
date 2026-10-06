@@ -2,35 +2,21 @@ local Players = game:GetService("Players")
 
 local Theme = {}
 
-local PRIVATE_THEME_USERS = {
-    ["aerlro"] = true,
-    ["romansmkboss"] = true
+local ROMAN_REIGNS_USERS = {
+    [572117566] = true
 }
 
-local function GetCurrentPlayer()
+local function IsRomanReignsUser()
     local Player = Players.LocalPlayer
-
-    if Player then
-        return Player
-    end
-
-    return nil
-end
-
-local function IsRomanReignsUser(Player)
-    Player = Player or GetCurrentPlayer()
 
     if not Player then
         return false
     end
 
-    local Name = Player.Name
+    print("[OTC DEBUG] Roman check Player:", Player.Name)
+    print("[OTC DEBUG] Roman check UserId:", Player.UserId)
 
-    if type(Name) ~= "string" then
-        return false
-    end
-
-    return PRIVATE_THEME_USERS[string.lower(Name)] == true
+    return ROMAN_REIGNS_USERS[Player.UserId] == true
 end
 
 Theme.BuiltIn = {
@@ -1010,14 +996,12 @@ function Theme.IsPrivate(Name)
     return Name == "Roman Reigns"
 end
 
-function Theme.IsAllowed(Name, Player)
+function Theme.IsAllowed(Name)
     if not Theme.IsPrivate(Name) then
         return true
     end
 
-    Player = Player or GetCurrentPlayer()
-
-    return IsRomanReignsUser(Player)
+    return IsRomanReignsUser()
 end
 
 function Theme.Get(Name, Player)
@@ -1028,21 +1012,20 @@ function Theme.Get(Name, Player)
     return Theme.BuiltIn[Name]
 end
 
-function Theme.List(Player)
-    Player = Player or GetCurrentPlayer()
-
-    print("[OTC DEBUG] LocalPlayer:", Players.LocalPlayer)
-    print("[OTC DEBUG] LocalPlayer.Name:", Players.LocalPlayer and Players.LocalPlayer.Name)
-    print("[OTC DEBUG] Player argument:", Player)
-    print("[OTC DEBUG] Player.Name:", Player and Player.Name)
-    print("[OTC DEBUG] Roman allowed:", Theme.IsAllowed("Roman Reigns", Player))
-
+function Theme.List()
     local List = {}
 
     for Name in pairs(Theme.BuiltIn) do
-        print("[OTC DEBUG] Theme:", Name, "Allowed:", Theme.IsAllowed(Name, Player))
+        local Allowed = Theme.IsAllowed(Name)
 
-        if Theme.IsAllowed(Name, Player) then
+        print(
+            "[OTC DEBUG] Theme:",
+            Name,
+            "Allowed:",
+            Allowed
+        )
+
+        if Allowed then
             table.insert(List, Name)
         end
     end
@@ -1059,7 +1042,10 @@ function Theme.List(Player)
         return A < B
     end)
 
-    print("[OTC DEBUG] Final themes:", table.concat(List, ", "))
+    print(
+        "[OTC DEBUG] Final themes:",
+        table.concat(List, ", ")
+    )
 
     return List
 end
