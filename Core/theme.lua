@@ -1021,7 +1021,12 @@ function Theme.List(Player)
 
     local List = {}
 
+    print("[OTC DEBUG] Player:", Player.Name)
+    print("[OTC DEBUG] Roman exists:", Theme.BuiltIn["Roman Reigns"] ~= nil)
+
     for Name in pairs(Theme.BuiltIn) do
+        print("[OTC DEBUG] Theme:", Name, "Allowed:", Theme.IsAllowed(Name, Player))
+
         if Theme.IsAllowed(Name, Player) then
             table.insert(List, Name)
         end
@@ -1038,6 +1043,8 @@ function Theme.List(Player)
 
         return A < B
     end)
+
+    print("[OTC DEBUG] Final themes:", table.concat(List, ", "))
 
     return List
 end
