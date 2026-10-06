@@ -13,8 +13,7 @@ local ROMAN_REIGNS_IMAGE =
     "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/Owner/db009abe18bb20e9192664f442bcb41a.jpg"
 
 local ROMAN_REIGNS_USERS = {
-    ["romansmkboss"] = true,
-    ["Aerlro"] = true
+    [572117566] = true
 }
 
 local function IsRomanReignsTheme(Name)
@@ -27,7 +26,7 @@ local function IsRomanReignsAllowed()
     end
 
     return ROMAN_REIGNS_USERS[
-        string.lower(LocalPlayer.Name)
+        LocalPlayer.UserId
     ] == true
 end
 
