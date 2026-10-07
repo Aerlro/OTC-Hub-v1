@@ -331,19 +331,15 @@ function Window.Create(
         "RomanReignsArtwork"
 
     RomanArtwork.Size =
-        UDim2.new(
-            0,
-            300,
-            0,
-            300
+        UDim2.fromScale(
+            1,
+            1
         )
 
     RomanArtwork.Position =
-        UDim2.new(
-            1,
-            -315,
-            1,
-            -315
+        UDim2.fromScale(
+            0,
+            0
         )
 
     RomanArtwork.BackgroundTransparency =
@@ -359,7 +355,7 @@ function Window.Create(
         0.35
 
     RomanArtwork.ScaleType =
-        Enum.ScaleType.Fit
+        Enum.ScaleType.Crop
 
     RomanArtwork.Active =
         false
@@ -368,10 +364,13 @@ function Window.Create(
         false
 
     RomanArtwork.Visible =
-        true
+        IsRomanReignsTheme(
+            ThemeName
+        )
+        and IsRomanReignsAllowed()
 
     RomanArtwork.ZIndex =
-        50
+        0
 
     RomanArtwork.Parent =
         Main
@@ -2724,6 +2723,12 @@ function Window.Create(
             NewTheme.Effects
             or {}
 
+        local ShowRomanArtwork =
+            IsRomanReignsTheme(
+                ThemeName
+            )
+            and IsRomanReignsAllowed()
+
         Main.BackgroundColor3 =
             NewTheme.Background
 
@@ -2812,6 +2817,22 @@ function Window.Create(
 
         Content.BackgroundTransparency =
             Transparency.Main or 0
+
+        if ShowRomanArtwork then
+
+            Main.BackgroundTransparency =
+                1
+
+            TopBar.BackgroundTransparency =
+                0.42
+
+            Sidebar.BackgroundTransparency =
+                0.42
+
+            Content.BackgroundTransparency =
+                0.42
+
+        end
 
         Logo.Image =
             LOGO_ASSET
@@ -2950,26 +2971,41 @@ function Window.Create(
             0.35
 
         RomanArtwork.Size =
-            UDim2.new(
-                0,
-                300,
-                0,
-                300
+            UDim2.fromScale(
+                1,
+                1
             )
 
         RomanArtwork.Position =
-            UDim2.new(
-                1,
-                -315,
-                1,
-                -315
-            )
+            UDim2.fromScale(
+            0,
+            0
+        )
+
+        RomanArtwork.ScaleType =
+            Enum.ScaleType.Crop
 
         RomanArtwork.ZIndex =
-            50
+            0
 
         RomanArtwork.Visible =
-            true
+            ShowRomanArtwork
+
+        if not ShowRomanArtwork then
+
+            Main.BackgroundTransparency =
+                Transparency.Main or 0
+
+            TopBar.BackgroundTransparency =
+                Transparency.Secondary or 0
+
+            Sidebar.BackgroundTransparency =
+                Transparency.Secondary or 0
+
+            Content.BackgroundTransparency =
+                Transparency.Main or 0
+
+        end
 
         if Gradients.Main then
 
