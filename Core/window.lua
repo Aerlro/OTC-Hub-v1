@@ -32,7 +32,6 @@ local function IsRomanReignsAllowed()
 end
 
 local function Tween(Object, Info, Properties)
-
     local TweenObject =
         TweenService:Create(
             Object,
@@ -46,29 +45,26 @@ local function Tween(Object, Info, Properties)
 end
 
 local function GetTheme(Object)
+    if not Object or not Object.OTC then
+        return nil
+    end
 
-    return Object.OTC._Themes[
-        Object.OTC.CurrentTheme
-    ]
-
-    or Object.OTC._Themes[
+    local ThemeName =
         Object.Theme
-    ]
+        or Object.OTC.CurrentTheme
+        or "Default"
 
-    or Object.OTC._Themes.Default
-
+    return Object.OTC._Themes[ThemeName]
+        or Object.OTC._Themes.Default
 end
 
 local function ApplyGradient(Object, GradientData)
-
     if not Object or not GradientData then
         return nil
     end
 
     local Existing =
-        Object:FindFirstChild(
-            "OTCGradient"
-        )
+        Object:FindFirstChild("OTCGradient")
 
     if Existing then
         Existing:Destroy()
@@ -100,10 +96,7 @@ local function ApplyGradient(Object, GradientData)
 end
 
 local function ApplyCorner(Object, Radius)
-
-    if not Object
-        or Radius == nil then
-
+    if not Object or Radius == nil then
         return
     end
 
@@ -113,13 +106,11 @@ local function ApplyCorner(Object, Radius)
         )
 
     if Corner then
-
         Corner.CornerRadius =
             UDim.new(
                 0,
                 Radius
             )
-
     end
 end
 
@@ -127,10 +118,7 @@ local function ApplyStroke(
     StrokeObject,
     ThemeData
 )
-
-    if not StrokeObject
-        or not ThemeData then
-
+    if not StrokeObject or not ThemeData then
         return
     end
 
@@ -155,7 +143,6 @@ function Window.Create(
     Settings,
     OTC
 )
-
     Settings =
         Settings or {}
 
@@ -168,13 +155,11 @@ function Window.Create(
         ThemeName = "Default"
     end
 
-    if IsRomanReignsTheme(
-        ThemeName
-    ) and not IsRomanReignsAllowed() then
+    if IsRomanReignsTheme(ThemeName)
+        and not IsRomanReignsAllowed() then
 
         ThemeName =
             "Default"
-
     end
 
     local Object = {}
@@ -228,19 +213,15 @@ function Window.Create(
         true
 
     pcall(function()
-
         ScreenGui.Parent =
             CoreGui
-
     end)
 
     if not ScreenGui.Parent then
-
         ScreenGui.Parent =
             LocalPlayer:WaitForChild(
                 "PlayerGui"
             )
-
     end
 
     Object.ScreenGui =
@@ -337,8 +318,11 @@ function Window.Create(
     local ResponsiveScale =
         Instance.new("UIScale")
 
-    ResponsiveScale.Scale = 1
-    ResponsiveScale.Parent = Main
+    ResponsiveScale.Scale =
+        1
+
+    ResponsiveScale.Parent =
+        Main
 
     Object.ResponsiveScale =
         ResponsiveScale
@@ -351,24 +335,28 @@ function Window.Create(
             return
         end
 
-        local Camera = workspace.CurrentCamera
+        local Camera =
+            workspace.CurrentCamera
 
         if not Camera then
             return
         end
 
-        local Viewport = Camera.ViewportSize
+        local Viewport =
+            Camera.ViewportSize
 
-        local Scale = math.min(
-            Viewport.X / 720,
-            Viewport.Y / 520
-        )
+        local Scale =
+            math.min(
+                Viewport.X / 720,
+                Viewport.Y / 520
+            )
 
-        Scale = math.clamp(
-            Scale,
-            0.72,
-            1
-        )
+        Scale =
+            math.clamp(
+                Scale,
+                0.72,
+                1
+            )
 
         Tween(
             ResponsiveScale,
@@ -386,7 +374,8 @@ function Window.Create(
     UpdateResponsiveScale()
 
     if Settings.Responsive ~= false then
-        local Camera = workspace.CurrentCamera
+        local Camera =
+            workspace.CurrentCamera
 
         if Camera then
             ResponsiveConnection =
@@ -719,13 +708,7 @@ function Window.Create(
         end
 
         local CurrentTheme =
-            OTC._Themes[
-                OTC.CurrentTheme
-            ]
-            or OTC._Themes[
-                Object.Theme
-            ]
-            or OTC._Themes.Default
+            GetTheme(Object)
 
         local Overlay =
             Instance.new("Frame")
@@ -1123,11 +1106,9 @@ function Window.Create(
             ]
 
         if not CurrentUpdates then
-
             CurrentUpdates = {
                 "No changelog available for this version."
             }
-
         end
 
         for Index, UpdateText in ipairs(
@@ -1179,7 +1160,6 @@ function Window.Create(
 
             Update.Parent =
                 Updates
-
         end
 
         UpdatesLayout:GetPropertyChangedSignal(
@@ -1204,7 +1184,6 @@ function Window.Create(
                 Popup,
                 CurrentTheme.Gradients.Main
             )
-
         end
 
         CloseVersion.MouseEnter:Connect(
@@ -1292,7 +1271,6 @@ function Window.Create(
             Close = CloseVersion,
             Updates = Updates
         }
-
     end
 
     VersionTag.MouseButton1Click:Connect(
@@ -1305,10 +1283,7 @@ function Window.Create(
         function()
 
             local Current =
-                OTC._Themes[
-                    OTC.CurrentTheme
-                ]
-                or OTC._Themes.Default
+                GetTheme(Object)
 
             Tween(
                 VersionTag,
@@ -1323,7 +1298,6 @@ function Window.Create(
                         or Current.Element
                 }
             )
-
         end
     )
 
@@ -1331,10 +1305,7 @@ function Window.Create(
         function()
 
             local Current =
-                OTC._Themes[
-                    OTC.CurrentTheme
-                ]
-                or OTC._Themes.Default
+                GetTheme(Object)
 
             Tween(
                 VersionTag,
@@ -1347,9 +1318,7 @@ function Window.Create(
                     BackgroundColor3 =
                         Current.Element
                 }
-
             )
-
         end
     )
 
@@ -1820,14 +1789,12 @@ function Window.Create(
         UserCard
 
     pcall(function()
-
         UserAvatar.Image =
             Players:GetUserThumbnailAsync(
                 LocalPlayer.UserId,
                 Enum.ThumbnailType.HeadShot,
                 Enum.ThumbnailSize.Size100x100
             )
-
     end)
 
     local MiniButton =
@@ -1960,9 +1927,7 @@ function Window.Create(
 
                     end
                 )
-
             end
-
         end
     )
 
@@ -1990,9 +1955,7 @@ function Window.Create(
                         StartPosition.Y.Offset
                             + Delta.Y
                     )
-
             end
-
         end
     )
 
@@ -2029,12 +1992,9 @@ function Window.Create(
                                 false
 
                         end
-
                     end
                 )
-
             end
-
         end
     )
 
@@ -2062,22 +2022,20 @@ function Window.Create(
                         MiniStartPosition.Y.Offset
                             + Delta.Y
                     )
-
             end
-
         end
     )
 
     function Object:GetTheme()
 
-        return self.OTC._Themes[
+        local ThemeName =
             self.Theme
-        ]
+            or self.OTC.CurrentTheme
+            or "Default"
 
-        or self.OTC._Themes[
-            self.OTC.CurrentTheme
+        return self.OTC._Themes[
+            ThemeName
         ]
-
         or self.OTC._Themes.Default
 
     end
@@ -2283,13 +2241,7 @@ function Window.Create(
         end
 
         local CurrentTheme =
-            OTC._Themes[
-                OTC.CurrentTheme
-            ]
-            or OTC._Themes[
-                Object.Theme
-            ]
-            or OTC._Themes.Default
+            GetTheme(Object)
 
         local Overlay =
             Instance.new("Frame")
@@ -2636,7 +2588,6 @@ function Window.Create(
                 Popup,
                 CurrentTheme.Gradients.Main
             )
-
         end
 
         if CurrentTheme.Gradients
@@ -2646,17 +2597,13 @@ function Window.Create(
                 UnloadButton,
                 CurrentTheme.Gradients.Accent
             )
-
         end
 
         CancelButton.MouseEnter:Connect(
             function()
 
                 local Current =
-                    OTC._Themes[
-                        OTC.CurrentTheme
-                    ]
-                    or OTC._Themes.Default
+                    GetTheme(Object)
 
                 CancelButton.BackgroundColor3 =
                     Current.ButtonHover
@@ -2670,10 +2617,7 @@ function Window.Create(
             function()
 
                 local Current =
-                    OTC._Themes[
-                        OTC.CurrentTheme
-                    ]
-                    or OTC._Themes.Default
+                    GetTheme(Object)
 
                 CancelButton.BackgroundColor3 =
                     Current.Button
@@ -2686,10 +2630,7 @@ function Window.Create(
             function()
 
                 local Current =
-                    OTC._Themes[
-                        OTC.CurrentTheme
-                    ]
-                    or OTC._Themes.Default
+                    GetTheme(Object)
 
                 UnloadButton.BackgroundColor3 =
                     Current.AccentHover
@@ -2702,10 +2643,7 @@ function Window.Create(
             function()
 
                 local Current =
-                    OTC._Themes[
-                        OTC.CurrentTheme
-                    ]
-                    or OTC._Themes.Default
+                    GetTheme(Object)
 
                 UnloadButton.BackgroundColor3 =
                     Current.Accent
@@ -2765,11 +2703,6 @@ function Window.Create(
             self.OTC._Themes[
                 ThemeName
             ]
-
-            or self.OTC._Themes[
-                self.Theme
-            ]
-
             or self.OTC._Themes.Default
 
         self.Theme =
@@ -2824,65 +2757,17 @@ function Window.Create(
             Corners.Main or 10
         )
 
-        TopBar.Size =
-            UDim2.new(
-                1,
-                0,
-                0,
-                62
-            )
-
-        TopBar.Position =
-            UDim2.new(
-                0,
-                0,
-                0,
-                0
-            )
-
         TopBar.BackgroundColor3 =
             NewTheme.Secondary
 
         TopBar.BackgroundTransparency =
             Transparency.Secondary or 0
 
-        Sidebar.Size =
-            UDim2.new(
-                0,
-                150,
-                1,
-                -62
-            )
-
-        Sidebar.Position =
-            UDim2.new(
-                0,
-                0,
-                0,
-                62
-            )
-
         Sidebar.BackgroundColor3 =
             NewTheme.Secondary
 
         Sidebar.BackgroundTransparency =
             Transparency.Secondary or 0
-
-        Content.Size =
-            UDim2.new(
-                1,
-                -150,
-                1,
-                -62
-            )
-
-        Content.Position =
-            UDim2.new(
-                0,
-                150,
-                0,
-                62
-            )
 
         Content.BackgroundColor3 =
             NewTheme.Background
@@ -2983,22 +2868,6 @@ function Window.Create(
             NewTheme.Scrollbar
             or NewTheme.Border
 
-        UserCard.Position =
-            UDim2.new(
-                0,
-                8,
-                1,
-                -68
-            )
-
-        UserCard.Size =
-            UDim2.new(
-                1,
-                -16,
-                0,
-                60
-            )
-
         UserCard.BackgroundColor3 =
             NewTheme.Element
 
@@ -3050,9 +2919,9 @@ function Window.Create(
 
         RomanArtwork.Position =
             UDim2.fromScale(
-            0,
-            0
-        )
+                0,
+                0
+            )
 
         RomanArtwork.ScaleType =
             Enum.ScaleType.Crop
@@ -3166,9 +3035,7 @@ function Window.Create(
                     end)
 
                 end
-
             end
-
         end
 
         if self.UnloadConfirmation then
@@ -3248,7 +3115,6 @@ function Window.Create(
                 )
 
             end
-
         end
 
         if self.VersionPopup then
@@ -3308,7 +3174,6 @@ function Window.Create(
                         NewTheme.Text
 
                 end
-
             end
 
             ApplyCorner(
@@ -3334,7 +3199,6 @@ function Window.Create(
                 )
 
             end
-
         end
 
         for _, TabObject in ipairs(
@@ -3350,32 +3214,24 @@ function Window.Create(
                 end)
 
             end
-
         end
-
     end
 
     CloseButton.MouseButton1Click:Connect(
         function()
-
             CreateUnloadConfirmation()
-
         end
     )
 
     MinimizeButton.MouseButton1Click:Connect(
         function()
-
             Object:Toggle()
-
         end
     )
 
     MiniButton.MouseButton1Click:Connect(
         function()
-
             Object:Toggle()
-
         end
     )
 
@@ -3407,7 +3263,6 @@ function Window.Create(
                         )
                 }
             )
-
         end
     )
 
@@ -3439,7 +3294,6 @@ function Window.Create(
                         )
                 }
             )
-
         end
     )
 
@@ -3471,7 +3325,6 @@ function Window.Create(
                         )
                 }
             )
-
         end
     )
 
@@ -3503,7 +3356,6 @@ function Window.Create(
                         )
                 }
             )
-
         end
     )
 
@@ -3543,8 +3395,12 @@ function Window.Create(
         end
 
         if self.ResponsiveConnection then
+
             self.ResponsiveConnection:Disconnect()
-            self.ResponsiveConnection = nil
+
+            self.ResponsiveConnection =
+                nil
+
         end
 
         if self.RomanArtwork then
@@ -3572,9 +3428,7 @@ function Window.Create(
                     nil
 
             end
-
         end
-
     end
 
     OTC._Windows[Object] =
@@ -3599,7 +3453,6 @@ function Window.Create(
             )
 
         end)
-
     end
 
     return Object
