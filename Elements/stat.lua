@@ -27,8 +27,8 @@ end
 function Stat.Create(Tab, OTC, Settings)
     Settings = Settings or {}
 
-    local Theme = OTC._Themes[OTC.CurrentTheme]
-        or OTC._Themes[Tab.Window.Theme]
+    local Theme = OTC._Themes[Tab.Window.Theme]
+        or OTC._Themes[OTC.CurrentTheme]
         or OTC._Themes.Default
 
     local Frame = create("Frame", {
@@ -95,8 +95,8 @@ function Stat.Create(Tab, OTC, Settings)
             return
         end
 
-        local CurrentTheme = OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[Tab.Window.Theme]
+        local CurrentTheme = OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes.Default
 
         self.Instance.BackgroundColor3 = CurrentTheme.Element

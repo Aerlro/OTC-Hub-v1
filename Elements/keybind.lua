@@ -33,8 +33,8 @@ function Keybind.Create(Tab, OTC, Settings)
 
     local TweenService = game:GetService("TweenService")
 
-    local Theme = OTC._Themes[OTC.CurrentTheme]
-        or OTC._Themes[Tab.Window.Theme]
+    local Theme = OTC._Themes[Tab.Window.Theme]
+        or OTC._Themes[OTC.CurrentTheme]
         or OTC._Themes.Default
 
     local Name = Settings.Name or "Keybind"
@@ -225,8 +225,8 @@ function Keybind.Create(Tab, OTC, Settings)
     end
 
     function Object:RefreshTheme()
-        local CurrentTheme = OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[Tab.Window.Theme]
+        local CurrentTheme = OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes.Default
 
         Frame.BackgroundColor3 = CurrentTheme.Element

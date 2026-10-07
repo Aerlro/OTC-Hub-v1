@@ -78,8 +78,8 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     local function GetTheme()
 
-        return OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[TabObject.Window.Theme]
+        return OTC._Themes[TabObject.Window.Theme]
+            or OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes.Default
 
     end

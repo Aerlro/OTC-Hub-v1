@@ -80,8 +80,8 @@ function Toggle.Create(Tab, OTC, Settings)
 
     local function getTheme()
 
-        return OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[Tab.Window.Theme]
+        return OTC._Themes[Tab.Window.Theme]
+            or OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes.Default
 
     end
