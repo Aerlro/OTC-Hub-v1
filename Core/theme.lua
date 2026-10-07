@@ -1163,6 +1163,11 @@ function Theme.IsAllowed(Name)
     return IsRomanReignsUser()
 end
 
+function Theme:IsThemeAllowed(Name)
+    local Player = Players.LocalPlayer
+    return self:IsAllowed(Name, Player)
+end
+
 function Theme.Get(Name, Player)
     if not Theme.IsAllowed(Name, Player) then
         return Theme.BuiltIn.Default
