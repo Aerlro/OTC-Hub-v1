@@ -6,10 +6,22 @@
 
 local OTC = {}
 
-OTC.Version = "1.0.1"
+OTC.Version = "1.0.2"
 OTC.Name = "OTC Hub"
 
 OTC.Changelog = {
+    ["1.0.2"] = {
+        "New modern OTC loading experience",
+        "Real configuration save and load system",
+        "New Keybind element",
+        "New Colorpicker element",
+        "New Stat element",
+        "New Dialog API",
+        "Responsive window scaling",
+        "Improved runtime state handling",
+        "Improved theme refresh support",
+        "New mobile-friendly foundation"
+    },
     ["1.0.1"] = {
         "New Halloween loading screen",
         "Animated Halloween decorations",
@@ -99,11 +111,16 @@ local ModulesToLoad = {
     "Core/animation.lua",
     "Core/notification.lua",
     "Core/lucide.lua",
+    "Core/config.lua",
+    "Core/dialog.lua",
     "Elements/button.lua",
     "Elements/toggle.lua",
     "Elements/slider.lua",
     "Elements/dropdown.lua",
-    "Elements/input.lua"
+    "Elements/input.lua",
+    "Elements/keybind.lua",
+    "Elements/colorpicker.lua",
+    "Elements/stat.lua"
 }
 
 local Loading = LoadingModule.Create(
@@ -258,6 +275,14 @@ local LucideModule = LoadModule(
     "Core/lucide.lua"
 )
 
+local ConfigModule = LoadModule(
+    "Core/config.lua"
+)
+
+local DialogModule = LoadModule(
+    "Core/dialog.lua"
+)
+
 --// Themes
 OTC._Themes =
     ThemeModule.BuiltIn
@@ -290,6 +315,19 @@ function OTC:SetTheme(Name)
         return false
     end
 
+    if ThemeModule.IsPrivate
+        and ThemeModule.IsPrivate(Name)
+        and ThemeModule.IsAllowed
+        and not ThemeModule.IsAllowed(Name, LocalPlayer) then
+
+        warn(
+            "[OTC Hub] You don't have permission to use this theme:",
+            Name
+        )
+
+        return false
+    end
+
     self.CurrentTheme =
         Name
 
@@ -307,7 +345,22 @@ function OTC:SetTheme(Name)
 end
 
 function OTC:GetThemes()
-    return ThemeModule:List()
+    return ThemeModule:List(LocalPlayer)
+end
+
+function OTC:Dialog(Data)
+    local Window = self._Windows[1]
+
+    if not Window or not Window.ScreenGui then
+        warn("[OTC Hub] No active window for dialog")
+        return nil
+    end
+
+    return DialogModule.Create(
+        Window.ScreenGui,
+        self:GetTheme(),
+        Data
+    )
 end
 
 --// Tween
@@ -345,12 +398,89 @@ function OTC:SetFlag(
     Name,
     Value
 )
-    self._Flags[Name] =
+    if Name == nil then
+        return
+    end
+
+    self._Flags[tostring(Name)] =
         Value
+
+    self._ConfigDirty = true
 end
 
-function OTC:GetFlag(Name)
-    return self._Flags[Name]
+function OTC:GetFlag(Name, Default)
+    if Name == nil then
+        return Default
+    end
+
+    local Value = self._Flags[tostring(Name)]
+
+    if Value == nil then
+        return Default
+    end
+
+    return Value
+end
+
+function OTC:Configure(Settings)
+    Settings = Settings or {}
+
+    self._Configuration = {
+        AutoSave = (Settings.AutoSave ~= nil and Settings.AutoSave or Settings.autoSave) == true,
+        AutoLoad = (Settings.AutoLoad ~= nil and Settings.AutoLoad or Settings.autoLoad) == true,
+        FileName = Settings.FileName
+            or Settings.fileName
+            or "OTCHub"
+    }
+
+    return self._Configuration
+end
+
+function OTC:LoadConfig(Name)
+    if not self._ConfigModule then
+        return false
+    end
+
+    local Configuration = self._Configuration or {}
+    local Data = self._ConfigModule:Load(
+        Name or Configuration.FileName or "OTCHub"
+    )
+
+    if type(Data) ~= "table" then
+        return false
+    end
+
+    if type(Data.Flags) == "table" then
+        for Key, Value in pairs(Data.Flags) do
+            self._Flags[Key] = Value
+        end
+    end
+
+    self._ConfigDirty = false
+
+    return true
+end
+
+function OTC:SaveConfig(Name)
+    if not self._ConfigModule then
+        return false
+    end
+
+    local Configuration = self._Configuration or {}
+
+    local Success = self._ConfigModule:Save(
+        Name or Configuration.FileName or "OTCHub",
+        {
+            Version = self.Version,
+            Flags = self._Flags
+        }
+    )
+
+    if Success then
+        self._ConfigDirty = false
+    end
+
+    return Success
 end
 
 --// Connections
@@ -395,6 +525,12 @@ OTC._AnimationModule =
 OTC._NotificationModule =
     NotificationModule
 
+OTC._ConfigModule =
+    ConfigModule
+
+OTC._DialogModule =
+    DialogModule
+
 --// Element Modules
 local ButtonModule = LoadModule(
     "Elements/button.lua"
@@ -416,12 +552,27 @@ local InputModule = LoadModule(
     "Elements/input.lua"
 )
 
+local KeybindModule = LoadModule(
+    "Elements/keybind.lua"
+)
+
+local ColorpickerModule = LoadModule(
+    "Elements/colorpicker.lua"
+)
+
+local StatModule = LoadModule(
+    "Elements/stat.lua"
+)
+
 OTC._Modules = {
     Button = ButtonModule,
     Toggle = ToggleModule,
     Slider = SliderModule,
     Dropdown = DropdownModule,
     Input = InputModule,
+    Keybind = KeybindModule,
+    Colorpicker = ColorpickerModule,
+    Stat = StatModule,
 }
 
 --// Lucide
@@ -456,6 +607,20 @@ function OTC:CreateWindow(
 )
     Settings =
         Settings or {}
+
+    local ConfigurationSettings =
+        Settings.Configuration
+        or Settings.configuration
+
+    if ConfigurationSettings then
+        self:Configure(ConfigurationSettings)
+
+        if self._Configuration.AutoLoad then
+            self:LoadConfig(
+                self._Configuration.FileName
+            )
+        end
+    end
 
     if Settings.Theme then
         if not self._Themes[
@@ -504,6 +669,22 @@ function OTC:CreateWindow(
             OTC,
             TabSettings
         )
+    end
+
+    function Window:Dialog(Data)
+        return DialogModule.Create(
+            self.ScreenGui,
+            self:GetTheme(),
+            Data
+        )
+    end
+
+    function Window:SaveConfig(Name)
+        return OTC:SaveConfig(Name)
+    end
+
+    function Window:LoadConfig(Name)
+        return OTC:LoadConfig(Name)
     end
 
     return Window

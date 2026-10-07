@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>Version 1.0.0</b> • <b>by Aerlro</b>
+  <b>Version 1.0.2</b> • <b>by Aerlro</b>
 </p>
 
 ---
@@ -26,6 +26,7 @@
 - 🔲 Custom corner radius
 - 🧱 Custom strokes
 - 🔔 Notification system
+- 🪟 Dialog system
 - 📑 Tabs
 - 📦 Sections
 - 🔘 Buttons
@@ -34,10 +35,15 @@
 - 📋 Dropdowns
 - ☑️ Multi-select Dropdowns
 - ⌨️ Inputs
+- ⌨️ Keybinds
+- 🎨 Colorpickers
+- 📊 Stat cards
 - 🚩 Flags
 - 🎬 Tween animations
 - 🖼️ Lucide icon support
-- 💾 Auto-save / Auto-load configuration support
+- 💾 Real JSON configuration save / load
+- 🔁 Runtime configuration API
+- 📱 Responsive window scaling
 - ⌨️ Configurable toggle key
 - 🧩 Modular architecture
 - ⚡ Raw GitHub loading
@@ -47,6 +53,7 @@
 - 🔵 Blue theme
 - 🟣 Purple theme
 - 🟠 Orange theme
+- 🟦 Cyber theme
 - ⚪ Default theme
 
 ---
@@ -253,6 +260,95 @@ MainTab:CreateInput({
 ```
 
 ---
+
+
+## ⌨️ Keybind
+
+```lua
+local Key = MainTab:CreateKeybind({
+    Name = "Toggle Menu",
+    Description = "Change the UI hotkey",
+    Default = Enum.KeyCode.RightControl,
+    Flag = "ToggleMenuKey",
+    Callback = function(KeyCode)
+        print("Key:", KeyCode.Name)
+    end
+})
+```
+
+## 🎨 Colorpicker
+
+```lua
+local Color = MainTab:CreateColorpicker({
+    Name = "Accent Color",
+    Default = Color3.fromRGB(0, 170, 255),
+    Flag = "AccentColor",
+    Callback = function(Value)
+        print(Value)
+    end
+})
+```
+
+## 📊 Stat
+
+```lua
+local FPS = MainTab:CreateStat({
+    Name = "FPS",
+    Value = "60"
+})
+
+FPS:SetValue("144")
+```
+
+## ➖ Divider and Space
+
+```lua
+MainTab:CreateDivider()
+MainTab:CreateSpace(12)
+```
+
+## 💾 Configuration
+
+OTC 1.0.2 adds a real JSON configuration layer. Value elements with a `Flag` automatically participate in saving and loading.
+
+```lua
+local Window = OTC:CreateWindow({
+    Name = "My Script",
+    Subtitle = "by Aerlro",
+    Theme = "Cyber",
+    Configuration = {
+        AutoSave = true,
+        AutoLoad = true,
+        FileName = "MyScript"
+    }
+})
+
+Window:SaveConfig()
+Window:LoadConfig()
+```
+
+Lowercase Rayfield-style configuration keys are also accepted: `configuration`, `autoSave`, `autoLoad`, and `fileName`.
+
+## 🪟 Dialog
+
+```lua
+Window:Dialog({
+    Title = "OTC Hub",
+    Content = "This is a modern OTC dialog.",
+    Buttons = {
+        {
+            Name = "Cancel"
+        },
+        {
+            Name = "Continue",
+            Primary = true,
+            Callback = function()
+                print("Continue")
+            end
+        }
+    }
+})
+```
 
 ## 🔔 Notifications
 
@@ -772,13 +868,19 @@ OTC-Hub-v1/
 │   ├── theme.lua
 │   ├── animation.lua
 │   ├── notification.lua
-│   └── lucide.lua
+│   ├── loading.lua
+│   ├── lucide.lua
+│   ├── config.lua
+│   └── dialog.lua
 └── Elements/
     ├── button.lua
     ├── toggle.lua
     ├── slider.lua
     ├── dropdown.lua
-    └── input.lua
+    ├── input.lua
+    ├── keybind.lua
+    ├── colorpicker.lua
+    └── stat.lua
 ```
 
 ---
@@ -794,6 +896,8 @@ Core/theme.lua
 Core/animation.lua
 Core/notification.lua
 Core/lucide.lua
+Core/config.lua
+Core/dialog.lua
 ```
 
 ### Elements
@@ -804,6 +908,9 @@ Elements/toggle.lua
 Elements/slider.lua
 Elements/dropdown.lua
 Elements/input.lua
+Elements/keybind.lua
+Elements/colorpicker.lua
+Elements/stat.lua
 ```
 
 ---
@@ -834,9 +941,17 @@ Saturated purple interface with bright purple accents.
 
 Saturated orange interface with bright orange accents.
 
+### Cyber
+
+Electric cyan and deep blue interface with a futuristic accent system.
+
 ### Halloween
 
 Purple, orange and dark Halloween-inspired theme.
+
+### Roman Reigns
+
+Private teal and gold theme restricted to the configured owner account.
 
 ---
 
@@ -854,8 +969,7 @@ local Window = OTC:CreateWindow({
     Configuration = {
         autoSave = true,
         autoLoad = true,
-        fileName = "OTC",
-        customFolder = "OTC"
+        fileName = "OTC"
     }
 })
 ```
