@@ -8,26 +8,17 @@ local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
-----------------------------------------------------------------
--- CONFIG
-----------------------------------------------------------------
-
 Loading.Config = {
     Title = "OTC HUB",
     Subtitle = "YOUR HUB. YOUR CONTROL.",
 
     Logo = "rbxassetid://95900623719417",
 
-    -- Optional images. If nil, a text symbol is used instead.
     Star = nil,
     Glyph = nil,
 
     MinimumDuration = 3.5,
 }
-
-----------------------------------------------------------------
--- HELPERS
-----------------------------------------------------------------
 
 local function Tween(Object, Time, Properties, Style, Direction)
     if not Object then
@@ -122,10 +113,6 @@ local function FadeOutGui(Root, Time)
     end
 end
 
-----------------------------------------------------------------
--- CREATE
-----------------------------------------------------------------
-
 function Loading.Create(Total)
     Total = tonumber(Total) or 1
 
@@ -149,10 +136,6 @@ function Loading.Create(Total)
 
     local Connections = {}
 
-    ------------------------------------------------------------
-    -- SCREEN GUI
-    ------------------------------------------------------------
-
     local ScreenGui = New("ScreenGui", {
         Name = "OTC_Loading",
         IgnoreGuiInset = true,
@@ -171,10 +154,6 @@ function Loading.Create(Total)
 
     Object.ScreenGui = ScreenGui
 
-    ------------------------------------------------------------
-    -- BACKGROUND (full black)
-    ------------------------------------------------------------
-
     local Background = New("Frame", {
         Name = "Background",
         Size = UDim2.fromScale(1, 1),
@@ -186,7 +165,6 @@ function Loading.Create(Total)
 
     Object.Background = Background
 
-    -- very faint horizontal scanlines
     for Index = 1, 60 do
         New("Frame", {
             Size = UDim2.new(1, 0, 0, 1),
@@ -198,7 +176,6 @@ function Loading.Create(Total)
         }, Background)
     end
 
-    -- sweeping light band (moves top -> bottom, repeating)
     local Band = New("Frame", {
         Name = "ScanBand",
         AnchorPoint = Vector2.new(0, 0.5),
@@ -220,10 +197,6 @@ function Loading.Create(Total)
             NumberSequenceKeypoint.new(1, 1),
         }),
     }, Band)
-
-    ------------------------------------------------------------
-    -- CORNER BRACKETS
-    ------------------------------------------------------------
 
     local Frame = New("Frame", {
         Name = "Frame",
@@ -268,10 +241,6 @@ function Loading.Create(Total)
     Bracket(1, 0)
     Bracket(0, 1)
     Bracket(1, 1)
-
-    ------------------------------------------------------------
-    -- LOGO ROW  (star  |  logo  |  glyph)
-    ------------------------------------------------------------
 
     local LogoY = 0.40
 
@@ -358,10 +327,6 @@ function Loading.Create(Total)
         })
     end
 
-    ------------------------------------------------------------
-    -- DECORATIVE LINES (expand outward)
-    ------------------------------------------------------------
-
     local LineY = 0.58
 
     local LeftLine = New("Frame", {
@@ -386,10 +351,6 @@ function Loading.Create(Total)
         ZIndex = 11,
     }, Background)
 
-    ------------------------------------------------------------
-    -- TITLE / SUBTITLE (typed)
-    ------------------------------------------------------------
-
     local Title = Label(Background, {
         Name = "Title",
         Position = UDim2.fromScale(0.5, 0.65),
@@ -411,10 +372,6 @@ function Loading.Create(Total)
         Font = Enum.Font.Gotham,
         ZIndex = 12,
     })
-
-    ------------------------------------------------------------
-    -- PROGRESS BAR
-    ------------------------------------------------------------
 
     local BarBackground = New("Frame", {
         Name = "ProgressBackground",
@@ -451,10 +408,6 @@ function Loading.Create(Total)
         ZIndex = 12,
     })
 
-    ------------------------------------------------------------
-    -- SKIP (hint + button, bottom right)
-    ------------------------------------------------------------
-
     local SkipHint = Label(Background, {
         Name = "SkipHint",
         AnchorPoint = Vector2.new(1, 1),
@@ -487,10 +440,6 @@ function Loading.Create(Total)
 
     Corner(SkipButton, 6)
 
-    ------------------------------------------------------------
-    -- REFERENCES
-    ------------------------------------------------------------
-
     Object.Logo = Logo
     Object.LogoGlow = LogoGlow
     Object.Title = Title
@@ -499,10 +448,6 @@ function Loading.Create(Total)
     Object.Bar = Bar
     Object.BarBackground = BarBackground
     Object.SkipButton = SkipButton
-
-    ------------------------------------------------------------
-    -- ANIMATION LOOP (scan band, glow pulse, subtle glitch)
-    ------------------------------------------------------------
 
     local Base = Object.StartTime
 
@@ -513,7 +458,6 @@ function Loading.Create(Total)
 
         local Time = os.clock() - Base
 
-        -- band sweeps top -> bottom, then pauses off-screen
         local Cycle = (Time * 0.42) % 1.45
 
         Band.Position = UDim2.fromScale(0, Cycle - 0.2)
@@ -525,7 +469,6 @@ function Loading.Create(Total)
             LogoGlow.Rotation = math.sin(Time * 0.45) * 2
         end
 
-        -- tiny logo glitch
         if Object.IntroDone and not Object.Finishing and math.random() < 0.03 then
             Logo.Position = UDim2.new(
                 0.5, math.random(-2, 2),
@@ -535,10 +478,6 @@ function Loading.Create(Total)
             Logo.Position = UDim2.fromScale(0.5, LogoY)
         end
     end))
-
-    ------------------------------------------------------------
-    -- UPDATE
-    ------------------------------------------------------------
 
     function Object:Update(Current, StatusText, DetailText)
         if self.Closed then
@@ -557,10 +496,6 @@ function Loading.Create(Total)
             Size = UDim2.fromScale(Progress, 1)
         })
     end
-
-    ------------------------------------------------------------
-    -- FINISH
-    ------------------------------------------------------------
 
     function Object:Finish(Instant)
         if self.Closed or self.Finishing then
@@ -601,10 +536,6 @@ function Loading.Create(Total)
         ScreenGui:Destroy()
     end
 
-    ------------------------------------------------------------
-    -- DESTROY
-    ------------------------------------------------------------
-
     function Object:Destroy()
         if self.Closed then
             return
@@ -621,10 +552,6 @@ function Loading.Create(Total)
 
         ScreenGui:Destroy()
     end
-
-    ------------------------------------------------------------
-    -- SKIP INPUT
-    ------------------------------------------------------------
 
     local function Skip()
         if Object.Closed or Object.Finishing then
@@ -652,10 +579,6 @@ function Loading.Create(Total)
         Tween(SkipButton, 0.2, { BackgroundColor3 = Color3.fromRGB(26, 26, 26) })
     end))
 
-    ------------------------------------------------------------
-    -- INTRO SEQUENCE
-    ------------------------------------------------------------
-
     local function Type(TextLabel, Text, Delay)
         for Index = 1, #Text do
             if Object.Closed then
@@ -669,7 +592,6 @@ function Loading.Create(Total)
     end
 
     task.spawn(function()
-        -- 1. logo fades in
         Tween(Logo, 0.8, { ImageTransparency = 0 })
         Tween(LogoGlow, 1, { ImageTransparency = 0.9 })
 
@@ -677,7 +599,6 @@ function Loading.Create(Total)
 
         if Object.Closed then return end
 
-        -- 2. star + glyph appear on the sides
         if StarIsImage then
             Tween(Star, 0.6, {
                 Size = UDim2.fromOffset(40, 40),
@@ -708,7 +629,6 @@ function Loading.Create(Total)
 
         if Object.Closed then return end
 
-        -- 3. side lines expand outward + brackets fade in
         Tween(LeftLine, 0.6, { Size = UDim2.fromOffset(100, 1) })
         Tween(RightLine, 0.6, { Size = UDim2.fromOffset(100, 1) })
 
@@ -720,7 +640,6 @@ function Loading.Create(Total)
 
         if Object.Closed then return end
 
-        -- 4. title typed letter by letter, then subtitle
         Type(Title, Config.Title, 0.07)
 
         task.wait(0.1)
@@ -729,7 +648,6 @@ function Loading.Create(Total)
 
         if Object.Closed then return end
 
-        -- 5. progress bar + percentage
         Tween(BarBackground, 0.5, { BackgroundTransparency = 0.2 })
         Tween(Bar, 0.5, { BackgroundTransparency = 0 })
         Tween(Percentage, 0.5, { TextTransparency = 0 })
@@ -740,7 +658,6 @@ function Loading.Create(Total)
 
         if Object.Closed then return end
 
-        -- 6. skip hint + button
         Tween(SkipHint, 0.6, { TextTransparency = 0 })
 
         Tween(SkipButton, 0.6, {
