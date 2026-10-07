@@ -2101,9 +2101,6 @@ function Window.Create(
         self.Theme =
             Name
 
-        self.OTC.CurrentTheme =
-            Name
-
         self:RefreshTheme()
 
         return true
@@ -2752,7 +2749,9 @@ function Window.Create(
     function Object:RefreshTheme()
 
         local ThemeName =
-            self.OTC.CurrentTheme
+            self.Theme
+            or self.OTC.CurrentTheme
+            or "Default"
 
         if IsRomanReignsTheme(
             ThemeName
@@ -2760,10 +2759,6 @@ function Window.Create(
 
             ThemeName =
                 "Default"
-
-            self.OTC.CurrentTheme =
-                "Default"
-
         end
 
         local NewTheme =
