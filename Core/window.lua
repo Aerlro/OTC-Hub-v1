@@ -7,7 +7,8 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
-local LOGO_ASSET = "rbxassetid://104463753775983"
+local LOGO_ASSET =
+    "rbxassetid://104463753775983"
 
 local ROMAN_REIGNS_IMAGE =
     "rbxassetid://102159565539986"
@@ -367,11 +368,10 @@ function Window.Create(
         false
 
     RomanArtwork.Visible =
-        IsRomanReignsAllowed()
-        and IsRomanReignsTheme(ThemeName)
+        true
 
     RomanArtwork.ZIndex =
-        1
+        50
 
     RomanArtwork.Parent =
         Main
@@ -2943,52 +2943,33 @@ function Window.Create(
         MiniButton.ImageTransparency =
             0
 
-        if IsRomanReignsTheme(
-            ThemeName
-        ) and IsRomanReignsAllowed() then
+        RomanArtwork.Image =
+            ROMAN_REIGNS_IMAGE
 
-            local Artwork =
-                NewTheme.Artwork
-                or {}
+        RomanArtwork.ImageTransparency =
+            0.35
 
-            RomanArtwork.Image =
-                ROMAN_REIGNS_IMAGE
+        RomanArtwork.Size =
+            UDim2.new(
+                0,
+                300,
+                0,
+                300
+            )
 
-            RomanArtwork.ImageTransparency =
-                Artwork.ImageTransparency
-                or 0.35
+        RomanArtwork.Position =
+            UDim2.new(
+                1,
+                -315,
+                1,
+                -315
+            )
 
-            RomanArtwork.Size =
-                Artwork.Size
-                or UDim2.new(
-                    0,
-                    300,
-                    0,
-                    300
-                )
+        RomanArtwork.ZIndex =
+            50
 
-            RomanArtwork.Position =
-                Artwork.Position
-                or UDim2.new(
-                    1,
-                    -315,
-                    1,
-                    -315
-                )
-
-            RomanArtwork.ZIndex =
-                Artwork.ZIndex
-                or 1
-
-            RomanArtwork.Visible =
-                Artwork.Enabled ~= false
-
-        else
-
-            RomanArtwork.Visible =
-                false
-
-        end
+        RomanArtwork.Visible =
+            true
 
         if Gradients.Main then
 
