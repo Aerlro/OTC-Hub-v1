@@ -30,86 +30,6 @@ local function IsRomanReignsAllowed()
     ] == true
 end
 
-local function GetRomanReignsAsset()
-
-    if not IsRomanReignsAllowed() then
-        return nil
-    end
-
-    if not writefile
-        or not isfile
-        or not getcustomasset then
-
-        return nil
-    end
-
-    local Folder =
-        "OTC-Hub-v1"
-
-    local File =
-        Folder .. "/roman_reigns.jpg"
-
-    pcall(function()
-
-        if isfolder
-            and not isfolder(Folder) then
-
-            makefolder(Folder)
-
-        end
-
-    end)
-
-    if not isfile(File) then
-
-        local Success, Data =
-            pcall(function()
-
-                return game:HttpGet(
-                    ROMAN_REIGNS_IMAGE
-                )
-
-            end)
-
-        if not Success
-            or not Data
-            or Data == "" then
-
-            return nil
-        end
-
-        local WriteSuccess =
-            pcall(function()
-
-                writefile(
-                    File,
-                    Data
-                )
-
-            end)
-
-        if not WriteSuccess then
-            return nil
-        end
-
-    end
-
-    local Success, Asset =
-        pcall(function()
-
-            return getcustomasset(
-                File
-            )
-
-        end)
-
-    if Success then
-        return Asset
-    end
-
-    return nil
-end
-
 local function Tween(Object, Info, Properties)
 
     local TweenObject =
@@ -431,8 +351,11 @@ function Window.Create(
     RomanArtwork.BorderSizePixel =
         0
 
+    RomanArtwork.Image =
+        ROMAN_REIGNS_IMAGE
+
     RomanArtwork.ImageTransparency =
-        0.72
+        0.35
 
     RomanArtwork.ScaleType =
         Enum.ScaleType.Fit
@@ -444,21 +367,14 @@ function Window.Create(
         false
 
     RomanArtwork.Visible =
-        false
+        IsRomanReignsAllowed()
+        and IsRomanReignsTheme(ThemeName)
 
     RomanArtwork.ZIndex =
         1
 
     RomanArtwork.Parent =
         Main
-
-    local RomanAsset =
-        GetRomanReignsAsset()
-
-    if RomanAsset then
-        RomanArtwork.Image =
-            RomanAsset
-    end
 
     Object.RomanArtwork =
         RomanArtwork
@@ -1355,6 +1271,7 @@ function Window.Create(
                     BackgroundColor3 =
                         Current.Element
                 }
+
             )
 
         end
@@ -3030,53 +2947,41 @@ function Window.Create(
             ThemeName
         ) and IsRomanReignsAllowed() then
 
-            local RomanAsset =
-                GetRomanReignsAsset()
+            local Artwork =
+                NewTheme.Artwork
+                or {}
 
-            if RomanAsset then
+            RomanArtwork.Image =
+                ROMAN_REIGNS_IMAGE
 
-                RomanArtwork.Image =
-                    RomanAsset
+            RomanArtwork.ImageTransparency =
+                Artwork.ImageTransparency
+                or 0.35
 
-                local Artwork =
-                    NewTheme.Artwork
-                    or {}
+            RomanArtwork.Size =
+                Artwork.Size
+                or UDim2.new(
+                    0,
+                    300,
+                    0,
+                    300
+                )
 
-                RomanArtwork.ImageTransparency =
-                    Artwork.ImageTransparency
-                    or 0.35
+            RomanArtwork.Position =
+                Artwork.Position
+                or UDim2.new(
+                    1,
+                    -315,
+                    1,
+                    -315
+                )
 
-                RomanArtwork.Size =
-                    Artwork.Size
-                    or UDim2.new(
-                        0,
-                        300,
-                        0,
-                        300
-                    )
+            RomanArtwork.ZIndex =
+                Artwork.ZIndex
+                or 1
 
-                RomanArtwork.Position =
-                    Artwork.Position
-                    or UDim2.new(
-                        1,
-                        -315,
-                        1,
-                        -315
-                    )
-
-                RomanArtwork.ZIndex =
-                    Artwork.ZIndex
-                    or 1
-
-                RomanArtwork.Visible =
-                    Artwork.Enabled ~= false
-
-            else
-
-                RomanArtwork.Visible =
-                    false
-
-            end
+            RomanArtwork.Visible =
+                Artwork.Enabled ~= false
 
         else
 
