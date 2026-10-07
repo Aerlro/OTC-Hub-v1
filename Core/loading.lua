@@ -4,28 +4,17 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
-Loading.Config = {
-    Title = "OTC HUB",
-    Subtitle = "YOUR HUB. YOUR CONTROL.",
-
-    Logo = "rbxassetid://95900623719417",
-
-    Star = nil,
-    Glyph = nil,
-
-    MinimumDuration = 3.5,
-}
+local LOGO_ASSET = "rbxassetid://95900623719417"
 
 local function Tween(Object, Time, Properties, Style, Direction)
     if not Object then
-        return
+        return nil
     end
 
-    local TweenObject = TweenService:Create(
+    local Animation = TweenService:Create(
         Object,
         TweenInfo.new(
             Time or 0.25,
@@ -35,42 +24,60 @@ local function Tween(Object, Time, Properties, Style, Direction)
         Properties
     )
 
-    TweenObject:Play()
+    Animation:Play()
 
-    return TweenObject
-end
-
-local function New(Class, Properties, Parent)
-    local Instance_ = Instance.new(Class)
-
-    for Key, Value in pairs(Properties) do
-        Instance_[Key] = Value
-    end
-
-    Instance_.Parent = Parent
-
-    return Instance_
+    return Animation
 end
 
 local function Corner(Object, Radius)
-    return New("UICorner", {
-        CornerRadius = UDim.new(0, Radius)
-    }, Object)
+    local UI = Instance.new("UICorner")
+    UI.CornerRadius = UDim.new(0, Radius)
+    UI.Parent = Object
+    return UI
 end
 
-local function Label(Parent, Properties)
-    Properties.BackgroundTransparency = 1
-    Properties.BorderSizePixel = 0
-    Properties.AnchorPoint = Properties.AnchorPoint or Vector2.new(0.5, 0.5)
-    Properties.Font = Properties.Font or Enum.Font.Gotham
-    Properties.TextXAlignment = Properties.TextXAlignment or Enum.TextXAlignment.Center
-    Properties.TextYAlignment = Enum.TextYAlignment.Center
-
-    return New("TextLabel", Properties, Parent)
+local function Stroke(Object, Color, Thickness, Transparency)
+    local UI = Instance.new("UIStroke")
+    UI.Color = Color
+    UI.Thickness = Thickness or 1
+    UI.Transparency = Transparency or 0
+    UI.Parent = Object
+    return UI
 end
 
-local function FadeOutGui(Root, Time)
-    local function Fade(Object)
+local function CreateText(Parent, Text, Size, Position, TextSize, Color, Font)
+    local Label = Instance.new("TextLabel")
+
+    Label.Size = Size
+    Label.Position = Position
+    Label.BackgroundTransparency = 1
+    Label.Text = Text
+    Label.TextColor3 = Color
+    Label.TextSize = TextSize
+    Label.Font = Font or Enum.Font.Gotham
+    Label.TextXAlignment = Enum.TextXAlignment.Center
+    Label.TextYAlignment = Enum.TextYAlignment.Center
+    Label.Parent = Parent
+
+    return Label
+end
+
+local function CreateImage(Parent, Asset, Size, Position, Transparency)
+    local Image = Instance.new("ImageLabel")
+
+    Image.Size = Size
+    Image.Position = Position
+    Image.BackgroundTransparency = 1
+    Image.Image = Asset
+    Image.ImageTransparency = Transparency or 0
+    Image.ScaleType = Enum.ScaleType.Fit
+    Image.Parent = Parent
+
+    return Image
+end
+
+local function FadeOut(Root, Time)
+    local function Apply(Object)
         if Object:IsA("GuiObject") then
             local Properties = {}
 
@@ -98,51 +105,39 @@ local function FadeOutGui(Root, Time)
             if next(Properties) then
                 Tween(Object, Time, Properties)
             end
-
         elseif Object:IsA("UIStroke") then
-            if Object.Transparency < 1 then
-                Tween(Object, Time, { Transparency = 1 })
-            end
+            Tween(Object, Time, {
+                Transparency = 1
+            })
         end
     end
 
-    Fade(Root)
+    Apply(Root)
 
     for _, Object in ipairs(Root:GetDescendants()) do
-        Fade(Object)
+        Apply(Object)
     end
 end
 
 function Loading.Create(Total)
-    Total = tonumber(Total) or 1
+    Total = math.max(1, tonumber(Total) or 1)
 
-    if Total <= 0 then
-        Total = 1
-    end
+    local Object = {
+        Total = Total,
+        Current = 0,
+        Closed = false,
+        Finishing = false,
+        StartTime = os.clock(),
+        MinimumDuration = 1.25
+    }
 
-    local Config = Loading.Config
+    local ScreenGui = Instance.new("ScreenGui")
 
-    local Object = {}
-
-    Object.Total = Total
-    Object.Current = 0
-    Object.Progress = 0
-    Object.Closed = false
-    Object.Finishing = false
-    Object.IntroDone = false
-
-    Object.StartTime = os.clock()
-    Object.MinimumDuration = Config.MinimumDuration
-
-    local Connections = {}
-
-    local ScreenGui = New("ScreenGui", {
-        Name = "OTC_Loading",
-        IgnoreGuiInset = true,
-        ResetOnSpawn = false,
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-        DisplayOrder = 999999,
-    })
+    ScreenGui.Name = "OTC_Loading"
+    ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.DisplayOrder = 999999
 
     pcall(function()
         ScreenGui.Parent = CoreGui
@@ -154,386 +149,357 @@ function Loading.Create(Total)
 
     Object.ScreenGui = ScreenGui
 
-    local Background = New("Frame", {
-        Name = "Background",
-        Size = UDim2.fromScale(1, 1),
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-        BorderSizePixel = 0,
-        ZIndex = 1,
-        Active = true,
-    }, ScreenGui)
+    local Overlay = Instance.new("Frame")
+    Overlay.Name = "Overlay"
+    Overlay.Size = UDim2.fromScale(1, 1)
+    Overlay.BackgroundColor3 = Color3.new(0, 0, 0)
+    Overlay.BackgroundTransparency = 0.58
+    Overlay.BorderSizePixel = 0
+    Overlay.ZIndex = 1
+    Overlay.Parent = ScreenGui
 
-    Object.Background = Background
+    Object.Overlay = Overlay
 
-    for Index = 1, 60 do
-        New("Frame", {
-            Size = UDim2.new(1, 0, 0, 1),
-            Position = UDim2.new(0, 0, Index / 60, 0),
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 0.988,
-            BorderSizePixel = 0,
-            ZIndex = 2,
-        }, Background)
+    local Main = Instance.new("Frame")
+    Main.Name = "Main"
+    Main.Size = UDim2.new(0.73, 0, 0.56, 0)
+    Main.Position = UDim2.new(0.135, 0, 0.22, 0)
+    Main.BackgroundTransparency = 1
+    Main.BorderSizePixel = 0
+    Main.ZIndex = 10
+    Main.Parent = ScreenGui
+
+    local function CreateCornerLine(Position, Size)
+        local Line = Instance.new("Frame")
+        Line.Size = Size
+        Line.Position = Position
+        Line.BackgroundColor3 = Color3.fromRGB(170, 170, 170)
+        Line.BackgroundTransparency = 0.52
+        Line.BorderSizePixel = 0
+        Line.ZIndex = 11
+        Line.Parent = Main
+        return Line
     end
 
-    local Band = New("Frame", {
-        Name = "ScanBand",
-        AnchorPoint = Vector2.new(0, 0.5),
-        Size = UDim2.new(1, 0, 0, 80),
-        Position = UDim2.fromScale(0, -0.2),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0,
-        BorderSizePixel = 0,
-        ZIndex = 3,
-    }, Background)
+    CreateCornerLine(
+        UDim2.fromScale(0, 0),
+        UDim2.fromOffset(70, 1)
+    )
 
-    New("UIGradient", {
-        Rotation = 0,
-        Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(0.15, 0.985),
-            NumberSequenceKeypoint.new(0.5, 0.93),
-            NumberSequenceKeypoint.new(0.85, 0.985),
-            NumberSequenceKeypoint.new(1, 1),
-        }),
-    }, Band)
+    CreateCornerLine(
+        UDim2.fromScale(0, 0),
+        UDim2.fromOffset(1, 22)
+    )
 
-    local Frame = New("Frame", {
-        Name = "Frame",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.fromScale(0.73, 0.55),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        ZIndex = 4,
-    }, Background)
+    CreateCornerLine(
+        UDim2.new(1, -70, 0, 0),
+        UDim2.fromOffset(70, 1)
+    )
 
-    local Brackets = {}
+    CreateCornerLine(
+        UDim2.new(1, -1, 0, 0),
+        UDim2.fromOffset(1, 22)
+    )
 
-    local function Bracket(AnchorX, AnchorY)
-        local Length = 14
+    CreateCornerLine(
+        UDim2.new(0, 0, 1, -1),
+        UDim2.fromOffset(70, 1)
+    )
 
-        local Horizontal = New("Frame", {
-            AnchorPoint = Vector2.new(AnchorX, AnchorY),
-            Position = UDim2.fromScale(AnchorX, AnchorY),
-            Size = UDim2.fromOffset(Length, 1),
-            BackgroundColor3 = Color3.fromRGB(150, 150, 150),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ZIndex = 4,
-        }, Frame)
+    CreateCornerLine(
+        UDim2.new(0, 0, 1, -22),
+        UDim2.fromOffset(1, 22)
+    )
 
-        local Vertical = New("Frame", {
-            AnchorPoint = Vector2.new(AnchorX, AnchorY),
-            Position = UDim2.fromScale(AnchorX, AnchorY),
-            Size = UDim2.fromOffset(1, Length),
-            BackgroundColor3 = Color3.fromRGB(150, 150, 150),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ZIndex = 4,
-        }, Frame)
+    CreateCornerLine(
+        UDim2.new(1, -70, 1, -1),
+        UDim2.fromOffset(70, 1)
+    )
 
-        table.insert(Brackets, Horizontal)
-        table.insert(Brackets, Vertical)
-    end
+    CreateCornerLine(
+        UDim2.new(1, -1, 1, -22),
+        UDim2.fromOffset(1, 22)
+    )
 
-    Bracket(0, 0)
-    Bracket(1, 0)
-    Bracket(0, 1)
-    Bracket(1, 1)
+    local Center = Instance.new("Frame")
+    Center.Name = "Center"
+    Center.Size = UDim2.fromOffset(500, 300)
+    Center.Position = UDim2.new(0.5, -250, 0.5, -150)
+    Center.BackgroundTransparency = 1
+    Center.ZIndex = 20
+    Center.Parent = ScreenGui
 
-    local LogoY = 0.40
+    local LogoGlow = CreateImage(
+        Center,
+        LOGO_ASSET,
+        UDim2.fromOffset(145, 145),
+        UDim2.new(0.5, -72.5, 0, -2),
+        0.94
+    )
 
-    local LogoGlow = New("ImageLabel", {
-        Name = "LogoGlow",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, LogoY),
-        Size = UDim2.fromOffset(150, 150),
-        BackgroundTransparency = 1,
-        Image = Config.Logo,
-        ImageColor3 = Color3.fromRGB(255, 255, 255),
-        ImageTransparency = 1,
-        ScaleType = Enum.ScaleType.Fit,
-        ZIndex = 10,
-    }, Background)
+    LogoGlow.ImageColor3 = Color3.new(1, 1, 1)
+    LogoGlow.ZIndex = 20
 
-    local Logo = New("ImageLabel", {
-        Name = "Logo",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, LogoY),
-        Size = UDim2.fromOffset(110, 110),
-        BackgroundTransparency = 1,
-        Image = Config.Logo,
-        ImageTransparency = 1,
-        ScaleType = Enum.ScaleType.Fit,
-        ZIndex = 11,
-    }, Background)
+    local Logo = CreateImage(
+        Center,
+        LOGO_ASSET,
+        UDim2.fromOffset(108, 108),
+        UDim2.new(0.5, -54, 0, 16),
+        0
+    )
 
-    local Star
-    local StarIsImage = Config.Star ~= nil
+    Logo.ZIndex = 21
 
-    if StarIsImage then
-        Star = New("ImageLabel", {
-            Name = "Star",
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.fromScale(0.415, LogoY),
-            Size = UDim2.fromOffset(0, 0),
-            BackgroundTransparency = 1,
-            Image = Config.Star,
-            ImageTransparency = 1,
-            ScaleType = Enum.ScaleType.Fit,
-            ZIndex = 11,
-        }, Background)
-    else
-        Star = Label(Background, {
-            Name = "Star",
-            Position = UDim2.fromScale(0.415, LogoY),
-            Size = UDim2.fromOffset(60, 60),
-            Text = "✦",
-            TextSize = 12,
-            TextColor3 = Color3.fromRGB(225, 225, 235),
-            TextTransparency = 1,
-            Font = Enum.Font.GothamBlack,
-            ZIndex = 11,
-        })
-    end
+    local LeftLine = Instance.new("Frame")
+    LeftLine.Size = UDim2.fromOffset(100, 1)
+    LeftLine.Position = UDim2.new(0.5, -245, 0, 112)
+    LeftLine.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+    LeftLine.BackgroundTransparency = 0.35
+    LeftLine.BorderSizePixel = 0
+    LeftLine.ZIndex = 21
+    LeftLine.Parent = Center
 
-    local Glyph
-    local GlyphIsImage = Config.Glyph ~= nil
+    local RightLine = LeftLine:Clone()
+    RightLine.Position = UDim2.new(0.5, 145, 0, 112)
+    RightLine.Parent = Center
 
-    if GlyphIsImage then
-        Glyph = New("ImageLabel", {
-            Name = "Glyph",
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.fromScale(0.585, LogoY),
-            Size = UDim2.fromOffset(26, 26),
-            BackgroundTransparency = 1,
-            Image = Config.Glyph,
-            ImageTransparency = 1,
-            ScaleType = Enum.ScaleType.Fit,
-            ZIndex = 11,
-        }, Background)
-    else
-        Glyph = Label(Background, {
-            Name = "Glyph",
-            Position = UDim2.fromScale(0.585, LogoY),
-            Size = UDim2.fromOffset(30, 30),
-            Text = "$",
-            TextSize = 20,
-            TextColor3 = Color3.fromRGB(200, 200, 205),
-            TextTransparency = 1,
-            Font = Enum.Font.GothamBlack,
-            ZIndex = 11,
-        })
-    end
+    local Title = CreateText(
+        Center,
+        "OTC HUB",
+        UDim2.fromOffset(500, 45),
+        UDim2.new(0.5, -250, 0, 134),
+        29,
+        Color3.fromRGB(245, 245, 245),
+        Enum.Font.GothamBlack
+    )
 
-    local LineY = 0.58
+    local Subtitle = CreateText(
+        Center,
+        "YOUR HUB. YOUR CONTROL.",
+        UDim2.fromOffset(500, 20),
+        UDim2.new(0.5, -250, 0, 177),
+        9,
+        Color3.fromRGB(125, 125, 125),
+        Enum.Font.Gotham
+    )
 
-    local LeftLine = New("Frame", {
-        Name = "LeftLine",
-        AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.fromScale(0.395, LineY),
-        Size = UDim2.fromOffset(0, 1),
-        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-        BackgroundTransparency = 0.15,
-        BorderSizePixel = 0,
-        ZIndex = 11,
-    }, Background)
-
-    local RightLine = New("Frame", {
-        Name = "RightLine",
-        AnchorPoint = Vector2.new(0, 0.5),
-        Position = UDim2.fromScale(0.605, LineY),
-        Size = UDim2.fromOffset(0, 1),
-        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-        BackgroundTransparency = 0.15,
-        BorderSizePixel = 0,
-        ZIndex = 11,
-    }, Background)
-
-    local Title = Label(Background, {
-        Name = "Title",
-        Position = UDim2.fromScale(0.5, 0.65),
-        Size = UDim2.fromOffset(500, 45),
-        Text = "",
-        TextSize = 32,
-        TextColor3 = Color3.fromRGB(250, 250, 250),
-        Font = Enum.Font.GothamBlack,
-        ZIndex = 12,
-    })
-
-    local Subtitle = Label(Background, {
-        Name = "Subtitle",
-        Position = UDim2.fromScale(0.5, 0.705),
-        Size = UDim2.fromOffset(500, 20),
-        Text = "",
-        TextSize = 10,
-        TextColor3 = Color3.fromRGB(130, 130, 130),
-        Font = Enum.Font.Gotham,
-        ZIndex = 12,
-    })
-
-    local BarBackground = New("Frame", {
-        Name = "ProgressBackground",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.776),
-        Size = UDim2.fromOffset(200, 2),
-        BackgroundColor3 = Color3.fromRGB(70, 70, 70),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        ZIndex = 12,
-    }, Background)
-
+    local BarBackground = Instance.new("Frame")
+    BarBackground.Size = UDim2.fromOffset(325, 3)
+    BarBackground.Position = UDim2.new(0.5, -162.5, 0, 218)
+    BarBackground.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+    BarBackground.BackgroundTransparency = 0.2
+    BarBackground.BorderSizePixel = 0
+    BarBackground.ZIndex = 22
+    BarBackground.Parent = Center
     Corner(BarBackground, 999)
 
-    local Bar = New("Frame", {
-        Name = "Progress",
-        Size = UDim2.fromScale(0, 1),
-        BackgroundColor3 = Color3.fromRGB(250, 250, 250),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        ZIndex = 13,
-    }, BarBackground)
-
+    local Bar = Instance.new("Frame")
+    Bar.Size = UDim2.new(0, 0, 1, 0)
+    Bar.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+    Bar.BorderSizePixel = 0
+    Bar.ZIndex = 23
+    Bar.Parent = BarBackground
     Corner(Bar, 999)
 
-    local Percentage = Label(Background, {
-        Name = "Percentage",
-        Position = UDim2.fromScale(0.5, 0.83),
-        Size = UDim2.fromOffset(200, 16),
-        Text = "0%",
-        TextSize = 9,
-        TextColor3 = Color3.fromRGB(110, 110, 110),
-        TextTransparency = 1,
-        ZIndex = 12,
-    })
+    local Percentage = CreateText(
+        Center,
+        "0%",
+        UDim2.fromOffset(325, 18),
+        UDim2.new(0.5, -162.5, 0, 232),
+        8,
+        Color3.fromRGB(150, 150, 150),
+        Enum.Font.Gotham
+    )
 
-    local SkipHint = Label(Background, {
-        Name = "SkipHint",
-        AnchorPoint = Vector2.new(1, 1),
-        Position = UDim2.new(1, -24, 1, -52),
-        Size = UDim2.fromOffset(220, 14),
-        Text = "Press SPACE or click to skip",
-        TextSize = 9,
-        TextColor3 = Color3.fromRGB(95, 95, 95),
-        TextTransparency = 1,
-        TextXAlignment = Enum.TextXAlignment.Right,
-        ZIndex = 20,
-    })
+    local Status = CreateText(
+        ScreenGui,
+        "Initializing OTC Hub...",
+        UDim2.fromOffset(600, 22),
+        UDim2.new(0.5, -300, 0.79, 0),
+        10,
+        Color3.fromRGB(165, 165, 165),
+        Enum.Font.Gotham
+    )
 
-    local SkipButton = New("TextButton", {
-        Name = "Skip",
-        AnchorPoint = Vector2.new(1, 1),
-        Position = UDim2.new(1, -24, 1, -20),
-        Size = UDim2.fromOffset(74, 26),
-        BackgroundColor3 = Color3.fromRGB(26, 26, 26),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Text = "SKIP",
-        TextColor3 = Color3.fromRGB(245, 245, 245),
-        TextTransparency = 1,
-        TextSize = 10,
-        Font = Enum.Font.GothamBold,
-        AutoButtonColor = false,
-        ZIndex = 21,
-    }, Background)
+    Status.TextTruncate = Enum.TextTruncate.AtEnd
+    Status.ZIndex = 25
 
-    Corner(SkipButton, 6)
+    local Detail = CreateText(
+        ScreenGui,
+        "Preparing modules...",
+        UDim2.fromOffset(600, 18),
+        UDim2.new(0.5, -300, 0.82, 0),
+        8,
+        Color3.fromRGB(105, 105, 105),
+        Enum.Font.Gotham
+    )
 
+    Detail.TextTruncate = Enum.TextTruncate.AtEnd
+    Detail.ZIndex = 25
+
+    local Skip = Instance.new("TextButton")
+    Skip.Size = UDim2.fromOffset(70, 25)
+    Skip.Position = UDim2.new(1, -82, 1, -32)
+    Skip.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    Skip.BackgroundTransparency = 0.15
+    Skip.BorderSizePixel = 0
+    Skip.Text = "SKIP"
+    Skip.TextColor3 = Color3.fromRGB(220, 220, 220)
+    Skip.TextSize = 8
+    Skip.Font = Enum.Font.GothamMedium
+    Skip.AutoButtonColor = false
+    Skip.ZIndex = 31
+    Skip.Parent = ScreenGui
+    Corner(Skip, 3)
+    local SkipStroke = Stroke(Skip, Color3.fromRGB(100, 100, 100), 1, 0.5)
+
+    Object.Main = Main
+    Object.Center = Center
     Object.Logo = Logo
     Object.LogoGlow = LogoGlow
     Object.Title = Title
     Object.Subtitle = Subtitle
+    Object.Status = Status
+    Object.Detail = Detail
     Object.Percentage = Percentage
     Object.Bar = Bar
     Object.BarBackground = BarBackground
-    Object.SkipButton = SkipButton
+    Object.SkipButton = Skip
 
-    local Base = Object.StartTime
+    Center.Position = UDim2.new(0.5, -250, 0.5, -130)
 
-    table.insert(Connections, RunService.RenderStepped:Connect(function()
+    Logo.ImageTransparency = 1
+    LogoGlow.ImageTransparency = 1
+    Title.TextTransparency = 1
+    Subtitle.TextTransparency = 1
+    LeftLine.BackgroundTransparency = 1
+    RightLine.BackgroundTransparency = 1
+    BarBackground.BackgroundTransparency = 1
+    Percentage.TextTransparency = 1
+    Status.TextTransparency = 1
+    Detail.TextTransparency = 1
+    Skip.BackgroundTransparency = 1
+    Skip.TextTransparency = 1
+    SkipStroke.Transparency = 1
+
+    Tween(Center, 0.7, {
+        Position = UDim2.new(0.5, -250, 0.5, -150)
+    })
+
+    Tween(Logo, 0.65, {ImageTransparency = 0})
+    Tween(LogoGlow, 0.8, {ImageTransparency = 0.92})
+    Tween(LeftLine, 0.65, {BackgroundTransparency = 0.35})
+    Tween(RightLine, 0.65, {BackgroundTransparency = 0.35})
+    Tween(Title, 0.65, {TextTransparency = 0})
+    Tween(Subtitle, 0.75, {TextTransparency = 0})
+    Tween(BarBackground, 0.75, {BackgroundTransparency = 0.2})
+    Tween(Percentage, 0.8, {TextTransparency = 0})
+    Tween(Status, 0.8, {TextTransparency = 0})
+    Tween(Detail, 0.85, {TextTransparency = 0})
+    Tween(Skip, 0.8, {
+        BackgroundTransparency = 0.15,
+        TextTransparency = 0
+    })
+    Tween(SkipStroke, 0.8, {Transparency = 0.5})
+
+    Object.Connection = RunService.RenderStepped:Connect(function()
         if Object.Closed then
             return
         end
 
-        local Time = os.clock() - Base
+        local Time = os.clock()
 
-        local Cycle = (Time * 0.42) % 1.45
+        LogoGlow.ImageTransparency =
+            0.91 + math.sin(Time * 2.5) * 0.025
 
-        Band.Position = UDim2.fromScale(0, Cycle - 0.2)
-
-        if Object.IntroDone and not Object.Finishing then
-            LogoGlow.ImageTransparency =
-                0.9 + math.sin(Time * 2.5) * 0.03
-
-            LogoGlow.Rotation = math.sin(Time * 0.45) * 2
-        end
-
-        if Object.IntroDone and not Object.Finishing and math.random() < 0.03 then
-            Logo.Position = UDim2.new(
-                0.5, math.random(-2, 2),
-                LogoY, math.random(-1, 1)
-            )
-        else
-            Logo.Position = UDim2.fromScale(0.5, LogoY)
-        end
-    end))
+        LogoGlow.Rotation =
+            math.sin(Time * 0.45) * 2
+    end)
 
     function Object:Update(Current, StatusText, DetailText)
         if self.Closed then
             return
         end
 
-        self.Current = math.clamp(tonumber(Current) or 0, 0, self.Total)
+        self.Current = math.clamp(
+            tonumber(Current) or 0,
+            0,
+            self.Total
+        )
 
         local Progress = self.Current / self.Total
 
-        self.Progress = Progress
+        self.Status.Text =
+            StatusText or "Loading OTC Hub..."
 
-        Percentage.Text = tostring(math.floor(Progress * 100)) .. "%"
+        self.Detail.Text =
+            DetailText or ""
 
-        Tween(Bar, 0.3, {
-            Size = UDim2.fromScale(Progress, 1)
+        self.Percentage.Text =
+            tostring(math.floor(Progress * 100)) .. "%"
+
+        Tween(self.Bar, 0.3, {
+            Size = UDim2.new(
+                Progress,
+                0,
+                1,
+                0
+            )
         })
     end
 
-    function Object:Finish(Instant)
+    local SkipConnection
+
+    SkipConnection = Skip.MouseButton1Click:Connect(function()
+        if not Object.Closed and not Object.Finishing then
+            Object:Finish()
+        end
+    end)
+
+    Object.SkipConnection = SkipConnection
+
+    function Object:Finish()
         if self.Closed or self.Finishing then
             return
         end
 
         self.Finishing = true
 
-        if not Instant then
-            local Remaining =
-                self.MinimumDuration - (os.clock() - self.StartTime)
+        local Remaining =
+            self.MinimumDuration
+            - (os.clock() - self.StartTime)
 
-            if Remaining > 0 then
-                task.wait(Remaining)
-            end
+        if Remaining > 0 then
+            task.wait(Remaining)
         end
 
-        if self.Closed then
-            return
+        self:Update(
+            self.Total,
+            "OTC Hub ready!",
+            "Initialization complete"
+        )
+
+        task.wait(0.2)
+
+        if self.Connection then
+            self.Connection:Disconnect()
+            self.Connection = nil
         end
 
-        self:Update(self.Total)
-
-        task.wait(Instant and 0.1 or 0.3)
-
-        for _, Connection in ipairs(Connections) do
-            Connection:Disconnect()
+        if self.SkipConnection then
+            self.SkipConnection:Disconnect()
+            self.SkipConnection = nil
         end
 
-        table.clear(Connections)
+        FadeOut(ScreenGui, 0.55)
 
-        FadeOutGui(ScreenGui, 0.6)
-
-        task.wait(0.7)
+        task.wait(0.65)
 
         self.Closed = true
 
-        ScreenGui:Destroy()
+        if ScreenGui then
+            ScreenGui:Destroy()
+        end
     end
 
     function Object:Destroy()
@@ -544,129 +510,26 @@ function Loading.Create(Total)
         self.Closed = true
         self.Finishing = true
 
-        for _, Connection in ipairs(Connections) do
-            Connection:Disconnect()
+        if self.Connection then
+            self.Connection:Disconnect()
+            self.Connection = nil
         end
 
-        table.clear(Connections)
-
-        ScreenGui:Destroy()
-    end
-
-    local function Skip()
-        if Object.Closed or Object.Finishing then
-            return
+        if self.SkipConnection then
+            self.SkipConnection:Disconnect()
+            self.SkipConnection = nil
         end
 
-        task.spawn(function()
-            Object:Finish(true)
-        end)
-    end
-
-    table.insert(Connections, SkipButton.MouseButton1Click:Connect(Skip))
-
-    table.insert(Connections, UserInputService.InputBegan:Connect(function(Input, Processed)
-        if Input.KeyCode == Enum.KeyCode.Space and not Processed then
-            Skip()
-        end
-    end))
-
-    table.insert(Connections, SkipButton.MouseEnter:Connect(function()
-        Tween(SkipButton, 0.2, { BackgroundColor3 = Color3.fromRGB(45, 45, 45) })
-    end))
-
-    table.insert(Connections, SkipButton.MouseLeave:Connect(function()
-        Tween(SkipButton, 0.2, { BackgroundColor3 = Color3.fromRGB(26, 26, 26) })
-    end))
-
-    local function Type(TextLabel, Text, Delay)
-        for Index = 1, #Text do
-            if Object.Closed then
-                return
-            end
-
-            TextLabel.Text = string.sub(Text, 1, Index)
-
-            task.wait(Delay)
+        if ScreenGui then
+            ScreenGui:Destroy()
         end
     end
 
-    task.spawn(function()
-        Tween(Logo, 0.8, { ImageTransparency = 0 })
-        Tween(LogoGlow, 1, { ImageTransparency = 0.9 })
-
-        task.wait(0.45)
-
-        if Object.Closed then return end
-
-        if StarIsImage then
-            Tween(Star, 0.6, {
-                Size = UDim2.fromOffset(40, 40),
-                ImageTransparency = 0,
-                Rotation = 0,
-            }, Enum.EasingStyle.Back)
-        else
-            Star.Rotation = -90
-
-            Tween(Star, 0.6, {
-                TextSize = 46,
-                TextTransparency = 0,
-                Rotation = 0,
-            }, Enum.EasingStyle.Back)
-        end
-
-        task.wait(0.25)
-
-        if Object.Closed then return end
-
-        if GlyphIsImage then
-            Tween(Glyph, 0.5, { ImageTransparency = 0 })
-        else
-            Tween(Glyph, 0.5, { TextTransparency = 0 })
-        end
-
-        task.wait(0.3)
-
-        if Object.Closed then return end
-
-        Tween(LeftLine, 0.6, { Size = UDim2.fromOffset(100, 1) })
-        Tween(RightLine, 0.6, { Size = UDim2.fromOffset(100, 1) })
-
-        for _, Piece in ipairs(Brackets) do
-            Tween(Piece, 0.6, { BackgroundTransparency = 0.4 })
-        end
-
-        task.wait(0.35)
-
-        if Object.Closed then return end
-
-        Type(Title, Config.Title, 0.07)
-
-        task.wait(0.1)
-
-        Type(Subtitle, Config.Subtitle, 0.025)
-
-        if Object.Closed then return end
-
-        Tween(BarBackground, 0.5, { BackgroundTransparency = 0.2 })
-        Tween(Bar, 0.5, { BackgroundTransparency = 0 })
-        Tween(Percentage, 0.5, { TextTransparency = 0 })
-
-        Object.IntroDone = true
-
-        task.wait(0.8)
-
-        if Object.Closed then return end
-
-        Tween(SkipHint, 0.6, { TextTransparency = 0 })
-
-        Tween(SkipButton, 0.6, {
-            BackgroundTransparency = 0.1,
-            TextTransparency = 0,
-        })
-    end)
-
-    Object:Update(0)
+    Object:Update(
+        0,
+        "Initializing OTC Hub...",
+        "Preparing modules..."
+    )
 
     return Object
 end

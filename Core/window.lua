@@ -8,7 +8,7 @@ local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
 local LOGO_ASSET =
-    "rbxassetid://104463753775983"
+    "rbxassetid://95900623719417"
 
 local ROMAN_REIGNS_IMAGE =
     "rbxassetid://102159565539986"
@@ -252,20 +252,30 @@ function Window.Create(
     Main.Name =
         "Main"
 
+    local WindowWidth =
+        tonumber(Settings.Width)
+        or 560
+
+    local WindowHeight =
+        tonumber(Settings.Height)
+        or 380
+
     Main.Size =
-        UDim2.new(
+        Settings.Size
+        or UDim2.new(
             0,
-            560,
+            WindowWidth,
             0,
-            380
+            WindowHeight
         )
 
     Main.Position =
-        UDim2.new(
+        Settings.Position
+        or UDim2.new(
             0.5,
-            -280,
+            -WindowWidth / 2,
             0.5,
-            -190
+            -WindowHeight / 2
         )
 
     Main.BackgroundColor3 =
@@ -323,6 +333,73 @@ function Window.Create(
 
     Object.MainStroke =
         MainStroke
+
+    local ResponsiveScale =
+        Instance.new("UIScale")
+
+    ResponsiveScale.Scale = 1
+    ResponsiveScale.Parent = Main
+
+    Object.ResponsiveScale =
+        ResponsiveScale
+
+    local ResponsiveConnection
+
+    local function UpdateResponsiveScale()
+        if Settings.Responsive == false then
+            ResponsiveScale.Scale = 1
+            return
+        end
+
+        local Camera = workspace.CurrentCamera
+
+        if not Camera then
+            return
+        end
+
+        local Viewport = Camera.ViewportSize
+
+        local Scale = math.min(
+            Viewport.X / 720,
+            Viewport.Y / 520
+        )
+
+        Scale = math.clamp(
+            Scale,
+            0.72,
+            1
+        )
+
+        Tween(
+            ResponsiveScale,
+            TweenInfo.new(
+                0.2,
+                Enum.EasingStyle.Quint,
+                Enum.EasingDirection.Out
+            ),
+            {
+                Scale = Scale
+            }
+        )
+    end
+
+    UpdateResponsiveScale()
+
+    if Settings.Responsive ~= false then
+        local Camera = workspace.CurrentCamera
+
+        if Camera then
+            ResponsiveConnection =
+                Camera:GetPropertyChangedSignal(
+                    "ViewportSize"
+                ):Connect(
+                    UpdateResponsiveScale
+                )
+        end
+    end
+
+    Object.ResponsiveConnection =
+        ResponsiveConnection
 
     local RomanArtwork =
         Instance.new("ImageLabel")
@@ -1994,11 +2071,11 @@ function Window.Create(
     function Object:GetTheme()
 
         return self.OTC._Themes[
-            self.OTC.CurrentTheme
+            self.Theme
         ]
 
         or self.OTC._Themes[
-            self.Theme
+            self.OTC.CurrentTheme
         ]
 
         or self.OTC._Themes.Default
@@ -3468,6 +3545,11 @@ function Window.Create(
             self.VersionPopup =
                 nil
 
+        end
+
+        if self.ResponsiveConnection then
+            self.ResponsiveConnection:Disconnect()
+            self.ResponsiveConnection = nil
         end
 
         if self.RomanArtwork then

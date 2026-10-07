@@ -9,7 +9,7 @@ local Notification = {}
 local TweenService = game:GetService("TweenService")
 local ContentProvider = game:GetService("ContentProvider")
 
-local LOGO_ASSET = "rbxassetid://104463753775983"
+local LOGO_ASSET = "rbxassetid://95900623719417"
 
 local function tween(Object, Time, Properties)
     local Info = TweenInfo.new(

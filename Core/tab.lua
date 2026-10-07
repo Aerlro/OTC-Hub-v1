@@ -277,8 +277,8 @@ function Tab.Create(
     Settings = Settings or {}
 
     local function getTheme()
-        return OTC._Themes[OTC.CurrentTheme]
-            or OTC._Themes[Window.Theme]
+        return OTC._Themes[Window.Theme]
+            or OTC._Themes[OTC.CurrentTheme]
             or OTC._Themes.Default
     end
 
@@ -961,6 +961,134 @@ function Tab.Create(
             self.OTC,
             Settings
         )
+    end
+
+    function TabObject:CreateKeybind(Settings)
+        Settings = Settings or {}
+
+        local Module =
+            self.OTC._Modules
+            and self.OTC._Modules.Keybind
+
+        if not Module then
+            error(
+                "[OTC Hub] Keybind module is not loaded"
+            )
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    function TabObject:CreateColorpicker(Settings)
+        Settings = Settings or {}
+
+        local Module =
+            self.OTC._Modules
+            and self.OTC._Modules.Colorpicker
+
+        if not Module then
+            error(
+                "[OTC Hub] Colorpicker module is not loaded"
+            )
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    function TabObject:CreateStat(Settings)
+        Settings = Settings or {}
+
+        local Module =
+            self.OTC._Modules
+            and self.OTC._Modules.Stat
+
+        if not Module then
+            error(
+                "[OTC Hub] Stat module is not loaded"
+            )
+        end
+
+        return Module.Create(
+            self,
+            self.OTC,
+            Settings
+        )
+    end
+
+    function TabObject:CreateDivider()
+        local CurrentTheme = getTheme()
+
+        local Divider = create(
+            "Frame",
+            {
+                Name = "Divider",
+                Parent = Page,
+                Size = UDim2.new(1, 0, 0, 1),
+                BackgroundColor3 = CurrentTheme.Border,
+                BackgroundTransparency = 0.45,
+                BorderSizePixel = 0
+            }
+        )
+
+        local Object = {
+            Type = "Divider",
+            Instance = Divider
+        }
+
+        function Object:RefreshTheme()
+            local Theme = getTheme()
+            if self.Instance and self.Instance.Parent then
+                self.Instance.BackgroundColor3 = Theme.Border
+            end
+        end
+
+        function Object:Destroy()
+            if self.Instance then
+                self.Instance:Destroy()
+            end
+        end
+
+        self:AddElement(Object)
+
+        return Object
+    end
+
+    function TabObject:CreateSpace(Size)
+        local Space = create(
+            "Frame",
+            {
+                Name = "Space",
+                Parent = Page,
+                Size = UDim2.new(1, 0, 0, tonumber(Size) or 8),
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0
+            }
+        )
+
+        local Object = {
+            Type = "Space",
+            Instance = Space
+        }
+
+        function Object:RefreshTheme() end
+
+        function Object:Destroy()
+            if self.Instance then
+                self.Instance:Destroy()
+            end
+        end
+
+        self:AddElement(Object)
+
+        return Object
     end
 
     function TabObject:RefreshTheme()

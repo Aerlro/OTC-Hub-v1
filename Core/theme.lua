@@ -771,6 +771,130 @@ Theme.BuiltIn = {
         }
     },
 
+    ["Cyber"] = {
+        Background = Color3.fromRGB(7, 10, 22),
+        Secondary = Color3.fromRGB(12, 17, 35),
+        Element = Color3.fromRGB(18, 27, 52),
+        Hover = Color3.fromRGB(27, 45, 78),
+        Pressed = Color3.fromRGB(37, 60, 105),
+
+        Border = Color3.fromRGB(55, 150, 220),
+        BorderHover = Color3.fromRGB(85, 205, 255),
+
+        Text = Color3.fromRGB(245, 250, 255),
+        SubText = Color3.fromRGB(170, 195, 215),
+        MutedText = Color3.fromRGB(105, 130, 155),
+
+        Accent = Color3.fromRGB(0, 225, 255),
+        AccentDark = Color3.fromRGB(0, 135, 175),
+        AccentHover = Color3.fromRGB(85, 245, 255),
+        AccentText = Color3.fromRGB(5, 15, 20),
+
+        Success = Color3.fromRGB(65, 235, 155),
+        Warning = Color3.fromRGB(255, 205, 80),
+        Error = Color3.fromRGB(255, 80, 110),
+        Info = Color3.fromRGB(90, 170, 255),
+
+        Tab = Color3.fromRGB(10, 18, 38),
+        TabHover = Color3.fromRGB(18, 35, 65),
+        TabSelected = Color3.fromRGB(20, 60, 80),
+
+        Button = Color3.fromRGB(18, 27, 52),
+        ButtonHover = Color3.fromRGB(27, 45, 78),
+        ButtonPressed = Color3.fromRGB(37, 60, 105),
+
+        ToggleOff = Color3.fromRGB(18, 35, 55),
+        ToggleOn = Color3.fromRGB(0, 225, 255),
+        ToggleCircle = Color3.fromRGB(235, 250, 255),
+
+        Input = Color3.fromRGB(9, 17, 32),
+        InputHover = Color3.fromRGB(17, 32, 55),
+        InputFocus = Color3.fromRGB(0, 225, 255),
+
+        Dropdown = Color3.fromRGB(9, 17, 32),
+        DropdownHover = Color3.fromRGB(18, 35, 58),
+        DropdownSelected = Color3.fromRGB(0, 225, 255),
+
+        SliderBackground = Color3.fromRGB(16, 32, 55),
+        SliderFill = Color3.fromRGB(0, 225, 255),
+        SliderKnob = Color3.fromRGB(145, 250, 255),
+
+        PopupBackground = Color3.fromRGB(7, 13, 27),
+        PopupBorder = Color3.fromRGB(55, 150, 220),
+
+        NotificationBackground = Color3.fromRGB(9, 18, 34),
+        NotificationBorder = Color3.fromRGB(0, 225, 255),
+
+        Scrollbar = Color3.fromRGB(0, 225, 255),
+
+        Transparency = {
+            Main = 0,
+            Secondary = 0,
+            Element = 0,
+            Popup = 0,
+            Notification = 0
+        },
+
+        Stroke = {
+            Enabled = true,
+            Thickness = 1.5,
+            Transparency = 0
+        },
+
+        Corners = {
+            Main = 12,
+            Element = 8,
+            Button = 8,
+            Input = 8,
+            Dropdown = 8,
+            Popup = 12,
+            Notification = 9
+        },
+
+        Effects = {
+            Glow = true,
+            Shadow = true,
+            Gradient = true,
+            AnimatedGradient = true
+        },
+
+        Gradients = {
+            Main = {
+                Color3.fromRGB(7, 10, 22),
+                Color3.fromRGB(12, 25, 45),
+                Color3.fromRGB(8, 15, 35)
+            },
+            TopBar = {
+                Color3.fromRGB(9, 16, 32),
+                Color3.fromRGB(18, 45, 62),
+                Color3.fromRGB(10, 22, 40)
+            },
+            Sidebar = {
+                Color3.fromRGB(7, 14, 30),
+                Color3.fromRGB(12, 28, 52)
+            },
+            Element = {
+                Color3.fromRGB(15, 28, 52),
+                Color3.fromRGB(0, 120, 160),
+                Color3.fromRGB(25, 35, 65)
+            },
+            Accent = {
+                Color3.fromRGB(0, 145, 190),
+                Color3.fromRGB(0, 225, 255),
+                Color3.fromRGB(120, 250, 255)
+            }
+        },
+
+        Artwork = {
+            Enabled = false,
+            Image = "",
+            ImageTransparency = 1,
+            Size = UDim2.new(0, 300, 0, 300),
+            Position = UDim2.new(1, -315, 1, -315),
+            ZIndex = 1
+        }
+    },
+
     ["Halloween"] = {
         Background = Color3.fromRGB(24, 5, 35),
         Secondary = Color3.fromRGB(45, 8, 65),
