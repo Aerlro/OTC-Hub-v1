@@ -92,14 +92,18 @@ function Input.Create(Tab, OTC, Settings)
         Settings.Placeholder
         or "Enter text..."
 
-    local CurrentValue =
-        tostring(
-            Settings.CurrentValue
-            or ""
-        )
-
     local Flag =
         Settings.Flag
+
+    local CurrentValue =
+        tostring(
+            OTC:GetFlag(
+                Flag,
+                Settings.CurrentValue
+                or ""
+            )
+            or ""
+        )
 
     local ClearTextOnFocus =
         Settings.ClearTextOnFocus == true

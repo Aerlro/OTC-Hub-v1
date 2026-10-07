@@ -99,6 +99,9 @@ function Dropdown.Create(TabObject, OTC, Settings)
     local MultiSelect =
         Settings.MultiSelect == true
 
+    local Flag =
+        Settings.Flag
+
     local Callback =
         Settings.Callback
         or function()
@@ -854,14 +857,27 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     local Selected = {}
 
+    local SavedOption =
+        Flag
+        and OTC:GetFlag(
+            Flag,
+            nil
+        )
+        or nil
+
+    local InitialOption =
+        SavedOption ~= nil
+        and SavedOption
+        or Settings.CurrentOption
+
     if MultiSelect then
 
         if type(
-            Settings.CurrentOption
+            InitialOption
         ) == "table" then
 
             for _, Value in ipairs(
-                Settings.CurrentOption
+                InitialOption
             ) do
 
                 Selected[
@@ -874,11 +890,11 @@ function Dropdown.Create(TabObject, OTC, Settings)
 
     else
 
-        if Settings.CurrentOption ~= nil then
+        if InitialOption ~= nil then
 
             local Value =
                 tostring(
-                    Settings.CurrentOption
+                    InitialOption
                 )
 
             if table.find(
@@ -988,6 +1004,27 @@ function Dropdown.Create(TabObject, OTC, Settings)
     end
 
     local function FireCallback()
+
+        if Flag then
+            local SavedValue = {}
+
+            if MultiSelect then
+                for _, Option in ipairs(Options) do
+                    if Selected[Option] then
+                        table.insert(SavedValue, Option)
+                    end
+                end
+            else
+                for _, Option in ipairs(Options) do
+                    if Selected[Option] then
+                        SavedValue = Option
+                        break
+                    end
+                end
+            end
+
+            OTC:SetFlag(Flag, SavedValue)
+        end
 
         if MultiSelect then
 

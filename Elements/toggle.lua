@@ -100,7 +100,10 @@ function Toggle.Create(Tab, OTC, Settings)
         Settings.Flag
 
     local CurrentValue =
-        Settings.CurrentValue == true
+        OTC:GetFlag(
+            Flag,
+            Settings.CurrentValue == true
+        ) == true
 
     local Callback =
         Settings.Callback

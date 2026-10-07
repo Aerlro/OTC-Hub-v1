@@ -143,7 +143,12 @@ function Slider.Create(Tab, OTC, Settings)
     end
 
     local CurrentValue =
-        clamp(Default)
+        clamp(
+            OTC:GetFlag(
+                Flag,
+                Default
+            )
+        )
 
     local FrameHeight =
         Description
