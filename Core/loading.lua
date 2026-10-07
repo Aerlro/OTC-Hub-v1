@@ -7,7 +7,7 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
-local LOGO_ASSET = "rbxassetid://104463753775983"
+local LOGO_ASSET = "rbxassetid://95900623719417"
 
 local function Tween(Object, Time, Properties, Style, Direction)
     if not Object then
