@@ -579,6 +579,14 @@ OTC._Modules = {
 OTC._Lucide =
     LucideModule
 
+function OTC:IsThemeAllowed(Name)
+    if not self._ThemeModule then
+        return false
+    end
+
+    return self._ThemeModule:IsAllowed(Name, LocalPlayer)
+end
+
 --// Notifications
 function OTC:Notify(Data)
     Data = Data or {}
