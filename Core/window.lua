@@ -10,7 +10,7 @@ local LocalPlayer = Players.LocalPlayer
 local LOGO_ASSET = "rbxassetid://104463753775983"
 
 local ROMAN_REIGNS_IMAGE =
-    "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/Owner/db009abe18bb20e9192664f442bcb41a.jpg"
+    "rbxassetid://102159565539986"
 
 local ROMAN_REIGNS_USERS = {
     [572117566] = true
