@@ -10,6 +10,12 @@ local LocalPlayer = Players.LocalPlayer
 local LOGO_ASSET =
     "rbxassetid://95900623719417"
 
+local MINIMIZE_ASSET =
+    "rbxassetid://123120037399918"
+
+local CLOSE_ASSET =
+    "rbxassetid://97642116681622"
+
 local ROMAN_REIGNS_IMAGE =
     "rbxassetid://102159565539986"
 
@@ -571,6 +577,7 @@ function Window.Create(
             TopBarAccent,
             Theme.Gradients.Accent
         )
+
     end
 
     Object.TopBarAccent =
@@ -805,7 +812,7 @@ function Window.Create(
         VersionTag
 
     local SearchButton =
-        Instance.new("TextButton")
+        Instance.new("ImageButton")
 
     SearchButton.Name =
         "Search"
@@ -838,17 +845,11 @@ function Window.Create(
     SearchButton.AutoButtonColor =
         false
 
-    SearchButton.Text =
-        "⌕"
+    SearchButton.Image =
+        "rbxassetid://0"
 
-    SearchButton.TextColor3 =
-        Theme.Text
-
-    SearchButton.TextSize =
-        18
-
-    SearchButton.Font =
-        Enum.Font.GothamBold
+    SearchButton.ImageTransparency =
+        1
 
     SearchButton.Parent =
         TopBar
@@ -891,8 +892,9 @@ function Window.Create(
     SearchStroke.Parent =
         SearchButton
 
+    --// Minimize Image Button
     local MinimizeButton =
-        Instance.new("TextButton")
+        Instance.new("ImageButton")
 
     MinimizeButton.Name =
         "Minimize"
@@ -927,17 +929,14 @@ function Window.Create(
     MinimizeButton.AutoButtonColor =
         false
 
-    MinimizeButton.Text =
-        "—"
+    MinimizeButton.Image =
+        MINIMIZE_ASSET
 
-    MinimizeButton.TextColor3 =
-        Theme.Text
+    MinimizeButton.ImageTransparency =
+        0
 
-    MinimizeButton.TextSize =
-        18
-
-    MinimizeButton.Font =
-        Enum.Font.GothamBold
+    MinimizeButton.ScaleType =
+        Enum.ScaleType.Fit
 
     MinimizeButton.Parent =
         TopBar
@@ -956,8 +955,9 @@ function Window.Create(
     MinimizeCorner.Parent =
         MinimizeButton
 
+    --// Close Image Button
     local CloseButton =
-        Instance.new("TextButton")
+        Instance.new("ImageButton")
 
     CloseButton.Name =
         "Close"
@@ -992,17 +992,14 @@ function Window.Create(
     CloseButton.AutoButtonColor =
         false
 
-    CloseButton.Text =
-        "×"
+    CloseButton.Image =
+        CLOSE_ASSET
 
-    CloseButton.TextColor3 =
-        Theme.Text
+    CloseButton.ImageTransparency =
+        0
 
-    CloseButton.TextSize =
-        22
-
-    CloseButton.Font =
-        Enum.Font.GothamBold
+    CloseButton.ScaleType =
+        Enum.ScaleType.Fit
 
     CloseButton.Parent =
         TopBar
@@ -1690,468 +1687,6 @@ function Window.Create(
         end
     )
 
-    local SearchOverlay
-
-    local function OpenSearch()
-
-        if SearchOverlay then
-            SearchOverlay:Destroy()
-            SearchOverlay = nil
-            return
-        end
-
-        local ThemeNow =
-            Object:GetTheme()
-
-        local Overlay =
-            Instance.new("Frame")
-
-        Overlay.Name =
-            "SearchOverlay"
-
-        Overlay.Size =
-            UDim2.fromScale(
-                1,
-                1
-            )
-
-        Overlay.BackgroundColor3 =
-            Color3.new(
-                0,
-                0,
-                0
-            )
-
-        Overlay.BackgroundTransparency =
-            0.45
-
-        Overlay.BorderSizePixel =
-            0
-
-        Overlay.ZIndex =
-            500
-
-        Overlay.Parent =
-            ScreenGui
-
-        local Box =
-            Instance.new("Frame")
-
-        Box.Size =
-            UDim2.fromOffset(
-                440,
-                92
-            )
-
-        Box.Position =
-            UDim2.new(
-                0.5,
-                -220,
-                0.22,
-                0
-            )
-
-        Box.BackgroundColor3 =
-            ThemeNow.PopupBackground
-            or ThemeNow.Background
-
-        Box.BorderSizePixel =
-            0
-
-        Box.ZIndex =
-            501
-
-        Box.Parent =
-            Overlay
-
-        local Corner =
-            Instance.new("UICorner")
-
-        Corner.CornerRadius =
-            UDim.new(
-                0,
-                14
-            )
-
-        Corner.Parent =
-            Box
-
-        local Stroke =
-            Instance.new("UIStroke")
-
-        Stroke.Color =
-            ThemeNow.Border
-
-        Stroke.Thickness =
-            ThemeNow.Stroke
-            and ThemeNow.Stroke.Thickness
-            or 1
-
-        Stroke.Parent =
-            Box
-
-        local Input =
-            Instance.new("TextBox")
-
-        Input.Size =
-            UDim2.new(
-                1,
-                -32,
-                0,
-                42
-            )
-
-        Input.Position =
-            UDim2.fromOffset(
-                16,
-                14
-            )
-
-        Input.BackgroundColor3 =
-            ThemeNow.Input
-            or ThemeNow.Element
-
-        Input.BorderSizePixel =
-            0
-
-        Input.ClearTextOnFocus =
-            false
-
-        Input.PlaceholderText =
-            "Search tabs and elements..."
-
-        Input.PlaceholderColor3 =
-            ThemeNow.MutedText
-            or ThemeNow.SubText
-
-        Input.Text =
-            ""
-
-        Input.TextColor3 =
-            ThemeNow.Text
-
-        Input.TextSize =
-            14
-
-        Input.Font =
-            Enum.Font.GothamMedium
-
-        Input.TextXAlignment =
-            Enum.TextXAlignment.Left
-
-        Input.ZIndex =
-            502
-
-        Input.Parent =
-            Box
-
-        local InputCorner =
-            Instance.new("UICorner")
-
-        InputCorner.CornerRadius =
-            UDim.new(
-                0,
-                9
-            )
-
-        InputCorner.Parent =
-            Input
-
-        local Hint =
-            Instance.new("TextLabel")
-
-        Hint.Size =
-            UDim2.new(
-                1,
-                -32,
-                0,
-                18
-            )
-
-        Hint.Position =
-            UDim2.fromOffset(
-                16,
-                61
-            )
-
-        Hint.BackgroundTransparency =
-            1
-
-        Hint.Text =
-            "Enter to open the first match • Esc to close"
-
-        Hint.TextColor3 =
-            ThemeNow.SubText
-
-        Hint.TextSize =
-            9
-
-        Hint.Font =
-            Enum.Font.Gotham
-
-        Hint.TextXAlignment =
-            Enum.TextXAlignment.Left
-
-        Hint.ZIndex =
-            502
-
-        Hint.Parent =
-            Box
-
-        local function ElementText(
-            Element,
-            Field
-        )
-            local Value =
-                Element
-                and Element[Field]
-
-            if typeof(Value) ==
-                "Instance" then
-
-                return tostring(
-                    Value.Text
-                    or ""
-                )
-            end
-
-            return tostring(
-                Value
-                or ""
-            )
-        end
-
-        local function Search(Query)
-
-            Query =
-                tostring(
-                    Query
-                    or ""
-                )
-                :lower()
-                :gsub(
-                    "^%s+",
-                    ""
-                )
-                :gsub(
-                    "%s+$",
-                    ""
-                )
-
-            if Query == "" then
-                return
-            end
-
-            for _, TabObject in ipairs(
-                Object.Tabs
-            ) do
-
-                if tostring(
-                    TabObject.Name
-                ):lower():find(
-                    Query,
-                    1,
-                    true
-                ) then
-
-                    Object:SelectTab(
-                        TabObject
-                    )
-
-                    return true
-                end
-
-                for _, Element in ipairs(
-                    TabObject.Elements
-                    or {}
-                ) do
-
-                    local Title =
-                        ElementText(
-                            Element,
-                            "Title"
-                        )
-
-                    local Description =
-                        ElementText(
-                            Element,
-                            "Description"
-                        )
-
-                    if tostring(
-                        Title
-                    ):lower():find(
-                        Query,
-                        1,
-                        true
-                    )
-                    or tostring(
-                        Description
-                    ):lower():find(
-                        Query,
-                        1,
-                        true
-                    ) then
-
-                        Object:SelectTab(
-                            TabObject
-                        )
-
-                        if Element.Instance
-                            and Element.Instance.Parent then
-
-                            pcall(function()
-
-                                local Page =
-                                    TabObject.Page
-
-                                local Y =
-                                    math.max(
-                                        0,
-                                        Element.Instance.AbsolutePosition.Y
-                                            - Page.AbsolutePosition.Y
-                                            + Page.CanvasPosition.Y
-                                            - 20
-                                    )
-
-                                Page.CanvasPosition =
-                                    Vector2.new(
-                                        0,
-                                        Y
-                                    )
-
-                            end)
-                        end
-
-                        return true
-                    end
-                end
-            end
-        end
-
-        Input.FocusLost:Connect(
-            function(
-                EnterPressed
-            )
-
-                if EnterPressed then
-
-                    Search(
-                        Input.Text
-                    )
-
-                    task.delay(
-                        0.05,
-                        function()
-
-                            if Overlay.Parent then
-                                Overlay:Destroy()
-                                SearchOverlay = nil
-                            end
-
-                        end
-                    )
-                end
-            end
-        )
-
-        Overlay.InputBegan:Connect(
-            function(InputObject)
-
-                if InputObject.KeyCode ==
-                    Enum.KeyCode.Escape then
-
-                    Overlay:Destroy()
-                    SearchOverlay = nil
-
-                end
-
-            end
-        )
-
-        SearchOverlay =
-            Overlay
-
-        Input:CaptureFocus()
-
-    end
-
-    SearchButton.MouseButton1Click:Connect(
-        OpenSearch
-    )
-
-    function Object:Search(Query)
-
-        if SearchOverlay then
-            SearchOverlay:Destroy()
-            SearchOverlay = nil
-        end
-
-        Query =
-            tostring(
-                Query or ""
-            ):lower()
-
-        for _, TabObject in ipairs(
-            self.Tabs
-        ) do
-
-            if tostring(
-                TabObject.Name
-            ):lower():find(
-                Query,
-                1,
-                true
-            ) then
-
-                self:SelectTab(
-                    TabObject
-                )
-
-                return true
-            end
-
-            for _, Element in ipairs(
-                TabObject.Elements
-                or {}
-            ) do
-
-                local TitleValue =
-                    Element.Title
-
-                local Title =
-                    typeof(
-                        TitleValue
-                    ) == "Instance"
-                    and tostring(
-                        TitleValue.Text
-                        or ""
-                    )
-                    or tostring(
-                        TitleValue
-                        or ""
-                    )
-
-                if tostring(
-                    Title
-                ):lower():find(
-                    Query,
-                    1,
-                    true
-                ) then
-
-                    self:SelectTab(
-                        TabObject
-                    )
-
-                    return Element
-                end
-            end
-        end
-
-        return nil
-    end
-
     function Object:GetTheme()
 
         return self.OTC._Themes[
@@ -2365,6 +1900,364 @@ function Window.Create(
 
     end
 
+    function Object:RefreshTheme()
+
+        local ThemeName =
+            self.Theme
+
+        if IsRomanReignsTheme(
+            ThemeName
+        ) and not IsRomanReignsAllowed() then
+
+            ThemeName =
+                "Default"
+
+            self.Theme =
+                "Default"
+
+        end
+
+        local NewTheme =
+            self.OTC._Themes[
+                ThemeName
+            ]
+            or self.OTC._Themes.Default
+
+        self.Theme =
+            ThemeName
+
+        local Transparency =
+            NewTheme.Transparency
+            or {}
+
+        local Stroke =
+            NewTheme.Stroke
+            or {}
+
+        local Corners =
+            NewTheme.Corners
+            or {}
+
+        local Gradients =
+            NewTheme.Gradients
+            or {}
+
+        local Effects =
+            NewTheme.Effects
+            or {}
+
+        local ShowRomanArtwork =
+            IsRomanReignsTheme(
+                ThemeName
+            )
+            and IsRomanReignsAllowed()
+
+        Main.BackgroundColor3 =
+            NewTheme.Background
+
+        Main.BackgroundTransparency =
+            Transparency.Main or 0
+
+        MainStroke.Color =
+            NewTheme.Border
+
+        MainStroke.Thickness =
+            Stroke.Thickness or 1
+
+        MainStroke.Transparency =
+            Stroke.Transparency or 0
+
+        MainStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        ApplyCorner(
+            Main,
+            Corners.Main or 10
+        )
+
+        TopBar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        TopBar.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        TopBarAccent.BackgroundColor3 =
+            NewTheme.Accent
+
+        Object.ThemeGradients.TopBarAccent =
+            ApplyOrClearGradient(
+                TopBarAccent,
+                Gradients.Accent
+            )
+
+        Sidebar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        Sidebar.BackgroundTransparency =
+            Transparency.Secondary or 0
+
+        Content.BackgroundColor3 =
+            NewTheme.Element
+            or NewTheme.Background
+
+        Content.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        ContentStroke.Color =
+            NewTheme.Border
+
+        ContentStroke.Thickness =
+            Stroke.Thickness or 1
+
+        ContentStroke.Transparency =
+            Stroke.Transparency or 0
+
+        ContentStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        Logo.Image =
+            LOGO_ASSET
+
+        Title.TextColor3 =
+            NewTheme.Text
+
+        Subtitle.TextColor3 =
+            NewTheme.SubText
+
+        VersionTag.BackgroundColor3 =
+            NewTheme.Element
+
+        VersionTag.TextColor3 =
+            NewTheme.Text
+
+        VersionStroke.Color =
+            NewTheme.Border
+
+        VersionStroke.Thickness =
+            Stroke.Thickness or 1
+
+        VersionStroke.Transparency =
+            Stroke.Transparency or 0.3
+
+        VersionStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        SearchButton.BackgroundColor3 =
+            NewTheme.Element
+
+        SearchButton.BackgroundTransparency =
+            Transparency.Element or 0
+
+        SearchStroke.Color =
+            NewTheme.Border
+
+        SearchStroke.Thickness =
+            Stroke.Thickness or 1
+
+        SearchStroke.Transparency =
+            Stroke.Transparency or 0
+
+        SearchStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        MinimizeButton.BackgroundColor3 =
+            NewTheme.Element
+
+        MinimizeButton.BackgroundTransparency =
+            Transparency.Element or 0
+
+        MinimizeButton.Image =
+            MINIMIZE_ASSET
+
+        MinimizeButton.ImageTransparency =
+            0
+
+        CloseButton.BackgroundColor3 =
+            NewTheme.Element
+
+        CloseButton.BackgroundTransparency =
+            Transparency.Element or 0
+
+        CloseButton.Image =
+            CLOSE_ASSET
+
+        CloseButton.ImageTransparency =
+            0
+
+        ApplyCorner(
+            MinimizeButton,
+            Corners.Button or 7
+        )
+
+        ApplyCorner(
+            CloseButton,
+            Corners.Button or 7
+        )
+
+        SidebarTitle.TextColor3 =
+            NewTheme.MutedText
+            or NewTheme.SubText
+
+        TabsContainer.ScrollBarImageColor3 =
+            NewTheme.Scrollbar
+            or NewTheme.Border
+
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserCard.BackgroundTransparency =
+            Transparency.Element or 0
+
+        UserAvatar.BackgroundColor3 =
+            NewTheme.Background
+
+        UserDisplay.TextColor3 =
+            NewTheme.Text
+
+        UserName.TextColor3 =
+            NewTheme.SubText
+
+        MiniButton.Image =
+            LOGO_ASSET
+
+        RomanArtwork.Image =
+            ROMAN_REIGNS_IMAGE
+
+        RomanArtwork.Visible =
+            ShowRomanArtwork
+
+        if ShowRomanArtwork then
+
+            Main.BackgroundTransparency =
+                1
+
+            TopBar.BackgroundTransparency =
+                0.42
+
+            Sidebar.BackgroundTransparency =
+                0.42
+
+            Content.BackgroundTransparency =
+                0.42
+
+        end
+
+        if not ShowRomanArtwork then
+
+            Main.BackgroundTransparency =
+                Transparency.Main or 0
+
+            TopBar.BackgroundTransparency =
+                Transparency.Secondary or 0
+
+            Sidebar.BackgroundTransparency =
+                Transparency.Secondary or 0
+
+            Content.BackgroundTransparency =
+                Transparency.Element or 0
+
+        end
+
+        Object.ThemeGradients.Main =
+            ApplyOrClearGradient(
+                Main,
+                Gradients.Main
+            )
+
+        Object.ThemeGradients.TopBar =
+            ApplyOrClearGradient(
+                TopBar,
+                Gradients.TopBar
+            )
+
+        Object.ThemeGradients.Sidebar =
+            ApplyOrClearGradient(
+                Sidebar,
+                Gradients.Sidebar
+            )
+
+        Object.ThemeGradients.UserCard =
+            ApplyOrClearGradient(
+                UserCard,
+                Gradients.Element
+            )
+
+        Object.ThemeGradients.Minimize =
+            ApplyOrClearGradient(
+                MinimizeButton,
+                Gradients.Element
+            )
+
+        Object.ThemeGradients.Close =
+            ApplyOrClearGradient(
+                CloseButton,
+                Gradients.Element
+            )
+
+        ApplyStroke(
+            MainStroke,
+            NewTheme
+        )
+
+        if Effects.AnimatedGradient then
+
+            for _, GradientObject in pairs(
+                Object.ThemeGradients
+            ) do
+
+                if GradientObject then
+
+                    task.spawn(
+                        function()
+
+                            local StartRotation =
+                                GradientObject.Rotation
+
+                            Tween(
+                                GradientObject,
+                                TweenInfo.new(
+                                    6,
+                                    Enum.EasingStyle.Linear,
+                                    Enum.EasingDirection.In,
+                                    -1
+                                ),
+                                {
+                                    Rotation =
+                                        StartRotation
+                                        + 360
+                                }
+                            )
+
+                        end
+                    )
+
+                end
+
+            end
+
+        end
+
+        for _, TabObject in ipairs(
+            self.Tabs
+        ) do
+
+            if TabObject.RefreshTheme then
+
+                pcall(
+                    function()
+
+                        TabObject:RefreshTheme()
+
+                    end
+                )
+
+            end
+
+        end
+
+    end
+
     local function CreateUnloadConfirmation()
 
         if Object.UnloadConfirmation then
@@ -2433,11 +2326,6 @@ function Window.Create(
             CurrentTheme.PopupBackground
             or CurrentTheme.Background
 
-        Popup.BackgroundTransparency =
-            CurrentTheme.Transparency
-            and CurrentTheme.Transparency.Popup
-            or 0
-
         Popup.BorderSizePixel =
             0
 
@@ -2473,24 +2361,11 @@ function Window.Create(
             and CurrentTheme.Stroke.Thickness
             or 1
 
-        PopupStroke.Transparency =
-            CurrentTheme.Stroke
-            and CurrentTheme.Stroke.Transparency
-            or 0
-
-        PopupStroke.Enabled =
-            CurrentTheme.Stroke
-            and CurrentTheme.Stroke.Enabled ~= false
-            or true
-
         PopupStroke.Parent =
             Popup
 
         local PopupTitle =
             Instance.new("TextLabel")
-
-        PopupTitle.Name =
-            "Title"
 
         PopupTitle.BackgroundTransparency =
             1
@@ -2535,9 +2410,6 @@ function Window.Create(
         local PopupDescription =
             Instance.new("TextLabel")
 
-        PopupDescription.Name =
-            "Description"
-
         PopupDescription.BackgroundTransparency =
             1
 
@@ -2572,9 +2444,6 @@ function Window.Create(
         PopupDescription.TextWrapped =
             true
 
-        PopupDescription.TextXAlignment =
-            Enum.TextXAlignment.Left
-
         PopupDescription.ZIndex =
             102
 
@@ -2583,9 +2452,6 @@ function Window.Create(
 
         local CancelButton =
             Instance.new("TextButton")
-
-        CancelButton.Name =
-            "Cancel"
 
         CancelButton.Size =
             UDim2.new(
@@ -2610,12 +2476,6 @@ function Window.Create(
         CancelButton.BorderSizePixel =
             0
 
-        CancelButton.AutoButtonColor =
-            false
-
-        CancelButton.Font =
-            Enum.Font.GothamSemibold
-
         CancelButton.Text =
             "Cancel"
 
@@ -2624,6 +2484,9 @@ function Window.Create(
 
         CancelButton.TextSize =
             14
+
+        CancelButton.Font =
+            Enum.Font.GothamSemibold
 
         CancelButton.ZIndex =
             102
@@ -2648,9 +2511,6 @@ function Window.Create(
         local UnloadButton =
             Instance.new("TextButton")
 
-        UnloadButton.Name =
-            "Unload"
-
         UnloadButton.Size =
             UDim2.new(
                 0,
@@ -2673,12 +2533,6 @@ function Window.Create(
         UnloadButton.BorderSizePixel =
             0
 
-        UnloadButton.AutoButtonColor =
-            false
-
-        UnloadButton.Font =
-            Enum.Font.GothamSemibold
-
         UnloadButton.Text =
             "Unload"
 
@@ -2688,6 +2542,9 @@ function Window.Create(
 
         UnloadButton.TextSize =
             14
+
+        UnloadButton.Font =
+            Enum.Font.GothamSemibold
 
         UnloadButton.ZIndex =
             102
@@ -2708,78 +2565,6 @@ function Window.Create(
 
         UnloadCorner.Parent =
             UnloadButton
-
-        if CurrentTheme.Gradients
-            and CurrentTheme.Gradients.Main then
-
-            ApplyGradient(
-                Popup,
-                CurrentTheme.Gradients.Main
-            )
-
-        end
-
-        if CurrentTheme.Gradients
-            and CurrentTheme.Gradients.Accent then
-
-            ApplyGradient(
-                UnloadButton,
-                CurrentTheme.Gradients.Accent
-            )
-
-        end
-
-        CancelButton.MouseEnter:Connect(
-            function()
-
-                local Current =
-                    Object:GetTheme()
-
-                CancelButton.BackgroundColor3 =
-                    Current.ButtonHover
-                    or Current.Hover
-                    or Current.Element
-
-            end
-        )
-
-        CancelButton.MouseLeave:Connect(
-            function()
-
-                local Current =
-                    Object:GetTheme()
-
-                CancelButton.BackgroundColor3 =
-                    Current.Button
-                    or Current.Element
-
-            end
-        )
-
-        UnloadButton.MouseEnter:Connect(
-            function()
-
-                local Current =
-                    Object:GetTheme()
-
-                UnloadButton.BackgroundColor3 =
-                    Current.AccentHover
-                    or Current.Accent
-
-            end
-        )
-
-        UnloadButton.MouseLeave:Connect(
-            function()
-
-                local Current =
-                    Object:GetTheme()
-
-                UnloadButton.BackgroundColor3 =
-                    Current.Accent
-
-            end
-        )
 
         CancelButton.MouseButton1Click:Connect(
             function()
@@ -2809,1457 +2594,6 @@ function Window.Create(
             CancelButton = CancelButton,
             UnloadButton = UnloadButton
         }
-
-    end
-
-    local function CreateVersionPopup()
-
-        if Object.VersionPopup then
-            return
-        end
-
-        local CurrentTheme =
-            Object:GetTheme()
-
-        local Overlay =
-            Instance.new("Frame")
-
-        Overlay.Name =
-            "VersionOverlay"
-
-        Overlay.Size =
-            UDim2.new(
-                1,
-                0,
-                1,
-                0
-            )
-
-        Overlay.BackgroundColor3 =
-            Color3.fromRGB(
-                0,
-                0,
-                0
-            )
-
-        Overlay.BackgroundTransparency =
-            0.45
-
-        Overlay.BorderSizePixel =
-            0
-
-        Overlay.ZIndex =
-            200
-
-        Overlay.Parent =
-            ScreenGui
-
-        local Popup =
-            Instance.new("Frame")
-
-        Popup.Name =
-            "VersionPopup"
-
-        Popup.Size =
-            UDim2.new(
-                0,
-                390,
-                0,
-                340
-            )
-
-        Popup.Position =
-            UDim2.new(
-                0.5,
-                -195,
-                0.5,
-                -170
-            )
-
-        Popup.BackgroundColor3 =
-            CurrentTheme.PopupBackground
-            or CurrentTheme.Background
-
-        Popup.BackgroundTransparency =
-            CurrentTheme.Transparency
-            and CurrentTheme.Transparency.Popup
-            or 0
-
-        Popup.BorderSizePixel =
-            0
-
-        Popup.ZIndex =
-            201
-
-        Popup.Parent =
-            Overlay
-
-        local PopupCorner =
-            Instance.new("UICorner")
-
-        PopupCorner.CornerRadius =
-            UDim.new(
-                0,
-                CurrentTheme.Corners
-                and CurrentTheme.Corners.Popup
-                or 12
-            )
-
-        PopupCorner.Parent =
-            Popup
-
-        local PopupStroke =
-            Instance.new("UIStroke")
-
-        PopupStroke.Color =
-            CurrentTheme.PopupBorder
-            or CurrentTheme.Border
-
-        PopupStroke.Thickness =
-            CurrentTheme.Stroke
-            and CurrentTheme.Stroke.Thickness
-            or 1
-
-        PopupStroke.Transparency =
-            CurrentTheme.Stroke
-            and CurrentTheme.Stroke.Transparency
-            or 0
-
-        PopupStroke.Enabled =
-            CurrentTheme.Stroke
-            and CurrentTheme.Stroke.Enabled ~= false
-            or true
-
-        PopupStroke.Parent =
-            Popup
-
-        local PopupTitle =
-            Instance.new("TextLabel")
-
-        PopupTitle.Name =
-            "Title"
-
-        PopupTitle.BackgroundTransparency =
-            1
-
-        PopupTitle.Position =
-            UDim2.new(
-                0,
-                20,
-                0,
-                16
-            )
-
-        PopupTitle.Size =
-            UDim2.new(
-                1,
-                -70,
-                0,
-                28
-            )
-
-        PopupTitle.Font =
-            Enum.Font.GothamBold
-
-        PopupTitle.Text =
-            "OTC Hub v"
-            .. tostring(
-                OTC.Version
-                or "1.0.0"
-            )
-
-        PopupTitle.TextColor3 =
-            CurrentTheme.Text
-
-        PopupTitle.TextSize =
-            19
-
-        PopupTitle.TextXAlignment =
-            Enum.TextXAlignment.Left
-
-        PopupTitle.ZIndex =
-            202
-
-        PopupTitle.Parent =
-            Popup
-
-        local PopupSubtitle =
-            Instance.new("TextLabel")
-
-        PopupSubtitle.Name =
-            "Subtitle"
-
-        PopupSubtitle.BackgroundTransparency =
-            1
-
-        PopupSubtitle.Position =
-            UDim2.new(
-                0,
-                20,
-                0,
-                45
-            )
-
-        PopupSubtitle.Size =
-            UDim2.new(
-                1,
-                -40,
-                0,
-                20
-            )
-
-        PopupSubtitle.Font =
-            Enum.Font.Gotham
-
-        PopupSubtitle.Text =
-            "What's New"
-
-        PopupSubtitle.TextColor3 =
-            CurrentTheme.SubText
-
-        PopupSubtitle.TextSize =
-            12
-
-        PopupSubtitle.TextXAlignment =
-            Enum.TextXAlignment.Left
-
-        PopupSubtitle.ZIndex =
-            202
-
-        PopupSubtitle.Parent =
-            Popup
-
-        local CloseVersion =
-            Instance.new("TextButton")
-
-        CloseVersion.Name =
-            "Close"
-
-        CloseVersion.Size =
-            UDim2.new(
-                0,
-                30,
-                0,
-                30
-            )
-
-        CloseVersion.Position =
-            UDim2.new(
-                1,
-                -42,
-                0,
-                14
-            )
-
-        CloseVersion.BackgroundColor3 =
-            CurrentTheme.Element
-
-        CloseVersion.BorderSizePixel =
-            0
-
-        CloseVersion.AutoButtonColor =
-            false
-
-        CloseVersion.Text =
-            "×"
-
-        CloseVersion.TextColor3 =
-            CurrentTheme.Text
-
-        CloseVersion.TextSize =
-            19
-
-        CloseVersion.Font =
-            Enum.Font.GothamBold
-
-        CloseVersion.ZIndex =
-            203
-
-        CloseVersion.Parent =
-            Popup
-
-        local CloseCorner =
-            Instance.new("UICorner")
-
-        CloseCorner.CornerRadius =
-            UDim.new(
-                0,
-                CurrentTheme.Corners
-                and CurrentTheme.Corners.Button
-                or 7
-            )
-
-        CloseCorner.Parent =
-            CloseVersion
-
-        local Updates =
-            Instance.new("ScrollingFrame")
-
-        Updates.Name =
-            "Updates"
-
-        Updates.Size =
-            UDim2.new(
-                1,
-                -40,
-                1,
-                -105
-            )
-
-        Updates.Position =
-            UDim2.new(
-                0,
-                20,
-                0,
-                75
-            )
-
-        Updates.BackgroundColor3 =
-            CurrentTheme.Element
-
-        Updates.BackgroundTransparency =
-            CurrentTheme.Transparency
-            and CurrentTheme.Transparency.Element
-            or 0
-
-        Updates.BorderSizePixel =
-            0
-
-        Updates.ScrollBarThickness =
-            3
-
-        Updates.ScrollBarImageColor3 =
-            CurrentTheme.Scrollbar
-            or CurrentTheme.Border
-
-        Updates.CanvasSize =
-            UDim2.new(
-                0,
-                0,
-                0,
-                0
-            )
-
-        Updates.ZIndex =
-            202
-
-        Updates.Parent =
-            Popup
-
-        local UpdatesCorner =
-            Instance.new("UICorner")
-
-        UpdatesCorner.CornerRadius =
-            UDim.new(
-                0,
-                CurrentTheme.Corners
-                and CurrentTheme.Corners.Element
-                or 8
-            )
-
-        UpdatesCorner.Parent =
-            Updates
-
-        local UpdatesPadding =
-            Instance.new("UIPadding")
-
-        UpdatesPadding.PaddingTop =
-            UDim.new(
-                0,
-                10
-            )
-
-        UpdatesPadding.PaddingBottom =
-            UDim.new(
-                0,
-                10
-            )
-
-        UpdatesPadding.PaddingLeft =
-            UDim.new(
-                0,
-                12
-            )
-
-        UpdatesPadding.PaddingRight =
-            UDim.new(
-                0,
-                12
-            )
-
-        UpdatesPadding.Parent =
-            Updates
-
-        local UpdatesLayout =
-            Instance.new("UIListLayout")
-
-        UpdatesLayout.Padding =
-            UDim.new(
-                0,
-                7
-            )
-
-        UpdatesLayout.SortOrder =
-            Enum.SortOrder.LayoutOrder
-
-        UpdatesLayout.Parent =
-            Updates
-
-        local Changelog =
-            OTC.Changelog
-            or {}
-
-        local CurrentUpdates =
-            Changelog[
-                OTC.Version
-            ]
-
-        if not CurrentUpdates then
-
-            CurrentUpdates = {
-                "No changelog available for this version."
-            }
-
-        end
-
-        local CategoryOrder = {
-            "ADDED",
-            "FIXED",
-            "CHANGED",
-            "REMOVED"
-        }
-
-        local CategoryColors = {
-            ADDED =
-                CurrentTheme.Success
-                or CurrentTheme.Accent,
-
-            FIXED =
-                CurrentTheme.Info
-                or CurrentTheme.Accent,
-
-            CHANGED =
-                CurrentTheme.Warning
-                or CurrentTheme.Accent,
-
-            REMOVED =
-                CurrentTheme.Error
-                or CurrentTheme.Accent
-        }
-
-        local ItemIndex =
-            0
-
-        if type(CurrentUpdates) ==
-            "table"
-            and CurrentUpdates.ADDED then
-
-            for _, Category in ipairs(
-                CategoryOrder
-            ) do
-
-                local Items =
-                    CurrentUpdates[
-                        Category
-                    ]
-                    or {}
-
-                if #Items > 0 then
-
-                    local Header =
-                        Instance.new(
-                            "TextLabel"
-                        )
-
-                    Header.Name =
-                        "Category_"
-                        .. Category
-
-                    Header.Size =
-                        UDim2.new(
-                            1,
-                            0,
-                            0,
-                            20
-                        )
-
-                    Header.BackgroundTransparency =
-                        1
-
-                    Header.Font =
-                        Enum.Font.GothamBold
-
-                    Header.Text =
-                        "["
-                        .. Category
-                        .. "]"
-
-                    Header.TextColor3 =
-                        CategoryColors[
-                            Category
-                        ]
-
-                    Header.TextSize =
-                        10
-
-                    Header.TextXAlignment =
-                        Enum.TextXAlignment.Left
-
-                    Header.ZIndex =
-                        203
-
-                    Header.Parent =
-                        Updates
-
-                    for _, UpdateText in ipairs(
-                        Items
-                    ) do
-
-                        ItemIndex += 1
-
-                        local Update =
-                            Instance.new(
-                                "TextLabel"
-                            )
-
-                        Update.Name =
-                            "Update_"
-                            .. ItemIndex
-
-                        Update.Size =
-                            UDim2.new(
-                                1,
-                                0,
-                                0,
-                                28
-                            )
-
-                        Update.BackgroundTransparency =
-                            1
-
-                        Update.Font =
-                            Enum.Font.Gotham
-
-                        Update.Text =
-                            "•  "
-                            .. tostring(
-                                UpdateText
-                            )
-
-                        Update.TextColor3 =
-                            CurrentTheme.Text
-
-                        Update.TextSize =
-                            11
-
-                        Update.TextWrapped =
-                            true
-
-                        Update.TextXAlignment =
-                            Enum.TextXAlignment.Left
-
-                        Update.TextYAlignment =
-                            Enum.TextYAlignment.Center
-
-                        Update.ZIndex =
-                            203
-
-                        Update.Parent =
-                            Updates
-
-                    end
-                end
-            end
-
-        else
-
-            for Index, UpdateText in ipairs(
-                CurrentUpdates
-            ) do
-
-                local Update =
-                    Instance.new(
-                        "TextLabel"
-                    )
-
-                Update.Name =
-                    "Update_"
-                    .. Index
-
-                Update.Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        28
-                    )
-
-                Update.BackgroundTransparency =
-                    1
-
-                Update.Font =
-                    Enum.Font.Gotham
-
-                Update.Text =
-                    "•  "
-                    .. tostring(
-                        UpdateText
-                    )
-
-                Update.TextColor3 =
-                    CurrentTheme.Text
-
-                Update.TextSize =
-                    11
-
-                Update.TextWrapped =
-                    true
-
-                Update.TextXAlignment =
-                    Enum.TextXAlignment.Left
-
-                Update.TextYAlignment =
-                    Enum.TextYAlignment.Center
-
-                Update.ZIndex =
-                    203
-
-                Update.Parent =
-                    Updates
-
-            end
-        end
-
-        UpdatesLayout:GetPropertyChangedSignal(
-            "AbsoluteContentSize"
-        ):Connect(
-            function()
-
-                Updates.CanvasSize =
-                    UDim2.new(
-                        0,
-                        0,
-                        0,
-                        UpdatesLayout.AbsoluteContentSize.Y
-                        + 20
-                    )
-
-            end
-        )
-
-        ApplyOrClearGradient(
-            Popup,
-            CurrentTheme.Gradients
-            and CurrentTheme.Gradients.Main
-        )
-
-        CloseVersion.MouseEnter:Connect(
-            function()
-
-                CloseVersion.BackgroundColor3 =
-                    Object:GetTheme().Hover
-                    or Object:GetTheme().Element
-
-            end
-        )
-
-        CloseVersion.MouseLeave:Connect(
-            function()
-
-                CloseVersion.BackgroundColor3 =
-                    Object:GetTheme().Element
-
-            end
-        )
-
-        CloseVersion.MouseButton1Click:Connect(
-            function()
-
-                if Object.VersionPopup
-                    and Object.VersionPopup.Overlay then
-
-                    Object.VersionPopup.Overlay:Destroy()
-
-                end
-
-                Object.VersionPopup =
-                    nil
-
-            end
-        )
-
-        Overlay.BackgroundTransparency =
-            1
-
-        Popup.Size =
-            UDim2.new(
-                0,
-                360,
-                0,
-                245
-            )
-
-        Tween(
-            Overlay,
-            TweenInfo.new(
-                0.18,
-                Enum.EasingStyle.Quad,
-                Enum.EasingDirection.Out
-            ),
-            {
-                BackgroundTransparency =
-                    0.45
-            }
-        )
-
-        Tween(
-            Popup,
-            TweenInfo.new(
-                0.22,
-                Enum.EasingStyle.Back,
-                Enum.EasingDirection.Out
-            ),
-            {
-                Size =
-                    UDim2.new(
-                        0,
-                        390,
-                        0,
-                        270
-                    )
-            }
-        )
-
-        Object.VersionPopup = {
-            Overlay = Overlay,
-            Popup = Popup,
-            PopupStroke = PopupStroke,
-            Title = PopupTitle,
-            Subtitle = PopupSubtitle,
-            Close = CloseVersion,
-            Updates = Updates
-        }
-
-    end
-
-    VersionTag.MouseButton1Click:Connect(
-        function()
-            CreateVersionPopup()
-        end
-    )
-
-    VersionTag.MouseEnter:Connect(
-        function()
-
-            local Current =
-                Object:GetTheme()
-
-            Tween(
-                VersionTag,
-                TweenInfo.new(
-                    0.12,
-                    Enum.EasingStyle.Quad,
-                    Enum.EasingDirection.Out
-                ),
-                {
-                    BackgroundColor3 =
-                        Current.Hover
-                        or Current.Element
-                }
-            )
-
-        end
-    )
-
-    VersionTag.MouseLeave:Connect(
-        function()
-
-            local Current =
-                Object:GetTheme()
-
-            Tween(
-                VersionTag,
-                TweenInfo.new(
-                    0.12,
-                    Enum.EasingStyle.Quad,
-                    Enum.EasingDirection.Out
-                ),
-                {
-                    BackgroundColor3 =
-                        Current.Element
-                }
-            )
-
-        end
-    )
-
-    function Object:RefreshTheme()
-
-        local ThemeName =
-            self.Theme
-
-        if IsRomanReignsTheme(
-            ThemeName
-        ) and not IsRomanReignsAllowed() then
-
-            ThemeName =
-                "Default"
-
-            self.Theme =
-                "Default"
-
-        end
-
-        local NewTheme =
-            self.OTC._Themes[
-                ThemeName
-            ]
-            or self.OTC._Themes.Default
-
-        self.Theme =
-            ThemeName
-
-        local Transparency =
-            NewTheme.Transparency
-            or {}
-
-        local Stroke =
-            NewTheme.Stroke
-            or {}
-
-        local Corners =
-            NewTheme.Corners
-            or {}
-
-        local Gradients =
-            NewTheme.Gradients
-            or {}
-
-        local Effects =
-            NewTheme.Effects
-            or {}
-
-        local ShowRomanArtwork =
-            IsRomanReignsTheme(
-                ThemeName
-            )
-            and IsRomanReignsAllowed()
-
-        --// Main
-        Main.BackgroundColor3 =
-            NewTheme.Background
-
-        Main.BackgroundTransparency =
-            Transparency.Main or 0
-
-        MainStroke.Color =
-            NewTheme.Border
-
-        MainStroke.Thickness =
-            Stroke.Thickness or 1
-
-        MainStroke.Transparency =
-            Stroke.Transparency or 0
-
-        MainStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        ApplyCorner(
-            Main,
-            Corners.Main or 10
-        )
-
-        --// TopBar
-        TopBar.Size =
-            UDim2.new(
-                1,
-                0,
-                0,
-                62
-            )
-
-        TopBar.Position =
-            UDim2.new(
-                0,
-                0,
-                0,
-                0
-            )
-
-        TopBar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        TopBar.BackgroundTransparency =
-            Transparency.Secondary or 0
-
-        --// TopBar Accent
-        TopBarAccent.BackgroundColor3 =
-            NewTheme.Accent
-
-        TopBarAccent.BackgroundTransparency =
-            0
-
-        TopBarAccent.Visible =
-            true
-
-        Object.ThemeGradients.TopBarAccent =
-            ApplyOrClearGradient(
-                TopBarAccent,
-                Gradients.Accent
-            )
-
-        --// Sidebar
-        Sidebar.Size =
-            UDim2.new(
-                0,
-                150,
-                1,
-                -62
-            )
-
-        Sidebar.Position =
-            UDim2.new(
-                0,
-                0,
-                0,
-                62
-            )
-
-        Sidebar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        Sidebar.BackgroundTransparency =
-            Transparency.Secondary or 0
-
-        --// Content
-        Content.Size =
-            UDim2.new(
-                1,
-                -150,
-                1,
-                -62
-            )
-
-        Content.Position =
-            UDim2.new(
-                0,
-                150,
-                0,
-                62
-            )
-
-        Content.BackgroundColor3 =
-            NewTheme.Element
-            or NewTheme.Background
-
-        Content.BackgroundTransparency =
-            Transparency.Element
-            or 0
-
-        --// Content Stroke
-        ContentStroke.Color =
-            NewTheme.Border
-
-        ContentStroke.Thickness =
-            Stroke.Thickness or 1
-
-        ContentStroke.Transparency =
-            Stroke.Transparency or 0
-
-        ContentStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        ApplyCorner(
-            Content,
-            Corners.Popup or 14
-        )
-
-        --// Roman Artwork
-        if ShowRomanArtwork then
-
-            Main.BackgroundTransparency =
-                1
-
-            TopBar.BackgroundTransparency =
-                0.42
-
-            Sidebar.BackgroundTransparency =
-                0.42
-
-            Content.BackgroundTransparency =
-                0.42
-
-        end
-
-        Logo.Image =
-            LOGO_ASSET
-
-        Logo.ImageTransparency =
-            0
-
-        Title.TextColor3 =
-            NewTheme.Text
-
-        Subtitle.TextColor3 =
-            NewTheme.SubText
-
-        --// Version
-        VersionTag.BackgroundColor3 =
-            NewTheme.Element
-
-        VersionTag.BackgroundTransparency =
-            Transparency.Element or 0
-
-        VersionTag.Text =
-            "v"
-            .. tostring(
-                self.OTC.Version
-                or "1.0.0"
-            )
-
-        VersionTag.TextColor3 =
-            NewTheme.Text
-
-        VersionStroke.Color =
-            NewTheme.Border
-
-        VersionStroke.Thickness =
-            Stroke.Thickness or 1
-
-        VersionStroke.Transparency =
-            Stroke.Transparency or 0.3
-
-        VersionStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        ApplyCorner(
-            VersionTag,
-            Corners.Button or 7
-        )
-
-        --// Search
-        SearchButton.BackgroundColor3 =
-            NewTheme.Element
-
-        SearchButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        SearchButton.TextColor3 =
-            NewTheme.Text
-
-        SearchStroke.Color =
-            NewTheme.Border
-
-        SearchStroke.Thickness =
-            Stroke.Thickness or 1
-
-        SearchStroke.Transparency =
-            Stroke.Transparency or 0
-
-        SearchStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        ApplyCorner(
-            SearchButton,
-            Corners.Button or 8
-        )
-
-        --// Window buttons
-        MinimizeButton.BackgroundColor3 =
-            NewTheme.Button
-            or NewTheme.Element
-
-        MinimizeButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        MinimizeButton.TextColor3 =
-            NewTheme.Text
-
-        CloseButton.BackgroundColor3 =
-            NewTheme.Button
-            or NewTheme.Element
-
-        CloseButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        CloseButton.TextColor3 =
-            NewTheme.Text
-
-        ApplyCorner(
-            MinimizeButton,
-            Corners.Button or 7
-        )
-
-        ApplyCorner(
-            CloseButton,
-            Corners.Button or 7
-        )
-
-        --// Navigation
-        SidebarTitle.TextColor3 =
-            NewTheme.MutedText
-            or NewTheme.SubText
-
-        TabsContainer.ScrollBarImageColor3 =
-            NewTheme.Scrollbar
-            or NewTheme.Border
-
-        --// User Card
-        UserCard.Position =
-            UDim2.new(
-                0,
-                8,
-                1,
-                -68
-            )
-
-        UserCard.Size =
-            UDim2.new(
-                1,
-                -16,
-                0,
-                60
-            )
-
-        UserCard.BackgroundColor3 =
-            NewTheme.Element
-
-        UserCard.BackgroundTransparency =
-            Transparency.Element or 0
-
-        UserAvatar.BackgroundColor3 =
-            NewTheme.Background
-
-        UserAvatar.BackgroundTransparency =
-            0
-
-        UserDisplay.TextColor3 =
-            NewTheme.Text
-
-        UserName.TextColor3 =
-            NewTheme.SubText
-
-        ApplyCorner(
-            UserCard,
-            Corners.Element or 8
-        )
-
-        ApplyCorner(
-            UserAvatar,
-            999
-        )
-
-        --// Mini Button
-        MiniButton.BackgroundTransparency =
-            1
-
-        MiniButton.Image =
-            LOGO_ASSET
-
-        MiniButton.ImageTransparency =
-            0
-
-        --// Roman artwork
-        RomanArtwork.Image =
-            ROMAN_REIGNS_IMAGE
-
-        RomanArtwork.ImageTransparency =
-            0.35
-
-        RomanArtwork.Size =
-            UDim2.fromScale(
-                1,
-                1
-            )
-
-        RomanArtwork.Position =
-            UDim2.fromScale(
-                0,
-                0
-            )
-
-        RomanArtwork.ScaleType =
-            Enum.ScaleType.Crop
-
-        RomanArtwork.ZIndex =
-            0
-
-        RomanArtwork.Visible =
-            ShowRomanArtwork
-
-        if not ShowRomanArtwork then
-
-            Main.BackgroundTransparency =
-                Transparency.Main or 0
-
-            TopBar.BackgroundTransparency =
-                Transparency.Secondary or 0
-
-            Sidebar.BackgroundTransparency =
-                Transparency.Secondary or 0
-
-            Content.BackgroundTransparency =
-                Transparency.Element or 0
-
-        end
-
-        --// Gradients
-        Object.ThemeGradients.Main =
-            ApplyOrClearGradient(
-                Main,
-                Gradients.Main
-            )
-
-        Object.ThemeGradients.TopBar =
-            ApplyOrClearGradient(
-                TopBar,
-                Gradients.TopBar
-            )
-
-        Object.ThemeGradients.Sidebar =
-            ApplyOrClearGradient(
-                Sidebar,
-                Gradients.Sidebar
-            )
-
-        Object.ThemeGradients.UserCard =
-            ApplyOrClearGradient(
-                UserCard,
-                Gradients.Element
-            )
-
-        Object.ThemeGradients.Minimize =
-            ApplyOrClearGradient(
-                MinimizeButton,
-                Gradients.Element
-            )
-
-        Object.ThemeGradients.Close =
-            ApplyOrClearGradient(
-                CloseButton,
-                Gradients.Element
-            )
-
-        --// Main Stroke
-        ApplyStroke(
-            MainStroke,
-            NewTheme
-        )
-
-        if Effects.AnimatedGradient then
-
-            for _, GradientObject in pairs(
-                Object.ThemeGradients
-            ) do
-
-                if GradientObject then
-
-                    task.spawn(
-                        function()
-
-                            local StartRotation =
-                                GradientObject.Rotation
-
-                            Tween(
-                                GradientObject,
-                                TweenInfo.new(
-                                    6,
-                                    Enum.EasingStyle.Linear,
-                                    Enum.EasingDirection.In,
-                                    -1
-                                ),
-                                {
-                                    Rotation =
-                                        StartRotation
-                                        + 360
-                                }
-                            )
-
-                        end
-                    )
-
-                end
-
-            end
-
-        end
-
-        --// Unload Confirmation
-        if self.UnloadConfirmation then
-
-            local Popup =
-                self.UnloadConfirmation
-
-            Popup.Popup.BackgroundColor3 =
-                NewTheme.PopupBackground
-                or NewTheme.Background
-
-            Popup.Popup.BackgroundTransparency =
-                Transparency.Popup or 0
-
-            Popup.PopupStroke.Color =
-                NewTheme.PopupBorder
-                or NewTheme.Border
-
-            Popup.PopupStroke.Thickness =
-                Stroke.Thickness or 1
-
-            Popup.PopupStroke.Transparency =
-                Stroke.Transparency or 0
-
-            Popup.PopupStroke.Enabled =
-                Stroke.Enabled ~= false
-
-            Popup.Title.TextColor3 =
-                NewTheme.Text
-
-            Popup.Description.TextColor3 =
-                NewTheme.SubText
-
-            Popup.CancelButton.BackgroundColor3 =
-                NewTheme.Button
-                or NewTheme.Element
-
-            Popup.CancelButton.TextColor3 =
-                NewTheme.Text
-
-            Popup.UnloadButton.BackgroundColor3 =
-                NewTheme.Accent
-
-            Popup.UnloadButton.TextColor3 =
-                NewTheme.AccentText
-                or NewTheme.Background
-
-            ApplyCorner(
-                Popup.Popup,
-                Corners.Popup or 10
-            )
-
-            ApplyCorner(
-                Popup.CancelButton,
-                Corners.Button or 7
-            )
-
-            ApplyCorner(
-                Popup.UnloadButton,
-                Corners.Button or 7
-            )
-
-            ApplyOrClearGradient(
-                Popup.Popup,
-                Gradients.Main
-            )
-
-            ApplyOrClearGradient(
-                Popup.UnloadButton,
-                Gradients.Accent
-            )
-
-        end
-
-        --// Version Popup
-        if self.VersionPopup then
-
-            local Popup =
-                self.VersionPopup
-
-            Popup.Popup.BackgroundColor3 =
-                NewTheme.PopupBackground
-                or NewTheme.Background
-
-            Popup.Popup.BackgroundTransparency =
-                Transparency.Popup or 0
-
-            Popup.PopupStroke.Color =
-                NewTheme.PopupBorder
-                or NewTheme.Border
-
-            Popup.PopupStroke.Thickness =
-                Stroke.Thickness or 1
-
-            Popup.PopupStroke.Transparency =
-                Stroke.Transparency or 0
-
-            Popup.PopupStroke.Enabled =
-                Stroke.Enabled ~= false
-
-            Popup.Title.TextColor3 =
-                NewTheme.Text
-
-            Popup.Subtitle.TextColor3 =
-                NewTheme.SubText
-
-            Popup.Close.BackgroundColor3 =
-                NewTheme.Element
-
-            Popup.Close.TextColor3 =
-                NewTheme.Text
-
-            Popup.Updates.BackgroundColor3 =
-                NewTheme.Element
-
-            Popup.Updates.BackgroundTransparency =
-                Transparency.Element or 0
-
-            Popup.Updates.ScrollBarImageColor3 =
-                NewTheme.Scrollbar
-                or NewTheme.Border
-
-            for _, Child in ipairs(
-                Popup.Updates:GetChildren()
-            ) do
-
-                if Child:IsA(
-                    "TextLabel"
-                ) then
-
-                    Child.TextColor3 =
-                        NewTheme.Text
-
-                end
-
-            end
-
-            ApplyCorner(
-                Popup.Popup,
-                Corners.Popup or 12
-            )
-
-            ApplyCorner(
-                Popup.Close,
-                Corners.Button or 7
-            )
-
-            ApplyCorner(
-                Popup.Updates,
-                Corners.Element or 8
-            )
-
-            ApplyOrClearGradient(
-                Popup.Popup,
-                Gradients.Main
-            )
-
-        end
-
-        --// Element Theme Refresh
-        for _, TabObject in ipairs(
-            self.Tabs
-        ) do
-
-            if TabObject.RefreshTheme then
-
-                pcall(
-                    function()
-
-                        TabObject:RefreshTheme()
-
-                    end
-                )
-
-            end
-
-        end
 
     end
 
@@ -4433,9 +2767,7 @@ function Window.Create(
         if self.UnloadConfirmation then
 
             if self.UnloadConfirmation.Overlay then
-
                 self.UnloadConfirmation.Overlay:Destroy()
-
             end
 
             self.UnloadConfirmation =
@@ -4446,9 +2778,7 @@ function Window.Create(
         if self.VersionPopup then
 
             if self.VersionPopup.Overlay then
-
                 self.VersionPopup.Overlay:Destroy()
-
             end
 
             self.VersionPopup =
@@ -4475,9 +2805,7 @@ function Window.Create(
         end
 
         if self.ScreenGui then
-
             self.ScreenGui:Destroy()
-
         end
 
         for Index, WindowObject in pairs(
@@ -4485,37 +2813,11 @@ function Window.Create(
         ) do
 
             if WindowObject == self then
-
                 OTC._Windows[Index] =
                     nil
-
             end
 
         end
-
-    end
-
-    if OTC._InitializeInput then
-
-        OTC._InitializeInput()
-
-    end
-
-    if OTC._Animation
-        and OTC._Animation.Appear then
-
-        pcall(
-            function()
-
-                OTC._Animation:Appear(
-                    Main,
-                    "Bottom",
-                    20,
-                    0.3
-                )
-
-            end
-        )
 
     end
 
