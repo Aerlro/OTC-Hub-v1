@@ -1,12 +1,10 @@
---[[
-    OTC Hub v1.0.2
-    Module Loader
-    by Aerlro
-]]
-
 local Loader = {}
 
 local Root = script.Parent
+
+Loader.Version = "1.0.3"
+Loader.Latest = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"
+Loader.Versioned = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/versions/1.0.3/otc.lua"
 
 Loader.Core = {
     Window = require(Root.Core.window),
@@ -26,7 +24,11 @@ Loader.Elements = {
     Input = require(Root.Elements.input),
     Keybind = require(Root.Elements.keybind),
     Colorpicker = require(Root.Elements.colorpicker),
-    Stat = require(Root.Elements.stat)
+    Stat = require(Root.Elements.stat),
+    Paragraph = require(Root.Elements.paragraph),
+    Badge = require(Root.Elements.badge),
+    Progress = require(Root.Elements.progress),
+    Image = require(Root.Elements.image)
 }
 
 function Loader:GetCore(Name)

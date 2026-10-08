@@ -1,114 +1,110 @@
-# OTC Hub v1 (i know it's AI idc i'm using only for me 😁)
+# OTC Hub v1
 
-<p align="center">
-  <img src="OTC.png" width="180">
-</p>
+<p align="center"><img src="OTC.png" width="180"></p>
 
 <h1 align="center">OTC Hub v1</h1>
-
-<p align="center">
-  A modern, modular and customizable Roblox Luau UI Library.
-</p>
-
-<p align="center">
-  <b>Version 1.0.2</b> • <b>by Aerlro</b>
-</p>
+<p align="center">Modern, modular and customizable Roblox Luau UI Library.</p>
+<p align="center"><b>Version 1.0.3</b> • <b>by Aerlro</b></p>
 
 ---
 
-## ✨ Features
+## ✨ 1.0.3
 
-- 🎨 Advanced Theme System
-- 🌈 Gradient support
-- ✨ Animated gradients
-- 💡 Glow and shadow effects
-- 🖌️ Custom component colors
-- 🔲 Custom corner radius
-- 🧱 Custom strokes
-- 🔔 Notification system
-- 🪟 Dialog system
-- 📑 Tabs
-- 📦 Sections
-- 🔘 Buttons
-- 🔄 Toggles
-- 🎚️ Sliders
-- 📋 Dropdowns
-- ☑️ Multi-select Dropdowns
-- ⌨️ Inputs
-- ⌨️ Keybinds
-- 🎨 Colorpickers
-- 📊 Stat cards
-- 🚩 Flags
-- 🎬 Tween animations
-- 🖼️ Lucide icon support
-- 💾 Real JSON configuration save / load
-- 🔁 Runtime configuration API
-- 📱 Responsive window scaling
-- ⌨️ Configurable toggle key
-- 🧩 Modular architecture
-- ⚡ Raw GitHub loading
-- 🎃 Halloween theme
-- 🔴 Red theme
-- 🟢 Green theme
-- 🔵 Blue theme
-- 🟣 Purple theme
-- 🟠 Orange theme
-- 🟦 Cyber theme
-- ⚪ Default theme
+- 🎨 Modern floating window redesign
+- 🔎 Global UI search
+- 💾 Multi-config management
+- 📤 Config export / import
+- 🗑️ Config delete / list
+- 📱 Improved responsive scaling
+- 🧩 Paragraph, Badge, Progress and Image elements
+- 🎨 Per-window theme isolation
+- 🛠️ Custom theme registration fixes
+- 📜 Structured version changelog
+- 🔒 Roman Reigns theme remains owner-only and is not public
+- ⚡ Version-specific loader
+- 🚀 Latest loader
 
 ---
 
-## 📦 Installation
+## 📥 Load Latest
 
-Load OTC Hub directly from GitHub:
+The latest loader always follows the `main` version of OTC Hub.
 
 ```lua
-local OTC = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/latest.lua"))()
 ```
 
-After loading the library, create a window:
+Direct latest library:
 
 ```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"))()
+```
+
+## 📌 Load a Specific Version
+
+OTC keeps versioned source trees so a version can stay fixed instead of following `main`.
+
+### v1.0.3
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/v1.0.3.lua"))()
+```
+
+Direct version source:
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/versions/1.0.3/otc.lua"))()
+```
+
+This means `latest` can continue receiving fixes while a script can stay on an exact version.
+
+---
+
+## 🪟 Window
+
+```lua
+local OTC = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/latest.lua"))()
+
 local Window = OTC:CreateWindow({
     Name = "OTC Hub",
     Subtitle = "by Aerlro",
-    Theme = "Default"
+    Theme = "Cyber",
+    Width = 640,
+    Height = 420,
+    ToggleKey = Enum.KeyCode.RightControl,
+    Responsive = true
 })
+```
+
+The 1.0.3 window uses a floating dashboard layout with rounded surfaces, an accent rail, separated navigation, user card, modern controls and responsive scaling.
+
+### Window API
+
+```lua
+Window:Toggle()
+Window:Minimize()
+Window:Restore()
+Window:Search("Walkspeed")
+Window:SaveConfig()
+Window:LoadConfig()
+Window:DeleteConfig("MyConfig")
 ```
 
 ---
 
-## 🪟 Create Window
+## 🔎 Search
+
+Click the search button in the top bar or use:
 
 ```lua
-local Window = OTC:CreateWindow({
-    Name = "OTC Hub",
-    Subtitle = "by Aerlro",
-    Theme = "Default"
-})
+Window:Search("Walkspeed")
 ```
 
-### Window Settings
-
-| Setting | Type | Description |
-|---|---|---|
-| `Name` | string | Window name |
-| `Subtitle` | string | Text displayed under the title |
-| `Theme` | string | Theme used by the window |
-
-Example:
-
-```lua
-local Window = OTC:CreateWindow({
-    Name = "My Script",
-    Subtitle = "by Aerlro",
-    Theme = "Purple"
-})
-```
+The search system can locate tabs and registered elements and switch to the matching tab.
 
 ---
 
-## 📑 Create Tab
+## 📑 Tabs
 
 ```lua
 local MainTab = Window:CreateTab({
@@ -117,179 +113,117 @@ local MainTab = Window:CreateTab({
 })
 ```
 
-Another example:
-
-```lua
-local SettingsTab = Window:CreateTab({
-    Name = "Settings",
-    Icon = "settings"
-})
-```
-
 ---
 
-## 📦 Create Section
+## 🧩 Elements
 
-```lua
-MainTab:CreateSection("Main Features")
-```
-
----
-
-## 📝 Create Text
-
-```lua
-MainTab:CreateText("Welcome to OTC Hub!")
-```
-
-With longer text:
-
-```lua
-MainTab:CreateText("This is an example of the OTC Hub text element.")
-```
-
----
-
-## 🔘 Button
+### Button
 
 ```lua
 MainTab:CreateButton({
     Name = "Test Button",
-    Description = "Click this button to test OTC Hub.",
+    Description = "Test the button.",
     Callback = function()
-        print("Button clicked!")
+        print("Clicked")
     end
 })
 ```
 
----
-
-## 🔄 Toggle
-
-```lua
-MainTab:CreateToggle({
-    Name = "Auto Farm",
-    Description = "Automatically farms resources",
-    CurrentValue = false,
-    Flag = "AutoFarm",
-    Callback = function(Value)
-        print("Auto Farm:", Value)
-    end
-})
-```
-
-### Toggle without description
+### Toggle
 
 ```lua
 MainTab:CreateToggle({
     Name = "Infinite Jump",
     CurrentValue = false,
-    Callback = function(Value)
-        print("Infinite Jump:", Value)
-    end
-})
-```
-
----
-
-## 🎚️ Slider
-
-```lua
-MainTab:CreateSlider({
-    Name = "Walkspeed",
-    Description = "Change your walkspeed",
-    Range = {16, 250},
-    Increment = 1,
-    CurrentValue = 16,
-    Flag = "Walkspeed",
-    Callback = function(Value)
-        print("Walkspeed:", Value)
-    end
-})
-```
-
----
-
-## 📋 Dropdown
-
-```lua
-MainTab:CreateDropdown({
-    Name = "Select Player",
-    Description = "Select a player",
-    Options = {"Player 1", "Player 2", "Player 3"},
-    CurrentOption = "Player 1",
-    MultiSelect = false,
-    Callback = function(Value)
-        print("Selected:", Value)
-    end
-})
-```
-
----
-
-## ☑️ Multi-Select Dropdown
-
-```lua
-MainTab:CreateDropdown({
-    Name = "Select Features",
-    Description = "Select multiple features",
-    Options = {"Auto Farm", "Auto Collect", "Auto Sell"},
-    CurrentOption = {},
-    MultiSelect = true,
-    Callback = function(Value)
-        print("Selected features:", Value)
-    end
-})
-```
-
----
-
-## ⌨️ Input
-
-```lua
-MainTab:CreateInput({
-    Name = "Username",
-    Description = "Enter a username",
-    PlaceholderText = "Enter username...",
-    CurrentValue = "",
-    Flag = "Username",
-    Callback = function(Value)
-        print("Username:", Value)
-    end
-})
-```
-
----
-
-
-## ⌨️ Keybind
-
-```lua
-local Key = MainTab:CreateKeybind({
-    Name = "Toggle Menu",
-    Description = "Change the UI hotkey",
-    Default = Enum.KeyCode.RightControl,
-    Flag = "ToggleMenuKey",
-    Callback = function(KeyCode)
-        print("Key:", KeyCode.Name)
-    end
-})
-```
-
-## 🎨 Colorpicker
-
-```lua
-local Color = MainTab:CreateColorpicker({
-    Name = "Accent Color",
-    Default = Color3.fromRGB(0, 170, 255),
-    Flag = "AccentColor",
+    Flag = "InfiniteJump",
     Callback = function(Value)
         print(Value)
     end
 })
 ```
 
-## 📊 Stat
+### Slider
+
+```lua
+MainTab:CreateSlider({
+    Name = "Walkspeed",
+    Range = {16, 250},
+    Increment = 1,
+    CurrentValue = 16,
+    Flag = "Walkspeed",
+    Callback = function(Value)
+        print(Value)
+    end
+})
+```
+
+### Dropdown
+
+```lua
+MainTab:CreateDropdown({
+    Name = "Player",
+    Options = {"Player 1", "Player 2", "Player 3"},
+    CurrentOption = "Player 1",
+    Callback = function(Value)
+        print(Value)
+    end
+})
+```
+
+### Multi-select Dropdown
+
+```lua
+MainTab:CreateDropdown({
+    Name = "Features",
+    Options = {"ESP", "Auto Farm", "Auto Sell"},
+    CurrentOption = {},
+    MultiSelect = true,
+    Callback = function(Value)
+        print(Value)
+    end
+})
+```
+
+### Input
+
+```lua
+MainTab:CreateInput({
+    Name = "Username",
+    PlaceholderText = "Enter username...",
+    Flag = "Username",
+    Callback = function(Value)
+        print(Value)
+    end
+})
+```
+
+### Keybind
+
+```lua
+MainTab:CreateKeybind({
+    Name = "Toggle Menu",
+    Default = Enum.KeyCode.RightControl,
+    Flag = "ToggleMenuKey",
+    Callback = function(Key)
+        print(Key.Name)
+    end
+})
+```
+
+### Colorpicker
+
+```lua
+MainTab:CreateColorpicker({
+    Name = "Accent Color",
+    Default = Color3.fromRGB(0, 225, 255),
+    Flag = "AccentColor",
+    Callback = function(Color)
+        print(Color)
+    end
+})
+```
+
+### Stat
 
 ```lua
 local FPS = MainTab:CreateStat({
@@ -300,21 +234,60 @@ local FPS = MainTab:CreateStat({
 FPS:SetValue("144")
 ```
 
-## ➖ Divider and Space
+### Paragraph
+
+```lua
+MainTab:CreateParagraph({
+    Title = "Information",
+    Content = "This is a larger information block for your hub."
+})
+```
+
+### Badge
+
+```lua
+MainTab:CreateBadge({
+    Text = "PREMIUM"
+})
+```
+
+### Progress
+
+```lua
+local Progress = MainTab:CreateProgress({
+    Name = "Loading",
+    Value = 75,
+    Max = 100
+})
+
+Progress:SetValue(100)
+```
+
+### Image
+
+```lua
+MainTab:CreateImage({
+    Image = "rbxassetid://1234567890"
+})
+```
+
+### Divider / Space / Text
 
 ```lua
 MainTab:CreateDivider()
 MainTab:CreateSpace(12)
+MainTab:CreateText("Welcome to OTC Hub!")
 ```
 
-## 💾 Configuration
+---
 
-OTC 1.0.2 adds a real JSON configuration layer. Value elements with a `Flag` automatically participate in saving and loading.
+## 💾 Configuration 2.0
+
+Flagged elements are stored automatically in JSON configurations.
 
 ```lua
 local Window = OTC:CreateWindow({
     Name = "My Script",
-    Subtitle = "by Aerlro",
     Theme = "Cyber",
     Configuration = {
         AutoSave = true,
@@ -322,67 +295,54 @@ local Window = OTC:CreateWindow({
         FileName = "MyScript"
     }
 })
-
-Window:SaveConfig()
-Window:LoadConfig()
 ```
 
-Lowercase Rayfield-style configuration keys are also accepted: `configuration`, `autoSave`, `autoLoad`, and `fileName`.
+### Config API
+
+```lua
+Window:SaveConfig("Main")
+Window:LoadConfig("Main")
+Window:DeleteConfig("Main")
+
+local Configs = Window:GetConfigs()
+local Data = Window:ExportConfig("Main")
+Window:ImportConfig("Imported", Data)
+```
+
+The underlying configuration module also exposes `Exists`, `Delete`, `List`, `Export` and `Import`.
+
+---
+
+## 🔔 Notifications
+
+```lua
+OTC:Notify({
+    Title = "OTC Hub",
+    Content = "Successfully loaded!",
+    Duration = 4
+})
+```
+
+Notifications use the active window's theme rather than the global default theme.
+
+---
 
 ## 🪟 Dialog
 
 ```lua
 Window:Dialog({
     Title = "OTC Hub",
-    Content = "This is a modern OTC dialog.",
+    Content = "Continue?",
     Buttons = {
-        {
-            Name = "Cancel"
-        },
+        {Name = "Cancel"},
         {
             Name = "Continue",
             Primary = true,
             Callback = function()
-                print("Continue")
+                print("Confirmed")
             end
         }
     }
-})
-```
-
-## 🔔 Notifications
-
-OTC Hub includes a built-in notification system.
-
-```lua
-OTC:Notify({
-    Title = "OTC Hub",
-    Content = "Hello from OTC Hub!",
-    Duration = 4
-})
-```
-
-### Notification with the OTC logo
-
-```lua
-OTC:Notify({
-    Title = "OTC Hub",
-    Content = "This notification uses the OTC logo.",
-    Duration = 4,
-    Icon = "rbxassetid://104463753775983"
-})
-```
-
-### Custom notification icon
-
-You can use your own Roblox asset:
-
-```lua
-OTC:Notify({
-    Title = "Custom Icon",
-    Content = "This notification uses a custom icon.",
-    Duration = 4,
-    Icon = "rbxassetid://1234567890"
 })
 ```
 
@@ -390,9 +350,7 @@ OTC:Notify({
 
 ## 🎨 Themes
 
-OTC Hub includes multiple built-in themes.
-
-Available themes:
+Built-in public themes:
 
 ```text
 Default
@@ -401,167 +359,51 @@ Green
 Blue
 Purple
 Orange
+Cyber
 Halloween
 ```
 
-Get all themes:
+The **Roman Reigns** theme is intentionally private and restricted to the owner account. It is not a public theme.
+
+### Change theme
 
 ```lua
-local Themes = OTC:GetThemes()
-print(Themes)
+Window:SetTheme("Cyber")
+OTC:SetTheme("Halloween")
 ```
 
----
+`Window:SetTheme()` changes only that window. `OTC:SetTheme()` changes the library's active theme and applies it to all active windows.
 
-## 🔄 Change Theme
-
-Change the theme while the UI is running:
-
-```lua
-OTC:SetTheme("Purple")
-```
-
-Example:
-
-```lua
-MainTab:CreateButton({
-    Name = "Purple Theme",
-    Callback = function()
-        OTC:SetTheme("Purple")
-    end
-})
-```
-
-Another example:
-
-```lua
-MainTab:CreateButton({
-    Name = "Halloween Theme",
-    Callback = function()
-        OTC:SetTheme("Halloween")
-    end
-})
-```
-
----
-
-## 🎨 Custom Themes
-
-You can register your own theme:
+### Custom theme
 
 ```lua
 OTC:RegisterTheme("Custom", {
-    Background = Color3.fromRGB(15, 15, 15),
-    Secondary = Color3.fromRGB(25, 25, 25),
-    Element = Color3.fromRGB(35, 35, 35),
-    Hover = Color3.fromRGB(50, 50, 50),
-    Pressed = Color3.fromRGB(65, 65, 65),
-    Border = Color3.fromRGB(100, 100, 100),
-    BorderHover = Color3.fromRGB(150, 150, 150),
+    Background = Color3.fromRGB(10, 10, 20),
+    Secondary = Color3.fromRGB(15, 15, 30),
+    Element = Color3.fromRGB(25, 25, 45),
+    Accent = Color3.fromRGB(255, 0, 170),
     Text = Color3.fromRGB(255, 255, 255),
-    SubText = Color3.fromRGB(190, 190, 190),
-    MutedText = Color3.fromRGB(130, 130, 130),
-    Accent = Color3.fromRGB(255, 255, 255),
-    AccentDark = Color3.fromRGB(180, 180, 180),
-    AccentHover = Color3.fromRGB(220, 220, 220),
-    AccentText = Color3.fromRGB(0, 0, 0)
+    SubText = Color3.fromRGB(190, 190, 210)
 })
+
+Window:SetTheme("Custom")
 ```
 
-Then activate it:
-
-```lua
-OTC:SetTheme("Custom")
-```
-
----
-
-## 🌈 Gradients
-
-OTC Hub supports gradients for different UI components.
-
-Supported gradient areas include:
-
-```text
-Main
-TopBar
-Sidebar
-Element
-Accent
-```
-
-Themes can define multiple colors using `ColorSequence`.
-
-Example:
-
-```lua
-Gradients = {
-    Main = {
-        Enabled = true,
-        Colors = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 0, 255)),
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 150)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 0))
-        }),
-        Rotation = 45
-    }
-}
-```
-
----
-
-## ✨ Animated Gradients
-
-OTC Hub supports animated gradients.
-
-Enable them through the theme:
-
-```lua
-Effects = {
-    Glow = true,
-    Shadow = true,
-    Gradient = true,
-    AnimatedGradient = true
-}
-```
+Custom themes inherit missing properties from `Default`.
 
 ---
 
 ## 🚩 Flags
 
-Elements can use flags.
-
-Example:
-
-```lua
-MainTab:CreateToggle({
-    Name = "Auto Farm",
-    CurrentValue = false,
-    Flag = "AutoFarm",
-    Callback = function(Value)
-        print(Value)
-    end
-})
-```
-
-Retrieve the flag:
-
-```lua
-local Value = OTC:GetFlag("AutoFarm")
-print(Value)
-```
-
-Set a flag:
-
 ```lua
 OTC:SetFlag("AutoFarm", true)
+
+local Enabled = OTC:GetFlag("AutoFarm", false)
 ```
 
 ---
 
 ## 🎬 Tween
-
-OTC Hub includes a tween helper:
 
 ```lua
 OTC:Tween(Object, 0.25, {
@@ -569,289 +411,20 @@ OTC:Tween(Object, 0.25, {
 })
 ```
 
-Custom easing:
-
-```lua
-OTC:Tween(
-    Object,
-    0.35,
-    {
-        Size = UDim2.new(0, 300, 0, 100)
-    },
-    Enum.EasingStyle.Quint,
-    Enum.EasingDirection.Out
-)
-```
-
 ---
 
-## 🧹 Connections
+## 📜 Version Changelog
 
-OTC Hub can manage connections:
-
-```lua
-local Connection = OTC:Connect(
-    game:GetService("RunService").Heartbeat:Connect(function()
-        print("Running")
-    end)
-)
-```
-
-Disconnect everything:
-
-```lua
-OTC:DisconnectAll()
-```
-
----
-
-## 🖼️ OTC Logo
-
-The default OTC logo asset is:
+The version popup now separates changes into:
 
 ```text
-rbxassetid://104463753775983
+[ADDED]
+[FIXED]
+[CHANGED]
+[REMOVED]
 ```
 
-The repository logo is:
-
-```text
-OTC.png
-```
-
-Repository:
-
-https://github.com/Aerlro/OTC-Hub-v1
-
----
-
-## 🧪 Complete Example
-
-```lua
-local OTC = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"))()
-
-local Window = OTC:CreateWindow({
-    Name = "OTC Hub",
-    Subtitle = "by Aerlro",
-    Theme = "Purple"
-})
-
-local MainTab = Window:CreateTab({
-    Name = "Main",
-    Icon = "home"
-})
-
-MainTab:CreateSection("Main Features")
-
-MainTab:CreateText("Welcome to OTC Hub!")
-
-MainTab:CreateButton({
-    Name = "Test Button",
-    Description = "Test the OTC button.",
-    Callback = function()
-        print("Button clicked!")
-    end
-})
-
-MainTab:CreateToggle({
-    Name = "Auto Farm",
-    Description = "Automatically farms resources",
-    CurrentValue = false,
-    Flag = "AutoFarm",
-    Callback = function(Value)
-        print("Auto Farm:", Value)
-    end
-})
-
-MainTab:CreateSlider({
-    Name = "Walkspeed",
-    Description = "Change your walkspeed",
-    Range = {16, 250},
-    Increment = 1,
-    CurrentValue = 16,
-    Flag = "Walkspeed",
-    Callback = function(Value)
-        print("Walkspeed:", Value)
-    end
-})
-
-MainTab:CreateDropdown({
-    Name = "Player",
-    Description = "Select a player",
-    Options = {"Player 1", "Player 2", "Player 3"},
-    CurrentOption = "Player 1",
-    MultiSelect = false,
-    Callback = function(Value)
-        print("Player:", Value)
-    end
-})
-
-MainTab:CreateDropdown({
-    Name = "Features",
-    Description = "Select multiple features",
-    Options = {"Auto Farm", "Auto Collect", "Auto Sell"},
-    CurrentOption = {},
-    MultiSelect = true,
-    Callback = function(Value)
-        print("Features:", Value)
-    end
-})
-
-MainTab:CreateInput({
-    Name = "Username",
-    Description = "Enter a username",
-    PlaceholderText = "Enter username...",
-    CurrentValue = "",
-    Flag = "Username",
-    Callback = function(Value)
-        print("Username:", Value)
-    end
-})
-
-MainTab:CreateSection("Notifications")
-
-MainTab:CreateButton({
-    Name = "Test Notification",
-    Description = "Show an OTC notification.",
-    Callback = function()
-        OTC:Notify({
-            Title = "OTC Hub",
-            Content = "Notification test!",
-            Duration = 4
-        })
-    end
-})
-
-MainTab:CreateButton({
-    Name = "Halloween Theme",
-    Callback = function()
-        OTC:SetTheme("Halloween")
-    end
-})
-```
-
----
-
-## 🧪 Theme Test
-
-```lua
-local OTC = loadstring(game:HttpGet("https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"))()
-
-local Window = OTC:CreateWindow({
-    Name = "OTC Hub",
-    Subtitle = "Theme Test",
-    Theme = "Default"
-})
-
-local MainTab = Window:CreateTab({
-    Name = "Theme Test",
-    Icon = "palette"
-})
-
-MainTab:CreateSection("Theme")
-
-MainTab:CreateText("Select a theme to test the OTC Hub theme system.")
-
-MainTab:CreateDropdown({
-    Name = "Theme",
-    Description = "Select an OTC Hub theme",
-    Options = OTC:GetThemes(),
-    CurrentOption = OTC.CurrentTheme,
-    MultiSelect = false,
-    Callback = function(Value)
-        local ThemeName = Value
-        if type(Value) == "table" then
-            ThemeName = Value[1]
-        end
-        if not ThemeName then return end
-        OTC:SetTheme(ThemeName)
-    end
-})
-
-MainTab:CreateSection("Button")
-
-MainTab:CreateButton({
-    Name = "Test Button",
-    Description = "Test button colors and hover.",
-    Callback = function()
-        print("Button test")
-    end
-})
-
-MainTab:CreateSection("Toggle")
-
-MainTab:CreateToggle({
-    Name = "Test Toggle",
-    Description = "Test toggle colors.",
-    CurrentValue = false,
-    Callback = function(Value)
-        print("Toggle:", Value)
-    end
-})
-
-MainTab:CreateSection("Slider")
-
-MainTab:CreateSlider({
-    Name = "Test Slider",
-    Description = "Test slider.",
-    Range = {0, 100},
-    Increment = 1,
-    CurrentValue = 50,
-    Callback = function(Value)
-        print("Slider:", Value)
-    end
-})
-
-MainTab:CreateSection("Dropdown")
-
-MainTab:CreateDropdown({
-    Name = "Test Dropdown",
-    Description = "Test dropdown.",
-    Options = {"Option 1", "Option 2", "Option 3"},
-    CurrentOption = "Option 1",
-    MultiSelect = false,
-    Callback = function(Value)
-        print("Dropdown:", Value)
-    end
-})
-
-MainTab:CreateDropdown({
-    Name = "Multi Dropdown",
-    Description = "Test multi-select.",
-    Options = {"Option 1", "Option 2", "Option 3"},
-    CurrentOption = {},
-    MultiSelect = true,
-    Callback = function(Value)
-        print("Multi Dropdown:", Value)
-    end
-})
-
-MainTab:CreateSection("Input")
-
-MainTab:CreateInput({
-    Name = "Test Input",
-    Description = "Test text input.",
-    PlaceholderText = "Type something...",
-    CurrentValue = "",
-    Callback = function(Value)
-        print("Input:", Value)
-    end
-})
-
-MainTab:CreateSection("Notifications")
-
-MainTab:CreateButton({
-    Name = "Test Notification",
-    Description = "Show a notification.",
-    Callback = function()
-        OTC:Notify({
-            Title = "OTC Hub",
-            Content = "Notification test.",
-            Duration = 4
-        })
-    end
-})
-```
+Click the version badge in the window header to view the current release changelog.
 
 ---
 
@@ -860,8 +433,11 @@ MainTab:CreateButton({
 ```text
 OTC-Hub-v1/
 ├── otc.lua
+├── latest.lua
+├── v1.0.3.lua
 ├── loader.lua
 ├── OTC.png
+├── Owner/
 ├── Core/
 │   ├── tab.lua
 │   ├── window.lua
@@ -872,119 +448,25 @@ OTC-Hub-v1/
 │   ├── lucide.lua
 │   ├── config.lua
 │   └── dialog.lua
-└── Elements/
-    ├── button.lua
-    ├── toggle.lua
-    ├── slider.lua
-    ├── dropdown.lua
-    ├── input.lua
-    ├── keybind.lua
-    ├── colorpicker.lua
-    └── stat.lua
+├── Elements/
+│   ├── button.lua
+│   ├── toggle.lua
+│   ├── slider.lua
+│   ├── dropdown.lua
+│   ├── input.lua
+│   ├── keybind.lua
+│   ├── colorpicker.lua
+│   ├── stat.lua
+│   ├── paragraph.lua
+│   ├── badge.lua
+│   ├── progress.lua
+│   └── image.lua
+└── versions/
+    └── 1.0.3/
+        ├── otc.lua
+        ├── Core/
+        └── Elements/
 ```
-
----
-
-## 🧩 Modules
-
-### Core
-
-```text
-Core/tab.lua
-Core/window.lua
-Core/theme.lua
-Core/animation.lua
-Core/notification.lua
-Core/lucide.lua
-Core/config.lua
-Core/dialog.lua
-```
-
-### Elements
-
-```text
-Elements/button.lua
-Elements/toggle.lua
-Elements/slider.lua
-Elements/dropdown.lua
-Elements/input.lua
-Elements/keybind.lua
-Elements/colorpicker.lua
-Elements/stat.lua
-```
-
----
-
-## 🎨 Built-in Themes
-
-### Default
-
-Neutral gray UI with white accents.
-
-### Red
-
-Saturated red interface with bright red accents.
-
-### Green
-
-Saturated green interface with bright green accents.
-
-### Blue
-
-Saturated blue interface with bright blue accents.
-
-### Purple
-
-Saturated purple interface with bright purple accents.
-
-### Orange
-
-Saturated orange interface with bright orange accents.
-
-### Cyber
-
-Electric cyan and deep blue interface with a futuristic accent system.
-
-### Halloween
-
-Purple, orange and dark Halloween-inspired theme.
-
-### Roman Reigns
-
-Private teal and gold theme restricted to the configured owner account.
-
----
-
-## ⚙️ Configuration
-
-OTC Hub supports automatic configuration settings through the window configuration system.
-
-Example:
-
-```lua
-local Window = OTC:CreateWindow({
-    Name = "OTC Hub",
-    Subtitle = "by Aerlro",
-    Theme = "Default",
-    Configuration = {
-        autoSave = true,
-        autoLoad = true,
-        fileName = "OTC"
-    }
-})
-```
-
----
-
-## 🔗 Repository
-
-GitHub:
-
-https://github.com/Aerlro/OTC-Hub-v1
-
-Raw Loader:
-
-https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua
 
 ---
 
@@ -1001,11 +483,3 @@ OTC Hub v1 is developed by Aerlro.
 This project is provided for educational and development purposes.
 
 Do not claim the project as your own.
-
----
-
-<p align="center">
-  <b>OTC Hub v1</b>
-  <br>
-  by Aerlro
-</p>
