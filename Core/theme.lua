@@ -1151,21 +1151,57 @@ Theme.BuiltIn = {
     }
 }
 
+local function DeepCopy(Value)
+    if type(Value) ~= "table" then
+        return Value
+    end
+
+    local Result = {}
+    for Key, Item in pairs(Value) do
+        Result[Key] = DeepCopy(Item)
+    end
+    return Result
+end
+
+local function Merge(Base, Override)
+    local Result = DeepCopy(Base or {})
+    for Key, Value in pairs(Override or {}) do
+        if type(Value) == "table" and type(Result[Key]) == "table" then
+            Result[Key] = Merge(Result[Key], Value)
+        else
+            Result[Key] = Value
+        end
+    end
+    return Result
+end
+
+function Theme.Register(Name, ThemeData)
+    if type(Name) ~= "string" or Name == "" then
+        return false
+    end
+
+    if type(ThemeData) ~= "table" then
+        return false
+    end
+
+    Theme.BuiltIn[Name] = Merge(Theme.BuiltIn.Default, ThemeData)
+    return true
+end
+
 function Theme.IsPrivate(Name)
     return Name == "Roman Reigns"
 end
 
-function Theme.IsAllowed(Name)
+function Theme.IsAllowed(Name, Player)
     if not Theme.IsPrivate(Name) then
         return true
     end
 
-    return IsRomanReignsUser()
-end
+    if Player and Player.UserId then
+        return ROMAN_REIGNS_USERS[Player.UserId] == true
+    end
 
-function Theme:IsThemeAllowed(Name)
-    local Player = Players.LocalPlayer
-    return self:IsAllowed(Name, Player)
+    return IsRomanReignsUser()
 end
 
 function Theme.Get(Name, Player)

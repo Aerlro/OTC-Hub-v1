@@ -173,8 +173,82 @@ function Config:Save(Name, Data)
     return WriteSuccess
 end
 
+function Config:Exists(Name)
+    if not available() then
+        return false
+    end
+    return isfile(self:GetPath(Name))
+end
+
+function Config:Delete(Name)
+    if not available() or type(delfile) ~= "function" then
+        return false
+    end
+    local Path = self:GetPath(Name)
+    if not isfile(Path) then
+        return false
+    end
+    return pcall(delfile, Path)
+end
+
 function Config:Available()
     return available()
+end
+
+function Config:List()
+    if not available() then
+        return {}
+    end
+
+    ensureFolder()
+
+    local Result = {}
+    if type(listfiles) ~= "function" then
+        return Result
+    end
+
+    local Success, Files = pcall(listfiles, self.Folder)
+    if not Success or type(Files) ~= "table" then
+        return Result
+    end
+
+    for _, Path in ipairs(Files) do
+        local Name = tostring(Path):match("([^/\\]+)%.json$")
+        if Name then
+            table.insert(Result, Name)
+        end
+    end
+
+    table.sort(Result)
+    return Result
+end
+
+function Config:Export(Name)
+    local Data = self:Load(Name)
+    if type(Data) ~= "table" then
+        return nil
+    end
+    local Clean = sanitize(Data)
+    local Success, Content = pcall(function()
+        return HttpService:JSONEncode(Clean)
+    end)
+    if not Success then
+        return nil
+    end
+    return Content
+end
+
+function Config:Import(Name, Content)
+    if type(Content) ~= "string" then
+        return false
+    end
+    local Success, Data = pcall(function()
+        return HttpService:JSONDecode(Content)
+    end)
+    if not Success or type(Data) ~= "table" then
+        return false
+    end
+    return self:Save(Name, restore(Data))
 end
 
 return Config
