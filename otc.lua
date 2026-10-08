@@ -26,7 +26,8 @@ OTC.Changelog = {
             "Cyber theme falling back to the default gray palette",
             "Theme refresh inconsistencies across elements",
             "Theme isolation for buttons, toggles, sliders, dropdowns, inputs, keybinds, colorpickers and stats",
-            "Window theme isolation during runtime theme changes"
+            "Window theme isolation during runtime theme changes",
+            "Missing element module initialization"
         },
         CHANGED = {
             "Window layout, spacing, corners and navigation styling",
@@ -38,6 +39,7 @@ OTC.Changelog = {
             "Old classic window spacing and visual hierarchy"
         }
     },
+
     ["1.0.2"] = {
         ADDED = {
             "Modern OTC loading experience",
@@ -56,6 +58,7 @@ OTC.Changelog = {
         CHANGED = {},
         REMOVED = {}
     },
+
     ["1.0.1"] = {
         ADDED = {
             "Halloween loading screen",
@@ -153,6 +156,7 @@ local ModulesToLoad = {
     "Core/lucide.lua",
     "Core/config.lua",
     "Core/dialog.lua",
+
     "Elements/button.lua",
     "Elements/toggle.lua",
     "Elements/slider.lua",
@@ -362,7 +366,10 @@ function OTC:SetTheme(Name)
     if ThemeModule.IsPrivate
         and ThemeModule.IsPrivate(Name)
         and ThemeModule.IsAllowed
-        and not ThemeModule.IsAllowed(Name, LocalPlayer) then
+        and not ThemeModule.IsAllowed(
+            Name,
+            LocalPlayer
+        ) then
 
         warn(
             "[OTC Hub] You don't have permission to use this theme:",
@@ -389,14 +396,22 @@ function OTC:SetTheme(Name)
 end
 
 function OTC:GetThemes()
-    return ThemeModule.List(LocalPlayer)
+    return ThemeModule.List(
+        LocalPlayer
+    )
 end
 
 function OTC:Dialog(Data)
-    local Window = self._Windows[1]
+    local Window =
+        self._Windows[1]
 
-    if not Window or not Window.ScreenGui then
-        warn("[OTC Hub] No active window for dialog")
+    if not Window
+        or not Window.ScreenGui then
+
+        warn(
+            "[OTC Hub] No active window for dialog"
+        )
+
         return nil
     end
 
@@ -452,12 +467,16 @@ function OTC:SetFlag(
     self._ConfigDirty = true
 end
 
-function OTC:GetFlag(Name, Default)
+function OTC:GetFlag(
+    Name,
+    Default
+)
     if Name == nil then
         return Default
     end
 
-    local Value = self._Flags[tostring(Name)]
+    local Value =
+        self._Flags[tostring(Name)]
 
     if Value == nil then
         return Default
@@ -466,13 +485,28 @@ function OTC:GetFlag(Name, Default)
     return Value
 end
 
+--// Configuration
 function OTC:Configure(Settings)
-    Settings = Settings or {}
+    Settings =
+        Settings or {}
 
     self._Configuration = {
-        AutoSave = (Settings.AutoSave ~= nil and Settings.AutoSave or Settings.autoSave) == true,
-        AutoLoad = (Settings.AutoLoad ~= nil and Settings.AutoLoad or Settings.autoLoad) == true,
-        FileName = Settings.FileName
+        AutoSave =
+            (
+                Settings.AutoSave ~= nil
+                and Settings.AutoSave
+                or Settings.autoSave
+            ) == true,
+
+        AutoLoad =
+            (
+                Settings.AutoLoad ~= nil
+                and Settings.AutoLoad
+                or Settings.autoLoad
+            ) == true,
+
+        FileName =
+            Settings.FileName
             or Settings.fileName
             or "OTCHub"
     }
@@ -485,22 +519,31 @@ function OTC:LoadConfig(Name)
         return false
     end
 
-    local Configuration = self._Configuration or {}
-    local Data = self._ConfigModule:Load(
-        Name or Configuration.FileName or "OTCHub"
-    )
+    local Configuration =
+        self._Configuration or {}
+
+    local Data =
+        self._ConfigModule:Load(
+            Name
+                or Configuration.FileName
+                or "OTCHub"
+        )
 
     if type(Data) ~= "table" then
         return false
     end
 
     if type(Data.Flags) == "table" then
-        for Key, Value in pairs(Data.Flags) do
-            self._Flags[Key] = Value
+        for Key, Value in pairs(
+            Data.Flags
+        ) do
+            self._Flags[Key] =
+                Value
         end
     end
 
-    self._ConfigDirty = false
+    self._ConfigDirty =
+        false
 
     return true
 end
@@ -510,18 +553,24 @@ function OTC:SaveConfig(Name)
         return false
     end
 
-    local Configuration = self._Configuration or {}
+    local Configuration =
+        self._Configuration or {}
 
-    local Success = self._ConfigModule:Save(
-        Name or Configuration.FileName or "OTCHub",
-        {
-            Version = self.Version,
-            Flags = self._Flags
-        }
-    )
+    local Success =
+        self._ConfigModule:Save(
+            Name
+                or Configuration.FileName
+                or "OTCHub",
+
+            {
+                Version = self.Version,
+                Flags = self._Flags
+            }
+        )
 
     if Success then
-        self._ConfigDirty = false
+        self._ConfigDirty =
+            false
     end
 
     return Success
@@ -531,8 +580,14 @@ function OTC:DeleteConfig(Name)
     if not self._ConfigModule then
         return false
     end
+
     return self._ConfigModule:Delete(
-        Name or (self._Configuration and self._Configuration.FileName) or "OTCHub"
+        Name
+            or (
+                self._Configuration
+                and self._Configuration.FileName
+            )
+            or "OTCHub"
     )
 end
 
@@ -540,6 +595,7 @@ function OTC:GetConfigs()
     if not self._ConfigModule then
         return {}
     end
+
     return self._ConfigModule:List()
 end
 
@@ -547,16 +603,29 @@ function OTC:ExportConfig(Name)
     if not self._ConfigModule then
         return nil
     end
+
     return self._ConfigModule:Export(
-        Name or (self._Configuration and self._Configuration.FileName) or "OTCHub"
+        Name
+            or (
+                self._Configuration
+                and self._Configuration.FileName
+            )
+            or "OTCHub"
     )
 end
 
-function OTC:ImportConfig(Name, Content)
+function OTC:ImportConfig(
+    Name,
+    Content
+)
     if not self._ConfigModule then
         return false
     end
-    return self._ConfigModule:Import(Name, Content)
+
+    return self._ConfigModule:Import(
+        Name,
+        Content
+    )
 end
 
 --// Connections
@@ -640,6 +709,22 @@ local StatModule = LoadModule(
     "Elements/stat.lua"
 )
 
+local ParagraphModule = LoadModule(
+    "Elements/paragraph.lua"
+)
+
+local BadgeModule = LoadModule(
+    "Elements/badge.lua"
+)
+
+local ProgressModule = LoadModule(
+    "Elements/progress.lua"
+)
+
+local ImageModule = LoadModule(
+    "Elements/image.lua"
+)
+
 OTC._Modules = {
     Button = ButtonModule,
     Toggle = ToggleModule,
@@ -652,7 +737,7 @@ OTC._Modules = {
     Paragraph = ParagraphModule,
     Badge = BadgeModule,
     Progress = ProgressModule,
-    Image = ImageModule,
+    Image = ImageModule
 }
 
 --// Lucide
@@ -661,7 +746,8 @@ OTC._Lucide =
 
 --// Notifications
 function OTC:Notify(Data)
-    Data = Data or {}
+    Data =
+        Data or {}
 
     local Window =
         self._Windows[1]
@@ -693,7 +779,9 @@ function OTC:CreateWindow(
         or Settings.configuration
 
     if ConfigurationSettings then
-        self:Configure(ConfigurationSettings)
+        self:Configure(
+            ConfigurationSettings
+        )
 
         if self._Configuration.AutoLoad then
             self:LoadConfig(
@@ -779,8 +867,14 @@ function OTC:CreateWindow(
         return OTC:ExportConfig(Name)
     end
 
-    function Window:ImportConfig(Name, Content)
-        return OTC:ImportConfig(Name, Content)
+    function Window:ImportConfig(
+        Name,
+        Content
+    )
+        return OTC:ImportConfig(
+            Name,
+            Content
+        )
     end
 
     return Window
