@@ -16,32 +16,10 @@ local MINIMIZE_ASSET =
 local CLOSE_ASSET =
     "rbxassetid://97642116681622"
 
-local ROMAN_REIGNS_IMAGE =
-    "rbxassetid://102159565539986"
-
-local ROMAN_REIGNS_USERS = {
-    [572117566] = true
-}
-
-local function IsRomanReignsTheme(Name)
-    return Name == "Roman Reigns"
-end
-
-local function IsRomanReignsAllowed()
-    if not LocalPlayer then
-        return false
-    end
-
-    return ROMAN_REIGNS_USERS[
-        LocalPlayer.UserId
-    ] == true
-end
+local SEARCH_ASSET =
+    "rbxassetid://122340561776969"
 
 local function Tween(Object, Info, Properties)
-    if not Object then
-        return
-    end
-
     local TweenObject =
         TweenService:Create(
             Object,
@@ -55,32 +33,64 @@ local function Tween(Object, Info, Properties)
 end
 
 local function GetTheme(Object)
-    return Object.OTC._Themes[
-        Object.Theme
-    ]
-    or Object.OTC._Themes[
-        Object.OTC.CurrentTheme
-    ]
-    or Object.OTC._Themes.Default
+    return Object.OTC._Themes[Object.Theme]
+        or Object.OTC._Themes[Object.OTC.CurrentTheme]
+        or Object.OTC._Themes.Default
+end
+
+local function IsThemeAllowed(OTC, Name)
+    if OTC._ThemeModule
+        and OTC._ThemeModule.IsAllowed then
+
+        return OTC._ThemeModule:IsAllowed(
+            Name,
+            LocalPlayer
+        )
+    end
+
+    return true
+end
+
+local function GetThemeAccessMessage(OTC, Name)
+    if OTC._ThemeModule
+        and OTC._ThemeModule.GetAccessMessage then
+
+        return OTC._ThemeModule:GetAccessMessage(
+            Name
+        )
+    end
+
+    return "You don't have permission to use this theme."
+end
+
+local function NotifyThemeDenied(Message)
+    warn("[OTC Hub] " .. tostring(Message))
+
+    pcall(function()
+        game:GetService("StarterGui"):SetCore(
+            "SendNotification",
+            {
+                Title = "OTC Hub",
+                Text = tostring(Message),
+                Duration = 4
+            }
+        )
+    end)
 end
 
 local function ApplyGradient(Object, GradientData)
-    if not Object then
+    if not Object or not GradientData then
         return nil
     end
 
     local Existing =
-        Object:FindFirstChild(
-            "OTCGradient"
-        )
+        Object:FindFirstChild("OTCGradient")
 
     if Existing then
         Existing:Destroy()
     end
 
-    if not GradientData
-        or GradientData.Enabled ~= true then
-
+    if GradientData.Enabled ~= true then
         return nil
     end
 
@@ -99,80 +109,31 @@ local function ApplyGradient(Object, GradientData)
     UIGradient.Rotation =
         GradientData.Rotation or 0
 
-    UIGradient.Parent =
-        Object
+    UIGradient.Parent = Object
 
     return UIGradient
 end
 
-local function ClearGradient(Object)
-    if not Object then
-        return
-    end
-
-    local Existing =
-        Object:FindFirstChild(
-            "OTCGradient"
-        )
-
-    if Existing then
-        Existing:Destroy()
-    end
-end
-
-local function ApplyOrClearGradient(
-    Object,
-    GradientData
-)
-    if not Object then
-        return nil
-    end
-
-    if GradientData then
-        return ApplyGradient(
-            Object,
-            GradientData
-        )
-    end
-
-    ClearGradient(Object)
-
-    return nil
-end
-
 local function ApplyCorner(Object, Radius)
-    if not Object
-        or Radius == nil then
-
+    if not Object or Radius == nil then
         return
     end
 
     local Corner =
-        Object:FindFirstChildOfClass(
-            "UICorner"
-        )
+        Object:FindFirstChildOfClass("UICorner")
 
     if Corner then
         Corner.CornerRadius =
-            UDim.new(
-                0,
-                Radius
-            )
+            UDim.new(0, Radius)
     end
 end
 
-local function ApplyStroke(
-    StrokeObject,
-    ThemeData
-)
-    if not StrokeObject
-        or not ThemeData then
-
+local function ApplyStroke(StrokeObject, ThemeData)
+    if not StrokeObject or not ThemeData then
         return
     end
 
-    local Stroke =
-        ThemeData.Stroke
+    local Stroke = ThemeData.Stroke
 
     if not Stroke then
         return
@@ -188,12 +149,9 @@ local function ApplyStroke(
         Stroke.Transparency or 0
 end
 
-function Window.Create(
-    Settings,
-    OTC
-)
-    Settings =
-        Settings or {}
+function Window.Create(Settings, OTC)
+
+    Settings = Settings or {}
 
     local ThemeName =
         Settings.Theme
@@ -201,49 +159,39 @@ function Window.Create(
         or "Default"
 
     if not OTC._Themes[ThemeName] then
-        ThemeName =
-            "Default"
+        ThemeName = "Default"
     end
 
-    if IsRomanReignsTheme(
-        ThemeName
-    ) and not IsRomanReignsAllowed() then
+    if not IsThemeAllowed(OTC, ThemeName) then
 
-        ThemeName =
-            "Default"
+        local Message =
+            GetThemeAccessMessage(
+                OTC,
+                ThemeName
+            )
+
+        NotifyThemeDenied(Message)
+
+        ThemeName = "Default"
     end
 
     local Object = {}
 
-    Object.OTC =
-        OTC
-
-    Object.Theme =
-        ThemeName
+    Object.OTC = OTC
+    Object.Theme = ThemeName
 
     Object.ToggleKey =
         Settings.ToggleKey
         or Enum.KeyCode.RightControl
 
     Object.Tabs = {}
-
-    Object.SelectedTab =
-        nil
-
-    Object.Minimized =
-        false
-
-    Object.Closed =
-        false
-
-    Object.UnloadConfirmation =
-        nil
-
-    Object.VersionPopup =
-        nil
-
-    Object.ThemeGradients =
-        {}
+    Object.SelectedTab = nil
+    Object.Minimized = false
+    Object.Closed = false
+    Object.UnloadConfirmation = nil
+    Object.VersionPopup = nil
+    Object.ThemeGradients = {}
+    Object.RomanArtwork = nil
 
     local Theme =
         GetTheme(Object)
@@ -264,8 +212,7 @@ function Window.Create(
         true
 
     pcall(function()
-        ScreenGui.Parent =
-            CoreGui
+        ScreenGui.Parent = CoreGui
     end)
 
     if not ScreenGui.Parent then
@@ -281,33 +228,22 @@ function Window.Create(
     local Main =
         Instance.new("Frame")
 
-    Main.Name =
-        "Main"
-
-    local WindowWidth =
-        tonumber(Settings.Width)
-        or 640
-
-    local WindowHeight =
-        tonumber(Settings.Height)
-        or 420
+    Main.Name = "Main"
 
     Main.Size =
-        Settings.Size
-        or UDim2.new(
+        UDim2.new(
             0,
-            WindowWidth,
+            560,
             0,
-            WindowHeight
+            380
         )
 
     Main.Position =
-        Settings.Position
-        or UDim2.new(
+        UDim2.new(
             0.5,
-            -WindowWidth / 2,
+            -280,
             0.5,
-            -WindowHeight / 2
+            -190
         )
 
     Main.BackgroundColor3 =
@@ -318,14 +254,9 @@ function Window.Create(
         and Theme.Transparency.Main
         or 0
 
-    Main.BorderSizePixel =
-        0
-
-    Main.ClipsDescendants =
-        true
-
-    Main.Parent =
-        ScreenGui
+    Main.BorderSizePixel = 0
+    Main.ClipsDescendants = true
+    Main.Parent = ScreenGui
 
     local MainCorner =
         Instance.new("UICorner")
@@ -335,11 +266,10 @@ function Window.Create(
             0,
             Theme.Corners
             and Theme.Corners.Main
-            or 18
+            or 10
         )
 
-    MainCorner.Parent =
-        Main
+    MainCorner.Parent = Main
 
     local MainStroke =
         Instance.new("UIStroke")
@@ -357,11 +287,6 @@ function Window.Create(
         and Theme.Stroke.Transparency
         or 0
 
-    MainStroke.Enabled =
-        Theme.Stroke
-        and Theme.Stroke.Enabled ~= false
-        or true
-
     MainStroke.Parent =
         Main
 
@@ -371,81 +296,6 @@ function Window.Create(
     Object.MainStroke =
         MainStroke
 
-    local ResponsiveScale =
-        Instance.new("UIScale")
-
-    ResponsiveScale.Scale =
-        1
-
-    ResponsiveScale.Parent =
-        Main
-
-    Object.ResponsiveScale =
-        ResponsiveScale
-
-    local ResponsiveConnection
-
-    local function UpdateResponsiveScale()
-        if Settings.Responsive == false then
-            ResponsiveScale.Scale = 1
-            return
-        end
-
-        local Camera =
-            workspace.CurrentCamera
-
-        if not Camera then
-            return
-        end
-
-        local Viewport =
-            Camera.ViewportSize
-
-        local Scale =
-            math.min(
-                Viewport.X / 720,
-                Viewport.Y / 520
-            )
-
-        Scale =
-            math.clamp(
-                Scale,
-                0.50,
-                1
-            )
-
-        Tween(
-            ResponsiveScale,
-            TweenInfo.new(
-                0.2,
-                Enum.EasingStyle.Quint,
-                Enum.EasingDirection.Out
-            ),
-            {
-                Scale = Scale
-            }
-        )
-    end
-
-    UpdateResponsiveScale()
-
-    if Settings.Responsive ~= false then
-        local Camera =
-            workspace.CurrentCamera
-
-        if Camera then
-            ResponsiveConnection =
-                Camera:GetPropertyChangedSignal(
-                    "ViewportSize"
-                ):Connect(
-                    UpdateResponsiveScale
-                )
-        end
-    end
-
-    Object.ResponsiveConnection =
-        ResponsiveConnection
-
     local RomanArtwork =
         Instance.new("ImageLabel")
 
@@ -453,15 +303,19 @@ function Window.Create(
         "RomanReignsArtwork"
 
     RomanArtwork.Size =
-        UDim2.fromScale(
-            1,
-            1
+        UDim2.new(
+            0,
+            300,
+            0,
+            300
         )
 
     RomanArtwork.Position =
-        UDim2.fromScale(
-            0,
-            0
+        UDim2.new(
+            1,
+            -315,
+            1,
+            -315
         )
 
     RomanArtwork.BackgroundTransparency =
@@ -470,14 +324,11 @@ function Window.Create(
     RomanArtwork.BorderSizePixel =
         0
 
-    RomanArtwork.Image =
-        ROMAN_REIGNS_IMAGE
-
     RomanArtwork.ImageTransparency =
-        0.35
+        0.72
 
     RomanArtwork.ScaleType =
-        Enum.ScaleType.Crop
+        Enum.ScaleType.Fit
 
     RomanArtwork.Active =
         false
@@ -486,19 +337,79 @@ function Window.Create(
         false
 
     RomanArtwork.Visible =
-        IsRomanReignsTheme(
-            ThemeName
-        )
-        and IsRomanReignsAllowed()
+        false
 
     RomanArtwork.ZIndex =
-        0
+        1
 
     RomanArtwork.Parent =
         Main
 
     Object.RomanArtwork =
         RomanArtwork
+
+    local function UpdateRomanArtwork(NewTheme)
+
+        local Artwork =
+            NewTheme.Artwork
+
+        if not Artwork
+            or Artwork.Enabled ~= true then
+
+            RomanArtwork.Visible =
+                false
+
+            RomanArtwork.Image =
+                ""
+
+            return
+        end
+
+        RomanArtwork.Size =
+            Artwork.Size
+            or UDim2.new(
+                0,
+                300,
+                0,
+                300
+            )
+
+        RomanArtwork.Position =
+            Artwork.Position
+            or UDim2.new(
+                1,
+                -315,
+                1,
+                -315
+            )
+
+        RomanArtwork.ImageTransparency =
+            Artwork.ImageTransparency
+            or 0.72
+
+        RomanArtwork.ZIndex =
+            Artwork.ZIndex or 1
+
+        local Image =
+            Artwork.Image
+
+        if type(Image) == "string"
+            and Image ~= "" then
+
+            RomanArtwork.Image =
+                Image
+
+            RomanArtwork.Visible =
+                true
+        else
+
+            RomanArtwork.Visible =
+                false
+
+            RomanArtwork.Image =
+                ""
+        end
+    end
 
     local TopBar =
         Instance.new("Frame")
@@ -533,55 +444,11 @@ function Window.Create(
     TopBar.BorderSizePixel =
         0
 
+    TopBar.ZIndex =
+        5
+
     TopBar.Parent =
         Main
-
-    local TopBarAccent =
-        Instance.new("Frame")
-
-    TopBarAccent.Name =
-        "AccentLine"
-
-    TopBarAccent.Size =
-        UDim2.new(
-            1,
-            -24,
-            0,
-            2
-        )
-
-    TopBarAccent.Position =
-        UDim2.new(
-            0,
-            12,
-            1,
-            -3
-        )
-
-    TopBarAccent.BackgroundColor3 =
-        Theme.Accent
-
-    TopBarAccent.BorderSizePixel =
-        0
-
-    TopBarAccent.ZIndex =
-        4
-
-    TopBarAccent.Parent =
-        TopBar
-
-    if Theme.Gradients
-        and Theme.Gradients.Accent then
-
-        ApplyGradient(
-            TopBarAccent,
-            Theme.Gradients.Accent
-        )
-
-    end
-
-    Object.TopBarAccent =
-        TopBarAccent
 
     local Logo =
         Instance.new("ImageLabel")
@@ -619,6 +486,9 @@ function Window.Create(
 
     Logo.ScaleType =
         Enum.ScaleType.Fit
+
+    Logo.ZIndex =
+        6
 
     Logo.Parent =
         TopBar
@@ -664,6 +534,9 @@ function Window.Create(
     Title.TextXAlignment =
         Enum.TextXAlignment.Left
 
+    Title.ZIndex =
+        6
+
     Title.Parent =
         TopBar
 
@@ -708,6 +581,9 @@ function Window.Create(
     Subtitle.TextXAlignment =
         Enum.TextXAlignment.Left
 
+    Subtitle.ZIndex =
+        6
+
     Subtitle.Parent =
         TopBar
 
@@ -728,7 +604,7 @@ function Window.Create(
     VersionTag.Position =
         UDim2.new(
             1,
-            -150,
+            -188,
             0.5,
             -11
         )
@@ -748,8 +624,8 @@ function Window.Create(
         false
 
     VersionTag.Text =
-        "v"
-        .. tostring(
+        "v" ..
+        tostring(
             OTC.Version
             or "1.0.0"
         )
@@ -763,12 +639,6 @@ function Window.Create(
     VersionTag.Font =
         Enum.Font.GothamBold
 
-    VersionTag.TextXAlignment =
-        Enum.TextXAlignment.Center
-
-    VersionTag.TextYAlignment =
-        Enum.TextYAlignment.Center
-
     VersionTag.ZIndex =
         10
 
@@ -779,10 +649,7 @@ function Window.Create(
         Instance.new("UICorner")
 
     VersionCorner.CornerRadius =
-        UDim.new(
-            0,
-            7
-        )
+        UDim.new(0, 7)
 
     VersionCorner.Parent =
         VersionTag
@@ -803,13 +670,10 @@ function Window.Create(
         and Theme.Stroke.Transparency
         or 0.3
 
-    VersionStroke.Enabled =
-        Theme.Stroke
-        and Theme.Stroke.Enabled ~= false
-        or true
-
     VersionStroke.Parent =
         VersionTag
+
+    -- SEARCH
 
     local SearchButton =
         Instance.new("ImageButton")
@@ -818,15 +682,17 @@ function Window.Create(
         "Search"
 
     SearchButton.Size =
-        UDim2.fromOffset(
+        UDim2.new(
+            0,
             34,
+            0,
             34
         )
 
     SearchButton.Position =
         UDim2.new(
             1,
-            -222,
+            -150,
             0.5,
             -17
         )
@@ -846,10 +712,16 @@ function Window.Create(
         false
 
     SearchButton.Image =
-        "rbxassetid://0"
+        SEARCH_ASSET
 
     SearchButton.ImageTransparency =
-        1
+        0
+
+    SearchButton.ScaleType =
+        Enum.ScaleType.Fit
+
+    SearchButton.ZIndex =
+        10
 
     SearchButton.Parent =
         TopBar
@@ -862,37 +734,12 @@ function Window.Create(
             0,
             Theme.Corners
             and Theme.Corners.Button
-            or 8
+            or 7
         )
 
     SearchCorner.Parent =
         SearchButton
 
-    local SearchStroke =
-        Instance.new("UIStroke")
-
-    SearchStroke.Color =
-        Theme.Border
-
-    SearchStroke.Thickness =
-        Theme.Stroke
-        and Theme.Stroke.Thickness
-        or 1
-
-    SearchStroke.Transparency =
-        Theme.Stroke
-        and Theme.Stroke.Transparency
-        or 0
-
-    SearchStroke.Enabled =
-        Theme.Stroke
-        and Theme.Stroke.Enabled ~= false
-        or true
-
-    SearchStroke.Parent =
-        SearchButton
-
-    --// Minimize Image Button
     local MinimizeButton =
         Instance.new("ImageButton")
 
@@ -910,7 +757,7 @@ function Window.Create(
     MinimizeButton.Position =
         UDim2.new(
             1,
-            -78,
+            -110,
             0.5,
             -17
         )
@@ -938,6 +785,9 @@ function Window.Create(
     MinimizeButton.ScaleType =
         Enum.ScaleType.Fit
 
+    MinimizeButton.ZIndex =
+        10
+
     MinimizeButton.Parent =
         TopBar
 
@@ -955,7 +805,6 @@ function Window.Create(
     MinimizeCorner.Parent =
         MinimizeButton
 
-    --// Close Image Button
     local CloseButton =
         Instance.new("ImageButton")
 
@@ -973,7 +822,7 @@ function Window.Create(
     CloseButton.Position =
         UDim2.new(
             1,
-            -40,
+            -72,
             0.5,
             -17
         )
@@ -1000,6 +849,9 @@ function Window.Create(
 
     CloseButton.ScaleType =
         Enum.ScaleType.Fit
+
+    CloseButton.ZIndex =
+        10
 
     CloseButton.Parent =
         TopBar
@@ -1051,6 +903,9 @@ function Window.Create(
     Sidebar.BorderSizePixel =
         0
 
+    Sidebar.ZIndex =
+        4
+
     Sidebar.Parent =
         Main
 
@@ -1077,99 +932,21 @@ function Window.Create(
         )
 
     Content.BackgroundColor3 =
-        Theme.Element
-        or Theme.Background
+        Theme.Background
 
     Content.BackgroundTransparency =
         Theme.Transparency
-        and Theme.Transparency.Element
+        and Theme.Transparency.Main
         or 0
 
     Content.BorderSizePixel =
         0
 
-    local ContentCorner =
-        Instance.new("UICorner")
-
-    ContentCorner.CornerRadius =
-        UDim.new(
-            0,
-            Theme.Corners
-            and Theme.Corners.Popup
-            or 14
-        )
-
-    ContentCorner.Parent =
-        Content
-
-    local ContentStroke =
-        Instance.new("UIStroke")
-
-    ContentStroke.Color =
-        Theme.Border
-
-    ContentStroke.Thickness =
-        Theme.Stroke
-        and Theme.Stroke.Thickness
-        or 1
-
-    ContentStroke.Transparency =
-        Theme.Stroke
-        and Theme.Stroke.Transparency
-        or 0
-
-    ContentStroke.Enabled =
-        Theme.Stroke
-        and Theme.Stroke.Enabled ~= false
-        or true
-
-    ContentStroke.Parent =
-        Content
+    Content.ZIndex =
+        3
 
     Content.Parent =
         Main
-
-    local SidebarTitle =
-        Instance.new("TextLabel")
-
-    SidebarTitle.Name =
-        "NavigationTitle"
-
-    SidebarTitle.Size =
-        UDim2.new(
-            1,
-            -24,
-            0,
-            18
-        )
-
-    SidebarTitle.Position =
-        UDim2.fromOffset(
-            12,
-            10
-        )
-
-    SidebarTitle.BackgroundTransparency =
-        1
-
-    SidebarTitle.Font =
-        Enum.Font.GothamBold
-
-    SidebarTitle.Text =
-        "NAVIGATION"
-
-    SidebarTitle.TextColor3 =
-        Theme.MutedText
-        or Theme.SubText
-
-    SidebarTitle.TextSize =
-        9
-
-    SidebarTitle.TextXAlignment =
-        Enum.TextXAlignment.Left
-
-    SidebarTitle.Parent =
-        Sidebar
 
     local TabsContainer =
         Instance.new("ScrollingFrame")
@@ -1182,7 +959,7 @@ function Window.Create(
             1,
             -16,
             1,
-            -106
+            -82
         )
 
     TabsContainer.Position =
@@ -1190,7 +967,7 @@ function Window.Create(
             0,
             8,
             0,
-            34
+            8
         )
 
     TabsContainer.BackgroundTransparency =
@@ -1214,6 +991,9 @@ function Window.Create(
             0
         )
 
+    TabsContainer.ZIndex =
+        5
+
     TabsContainer.Parent =
         Sidebar
 
@@ -1221,10 +1001,7 @@ function Window.Create(
         Instance.new("UIListLayout")
 
     TabsLayout.Padding =
-        UDim.new(
-            0,
-            5
-        )
+        UDim.new(0, 5)
 
     TabsLayout.SortOrder =
         Enum.SortOrder.LayoutOrder
@@ -1241,10 +1018,8 @@ function Window.Create(
                 0,
                 0,
                 0,
-                TabsLayout.AbsoluteContentSize.Y
-                + 8
+                TabsLayout.AbsoluteContentSize.Y + 8
             )
-
     end)
 
     local UserCard =
@@ -1258,7 +1033,7 @@ function Window.Create(
             1,
             -16,
             0,
-            58
+            60
         )
 
     UserCard.Position =
@@ -1266,7 +1041,7 @@ function Window.Create(
             0,
             8,
             1,
-            -66
+            -68
         )
 
     UserCard.BackgroundColor3 =
@@ -1279,6 +1054,9 @@ function Window.Create(
 
     UserCard.BorderSizePixel =
         0
+
+    UserCard.ZIndex =
+        6
 
     UserCard.Parent =
         Sidebar
@@ -1328,6 +1106,9 @@ function Window.Create(
     UserAvatar.BorderSizePixel =
         0
 
+    UserAvatar.ZIndex =
+        7
+
     UserAvatar.Parent =
         UserCard
 
@@ -1335,10 +1116,7 @@ function Window.Create(
         Instance.new("UICorner")
 
     AvatarCorner.CornerRadius =
-        UDim.new(
-            1,
-            0
-        )
+        UDim.new(1, 0)
 
     AvatarCorner.Parent =
         UserAvatar
@@ -1386,6 +1164,9 @@ function Window.Create(
     UserDisplay.TextTruncate =
         Enum.TextTruncate.AtEnd
 
+    UserDisplay.ZIndex =
+        7
+
     UserDisplay.Parent =
         UserCard
 
@@ -1418,8 +1199,7 @@ function Window.Create(
         Enum.Font.Gotham
 
     UserName.Text =
-        "@"
-        .. LocalPlayer.Name
+        "@" .. LocalPlayer.Name
 
     UserName.TextColor3 =
         Theme.SubText
@@ -1433,16 +1213,21 @@ function Window.Create(
     UserName.TextTruncate =
         Enum.TextTruncate.AtEnd
 
+    UserName.ZIndex =
+        7
+
     UserName.Parent =
         UserCard
 
     pcall(function()
+
         UserAvatar.Image =
             Players:GetUserThumbnailAsync(
                 LocalPlayer.UserId,
                 Enum.ThumbnailType.HeadShot,
                 Enum.ThumbnailSize.Size100x100
             )
+
     end)
 
     local MiniButton =
@@ -1494,9 +1279,6 @@ function Window.Create(
     Object.TopBar =
         TopBar
 
-    Object.TopBarAccent =
-        TopBarAccent
-
     Object.Logo =
         Logo
 
@@ -1515,9 +1297,6 @@ function Window.Create(
     Object.SearchButton =
         SearchButton
 
-    Object.SearchStroke =
-        SearchStroke
-
     Object.MinimizeButton =
         MinimizeButton
 
@@ -1529,9 +1308,6 @@ function Window.Create(
 
     Object.Content =
         Content
-
-    Object.ContentStroke =
-        ContentStroke
 
     Object.TabsContainer =
         TabsContainer
@@ -1557,67 +1333,59 @@ function Window.Create(
     local DragStart
     local StartPosition
 
-    TopBar.InputBegan:Connect(
-        function(Input)
+    TopBar.InputBegan:Connect(function(Input)
 
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseButton1
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseButton1
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
+
+            Dragging =
+                true
+
+            DragStart =
+                Input.Position
+
+            StartPosition =
+                Main.Position
+
+            Input.Changed:Connect(function()
+
+                if Input.UserInputState ==
+                    Enum.UserInputState.End then
+
+                    Dragging =
+                        false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+
+        if Dragging
+            and (
+                Input.UserInputType ==
+                    Enum.UserInputType.MouseMovement
                 or Input.UserInputType ==
-                Enum.UserInputType.Touch then
+                    Enum.UserInputType.Touch
+            ) then
 
-                Dragging =
-                    true
+            local Delta =
+                Input.Position -
+                DragStart
 
-                DragStart =
-                    Input.Position
-
-                StartPosition =
-                    Main.Position
-
-                Input.Changed:Connect(
-                    function()
-
-                        if Input.UserInputState ==
-                            Enum.UserInputState.End then
-
-                            Dragging =
-                                false
-
-                        end
-
-                    end
+            Main.Position =
+                UDim2.new(
+                    StartPosition.X.Scale,
+                    StartPosition.X.Offset +
+                        Delta.X,
+                    StartPosition.Y.Scale,
+                    StartPosition.Y.Offset +
+                        Delta.Y
                 )
-            end
         end
-    )
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if Dragging
-                and (
-                    Input.UserInputType ==
-                        Enum.UserInputType.MouseMovement
-                    or Input.UserInputType ==
-                        Enum.UserInputType.Touch
-                ) then
-
-                local Delta =
-                    Input.Position
-                    - DragStart
-
-                Main.Position =
-                    UDim2.new(
-                        StartPosition.X.Scale,
-                        StartPosition.X.Offset
-                            + Delta.X,
-                        StartPosition.Y.Scale,
-                        StartPosition.Y.Offset
-                            + Delta.Y
-                    )
-            end
-        end
-    )
+    end)
 
     local MiniDragging =
         false
@@ -1625,108 +1393,104 @@ function Window.Create(
     local MiniDragStart
     local MiniStartPosition
 
-    MiniButton.InputBegan:Connect(
-        function(Input)
+    MiniButton.InputBegan:Connect(function(Input)
 
-            if Input.UserInputType ==
-                Enum.UserInputType.MouseButton1
+        if Input.UserInputType ==
+            Enum.UserInputType.MouseButton1
+            or Input.UserInputType ==
+            Enum.UserInputType.Touch then
+
+            MiniDragging =
+                true
+
+            MiniDragStart =
+                Input.Position
+
+            MiniStartPosition =
+                MiniButton.Position
+
+            Input.Changed:Connect(function()
+
+                if Input.UserInputState ==
+                    Enum.UserInputState.End then
+
+                    MiniDragging =
+                        false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+
+        if MiniDragging
+            and (
+                Input.UserInputType ==
+                    Enum.UserInputType.MouseMovement
                 or Input.UserInputType ==
-                Enum.UserInputType.Touch then
+                    Enum.UserInputType.Touch
+            ) then
 
-                MiniDragging =
-                    true
+            local Delta =
+                Input.Position -
+                MiniDragStart
 
-                MiniDragStart =
-                    Input.Position
-
-                MiniStartPosition =
-                    MiniButton.Position
-
-                Input.Changed:Connect(
-                    function()
-
-                        if Input.UserInputState ==
-                            Enum.UserInputState.End then
-
-                            MiniDragging =
-                                false
-
-                        end
-
-                    end
+            MiniButton.Position =
+                UDim2.new(
+                    MiniStartPosition.X.Scale,
+                    MiniStartPosition.X.Offset +
+                        Delta.X,
+                    MiniStartPosition.Y.Scale,
+                    MiniStartPosition.Y.Offset +
+                        Delta.Y
                 )
-            end
         end
-    )
-
-    UserInputService.InputChanged:Connect(
-        function(Input)
-
-            if MiniDragging
-                and (
-                    Input.UserInputType ==
-                        Enum.UserInputType.MouseMovement
-                    or Input.UserInputType ==
-                        Enum.UserInputType.Touch
-                ) then
-
-                local Delta =
-                    Input.Position
-                    - MiniDragStart
-
-                MiniButton.Position =
-                    UDim2.new(
-                        MiniStartPosition.X.Scale,
-                        MiniStartPosition.X.Offset
-                            + Delta.X,
-                        MiniStartPosition.Y.Scale,
-                        MiniStartPosition.Y.Offset
-                            + Delta.Y
-                    )
-            end
-        end
-    )
+    end)
 
     function Object:GetTheme()
 
         return self.OTC._Themes[
             self.Theme
         ]
+
         or self.OTC._Themes[
             self.OTC.CurrentTheme
         ]
-        or self.OTC._Themes.Default
 
+        or self.OTC._Themes.Default
     end
 
     function Object:SetTheme(Name)
 
-        if not self.OTC._Themes[
-            Name
-        ] then
-
+        if not self.OTC._Themes[Name] then
             return false
-
         end
 
-        if IsRomanReignsTheme(Name)
-            and not IsRomanReignsAllowed() then
+        if not IsThemeAllowed(
+            self.OTC,
+            Name
+        ) then
 
-            warn(
-                "[OTC Hub] You don't have permission to use the Roman Reigns theme."
-            )
+            local Message =
+                GetThemeAccessMessage(
+                    self.OTC,
+                    Name
+                )
+
+            NotifyThemeDenied(Message)
 
             return false
-
         end
 
         self.Theme =
             Name
 
+        self.OTC.CurrentTheme =
+            Name
+
         self:RefreshTheme()
 
         return true
-
     end
 
     function Object:Toggle()
@@ -1740,7 +1504,6 @@ function Window.Create(
         else
             self:Minimize()
         end
-
     end
 
     function Object:Minimize()
@@ -1785,7 +1548,6 @@ function Window.Create(
                     )
             }
         )
-
     end
 
     function Object:Restore()
@@ -1830,10 +1592,8 @@ function Window.Create(
 
                 Main.Visible =
                     true
-
             end
         )
-
     end
 
     function Object:AddTab(TabObject)
@@ -1847,18 +1607,11 @@ function Window.Create(
             TabsContainer
 
         if not self.SelectedTab then
-
-            self:SelectTab(
-                TabObject
-            )
-
+            self:SelectTab(TabObject)
         end
-
     end
 
-    function Object:SelectTab(
-        TabObject
-    )
+    function Object:SelectTab(TabObject)
 
         if self.SelectedTab ==
             TabObject then
@@ -1871,17 +1624,14 @@ function Window.Create(
 
             self.SelectedTab.Page.Visible =
                 false
-
         end
 
         self.SelectedTab =
             TabObject
 
         if TabObject.Page then
-
             TabObject.Page.Visible =
                 true
-
         end
 
         for _, Tab in ipairs(
@@ -1893,369 +1643,8 @@ function Window.Create(
                 Tab:SetSelected(
                     Tab == TabObject
                 )
-
             end
-
         end
-
-    end
-
-    function Object:RefreshTheme()
-
-        local ThemeName =
-            self.Theme
-
-        if IsRomanReignsTheme(
-            ThemeName
-        ) and not IsRomanReignsAllowed() then
-
-            ThemeName =
-                "Default"
-
-            self.Theme =
-                "Default"
-
-        end
-
-        local NewTheme =
-            self.OTC._Themes[
-                ThemeName
-            ]
-            or self.OTC._Themes.Default
-
-        self.Theme =
-            ThemeName
-
-        local Transparency =
-            NewTheme.Transparency
-            or {}
-
-        local Stroke =
-            NewTheme.Stroke
-            or {}
-
-        local Corners =
-            NewTheme.Corners
-            or {}
-
-        local Gradients =
-            NewTheme.Gradients
-            or {}
-
-        local Effects =
-            NewTheme.Effects
-            or {}
-
-        local ShowRomanArtwork =
-            IsRomanReignsTheme(
-                ThemeName
-            )
-            and IsRomanReignsAllowed()
-
-        Main.BackgroundColor3 =
-            NewTheme.Background
-
-        Main.BackgroundTransparency =
-            Transparency.Main or 0
-
-        MainStroke.Color =
-            NewTheme.Border
-
-        MainStroke.Thickness =
-            Stroke.Thickness or 1
-
-        MainStroke.Transparency =
-            Stroke.Transparency or 0
-
-        MainStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        ApplyCorner(
-            Main,
-            Corners.Main or 10
-        )
-
-        TopBar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        TopBar.BackgroundTransparency =
-            Transparency.Secondary or 0
-
-        TopBarAccent.BackgroundColor3 =
-            NewTheme.Accent
-
-        Object.ThemeGradients.TopBarAccent =
-            ApplyOrClearGradient(
-                TopBarAccent,
-                Gradients.Accent
-            )
-
-        Sidebar.BackgroundColor3 =
-            NewTheme.Secondary
-
-        Sidebar.BackgroundTransparency =
-            Transparency.Secondary or 0
-
-        Content.BackgroundColor3 =
-            NewTheme.Element
-            or NewTheme.Background
-
-        Content.BackgroundTransparency =
-            Transparency.Element
-            or 0
-
-        ContentStroke.Color =
-            NewTheme.Border
-
-        ContentStroke.Thickness =
-            Stroke.Thickness or 1
-
-        ContentStroke.Transparency =
-            Stroke.Transparency or 0
-
-        ContentStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        Logo.Image =
-            LOGO_ASSET
-
-        Title.TextColor3 =
-            NewTheme.Text
-
-        Subtitle.TextColor3 =
-            NewTheme.SubText
-
-        VersionTag.BackgroundColor3 =
-            NewTheme.Element
-
-        VersionTag.TextColor3 =
-            NewTheme.Text
-
-        VersionStroke.Color =
-            NewTheme.Border
-
-        VersionStroke.Thickness =
-            Stroke.Thickness or 1
-
-        VersionStroke.Transparency =
-            Stroke.Transparency or 0.3
-
-        VersionStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        SearchButton.BackgroundColor3 =
-            NewTheme.Element
-
-        SearchButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        SearchStroke.Color =
-            NewTheme.Border
-
-        SearchStroke.Thickness =
-            Stroke.Thickness or 1
-
-        SearchStroke.Transparency =
-            Stroke.Transparency or 0
-
-        SearchStroke.Enabled =
-            Stroke.Enabled ~= false
-
-        MinimizeButton.BackgroundColor3 =
-            NewTheme.Element
-
-        MinimizeButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        MinimizeButton.Image =
-            MINIMIZE_ASSET
-
-        MinimizeButton.ImageTransparency =
-            0
-
-        CloseButton.BackgroundColor3 =
-            NewTheme.Element
-
-        CloseButton.BackgroundTransparency =
-            Transparency.Element or 0
-
-        CloseButton.Image =
-            CLOSE_ASSET
-
-        CloseButton.ImageTransparency =
-            0
-
-        ApplyCorner(
-            MinimizeButton,
-            Corners.Button or 7
-        )
-
-        ApplyCorner(
-            CloseButton,
-            Corners.Button or 7
-        )
-
-        SidebarTitle.TextColor3 =
-            NewTheme.MutedText
-            or NewTheme.SubText
-
-        TabsContainer.ScrollBarImageColor3 =
-            NewTheme.Scrollbar
-            or NewTheme.Border
-
-        UserCard.BackgroundColor3 =
-            NewTheme.Element
-
-        UserCard.BackgroundTransparency =
-            Transparency.Element or 0
-
-        UserAvatar.BackgroundColor3 =
-            NewTheme.Background
-
-        UserDisplay.TextColor3 =
-            NewTheme.Text
-
-        UserName.TextColor3 =
-            NewTheme.SubText
-
-        MiniButton.Image =
-            LOGO_ASSET
-
-        RomanArtwork.Image =
-            ROMAN_REIGNS_IMAGE
-
-        RomanArtwork.Visible =
-            ShowRomanArtwork
-
-        if ShowRomanArtwork then
-
-            Main.BackgroundTransparency =
-                1
-
-            TopBar.BackgroundTransparency =
-                0.42
-
-            Sidebar.BackgroundTransparency =
-                0.42
-
-            Content.BackgroundTransparency =
-                0.42
-
-        end
-
-        if not ShowRomanArtwork then
-
-            Main.BackgroundTransparency =
-                Transparency.Main or 0
-
-            TopBar.BackgroundTransparency =
-                Transparency.Secondary or 0
-
-            Sidebar.BackgroundTransparency =
-                Transparency.Secondary or 0
-
-            Content.BackgroundTransparency =
-                Transparency.Element or 0
-
-        end
-
-        Object.ThemeGradients.Main =
-            ApplyOrClearGradient(
-                Main,
-                Gradients.Main
-            )
-
-        Object.ThemeGradients.TopBar =
-            ApplyOrClearGradient(
-                TopBar,
-                Gradients.TopBar
-            )
-
-        Object.ThemeGradients.Sidebar =
-            ApplyOrClearGradient(
-                Sidebar,
-                Gradients.Sidebar
-            )
-
-        Object.ThemeGradients.UserCard =
-            ApplyOrClearGradient(
-                UserCard,
-                Gradients.Element
-            )
-
-        Object.ThemeGradients.Minimize =
-            ApplyOrClearGradient(
-                MinimizeButton,
-                Gradients.Element
-            )
-
-        Object.ThemeGradients.Close =
-            ApplyOrClearGradient(
-                CloseButton,
-                Gradients.Element
-            )
-
-        ApplyStroke(
-            MainStroke,
-            NewTheme
-        )
-
-        if Effects.AnimatedGradient then
-
-            for _, GradientObject in pairs(
-                Object.ThemeGradients
-            ) do
-
-                if GradientObject then
-
-                    task.spawn(
-                        function()
-
-                            local StartRotation =
-                                GradientObject.Rotation
-
-                            Tween(
-                                GradientObject,
-                                TweenInfo.new(
-                                    6,
-                                    Enum.EasingStyle.Linear,
-                                    Enum.EasingDirection.In,
-                                    -1
-                                ),
-                                {
-                                    Rotation =
-                                        StartRotation
-                                        + 360
-                                }
-                            )
-
-                        end
-                    )
-
-                end
-
-            end
-
-        end
-
-        for _, TabObject in ipairs(
-            self.Tabs
-        ) do
-
-            if TabObject.RefreshTheme then
-
-                pcall(
-                    function()
-
-                        TabObject:RefreshTheme()
-
-                    end
-                )
-
-            end
-
-        end
-
     end
 
     local function CreateUnloadConfirmation()
@@ -2265,7 +1654,15 @@ function Window.Create(
         end
 
         local CurrentTheme =
-            Object:GetTheme()
+            OTC._Themes[
+                Object.Theme
+            ]
+
+            or OTC._Themes[
+                OTC.CurrentTheme
+            ]
+
+            or OTC._Themes.Default
 
         local Overlay =
             Instance.new("Frame")
@@ -2278,6 +1675,14 @@ function Window.Create(
                 1,
                 0,
                 1,
+                0
+            )
+
+        Overlay.Position =
+            UDim2.new(
+                0,
+                0,
+                0,
                 0
             )
 
@@ -2326,6 +1731,11 @@ function Window.Create(
             CurrentTheme.PopupBackground
             or CurrentTheme.Background
 
+        Popup.BackgroundTransparency =
+            CurrentTheme.Transparency
+            and CurrentTheme.Transparency.Popup
+            or 0
+
         Popup.BorderSizePixel =
             0
 
@@ -2361,11 +1771,19 @@ function Window.Create(
             and CurrentTheme.Stroke.Thickness
             or 1
 
+        PopupStroke.Transparency =
+            CurrentTheme.Stroke
+            and CurrentTheme.Stroke.Transparency
+            or 0
+
         PopupStroke.Parent =
             Popup
 
         local PopupTitle =
             Instance.new("TextLabel")
+
+        PopupTitle.Name =
+            "Title"
 
         PopupTitle.BackgroundTransparency =
             1
@@ -2410,6 +1828,9 @@ function Window.Create(
         local PopupDescription =
             Instance.new("TextLabel")
 
+        PopupDescription.Name =
+            "Description"
+
         PopupDescription.BackgroundTransparency =
             1
 
@@ -2444,6 +1865,9 @@ function Window.Create(
         PopupDescription.TextWrapped =
             true
 
+        PopupDescription.TextXAlignment =
+            Enum.TextXAlignment.Left
+
         PopupDescription.ZIndex =
             102
 
@@ -2452,6 +1876,9 @@ function Window.Create(
 
         local CancelButton =
             Instance.new("TextButton")
+
+        CancelButton.Name =
+            "Cancel"
 
         CancelButton.Size =
             UDim2.new(
@@ -2476,6 +1903,12 @@ function Window.Create(
         CancelButton.BorderSizePixel =
             0
 
+        CancelButton.AutoButtonColor =
+            false
+
+        CancelButton.Font =
+            Enum.Font.GothamSemibold
+
         CancelButton.Text =
             "Cancel"
 
@@ -2484,9 +1917,6 @@ function Window.Create(
 
         CancelButton.TextSize =
             14
-
-        CancelButton.Font =
-            Enum.Font.GothamSemibold
 
         CancelButton.ZIndex =
             102
@@ -2511,6 +1941,9 @@ function Window.Create(
         local UnloadButton =
             Instance.new("TextButton")
 
+        UnloadButton.Name =
+            "Unload"
+
         UnloadButton.Size =
             UDim2.new(
                 0,
@@ -2533,6 +1966,12 @@ function Window.Create(
         UnloadButton.BorderSizePixel =
             0
 
+        UnloadButton.AutoButtonColor =
+            false
+
+        UnloadButton.Font =
+            Enum.Font.GothamSemibold
+
         UnloadButton.Text =
             "Unload"
 
@@ -2542,9 +1981,6 @@ function Window.Create(
 
         UnloadButton.TextSize =
             14
-
-        UnloadButton.Font =
-            Enum.Font.GothamSemibold
 
         UnloadButton.ZIndex =
             102
@@ -2573,15 +2009,12 @@ function Window.Create(
 
                 Object.UnloadConfirmation =
                     nil
-
             end
         )
 
         UnloadButton.MouseButton1Click:Connect(
             function()
-
                 Object:Unload()
-
             end
         )
 
@@ -2595,17 +2028,506 @@ function Window.Create(
             UnloadButton = UnloadButton
         }
 
+        Object:RefreshTheme()
     end
 
-    CloseButton.MouseButton1Click:Connect(
+    function Object:RefreshTheme()
+
+        local ThemeName =
+            self.Theme
+            or self.OTC.CurrentTheme
+
+        if not IsThemeAllowed(
+            self.OTC,
+            ThemeName
+        ) then
+
+            ThemeName =
+                "Default"
+        end
+
+        local NewTheme =
+            self.OTC._Themes[
+                ThemeName
+            ]
+
+            or self.OTC._Themes[
+                self.OTC.CurrentTheme
+            ]
+
+            or self.OTC._Themes.Default
+
+        self.Theme =
+            ThemeName
+
+        local Transparency =
+            NewTheme.Transparency
+            or {}
+
+        local Stroke =
+            NewTheme.Stroke
+            or {}
+
+        local Corners =
+            NewTheme.Corners
+            or {}
+
+        local Gradients =
+            NewTheme.Gradients
+            or {}
+
+        local Effects =
+            NewTheme.Effects
+            or {}
+
+        Main.BackgroundColor3 =
+            NewTheme.Background
+
+        Main.BackgroundTransparency =
+            Transparency.Main
+            or 0
+
+        MainStroke.Color =
+            NewTheme.Border
+
+        MainStroke.Thickness =
+            Stroke.Thickness
+            or 1
+
+        MainStroke.Transparency =
+            Stroke.Transparency
+            or 0
+
+        MainStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        ApplyCorner(
+            Main,
+            Corners.Main
+            or 10
+        )
+
+        TopBar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        TopBar.BackgroundTransparency =
+            Transparency.Secondary
+            or 0
+
+        Sidebar.BackgroundColor3 =
+            NewTheme.Secondary
+
+        Sidebar.BackgroundTransparency =
+            Transparency.Secondary
+            or 0
+
+        Content.BackgroundColor3 =
+            NewTheme.Background
+
+        Content.BackgroundTransparency =
+            Transparency.Main
+            or 0
+
+        Title.TextColor3 =
+            NewTheme.Text
+
+        Subtitle.TextColor3 =
+            NewTheme.SubText
+
+        VersionTag.BackgroundColor3 =
+            NewTheme.Element
+
+        VersionTag.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        VersionTag.Text =
+            "v" ..
+            tostring(
+                self.OTC.Version
+                or "1.0.0"
+            )
+
+        VersionTag.TextColor3 =
+            NewTheme.Text
+
+        VersionStroke.Color =
+            NewTheme.Border
+
+        VersionStroke.Thickness =
+            Stroke.Thickness
+            or 1
+
+        VersionStroke.Transparency =
+            Stroke.Transparency
+            or 0.3
+
+        VersionStroke.Enabled =
+            Stroke.Enabled ~= false
+
+        ApplyCorner(
+            VersionTag,
+            Corners.Button
+            or 7
+        )
+
+        SearchButton.BackgroundColor3 =
+            NewTheme.Button
+            or NewTheme.Element
+
+        SearchButton.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        SearchButton.Image =
+            SEARCH_ASSET
+
+        SearchButton.ImageTransparency =
+            0
+
+        ApplyCorner(
+            SearchButton,
+            Corners.Button
+            or 7
+        )
+
+        MinimizeButton.BackgroundColor3 =
+            NewTheme.Button
+            or NewTheme.Element
+
+        MinimizeButton.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        MinimizeButton.Image =
+            MINIMIZE_ASSET
+
+        MinimizeButton.ImageTransparency =
+            0
+
+        CloseButton.BackgroundColor3 =
+            NewTheme.Button
+            or NewTheme.Element
+
+        CloseButton.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        CloseButton.Image =
+            CLOSE_ASSET
+
+        CloseButton.ImageTransparency =
+            0
+
+        ApplyCorner(
+            MinimizeButton,
+            Corners.Button
+            or 7
+        )
+
+        ApplyCorner(
+            CloseButton,
+            Corners.Button
+            or 7
+        )
+
+        TabsContainer.ScrollBarImageColor3 =
+            NewTheme.Scrollbar
+            or NewTheme.Border
+
+        UserCard.BackgroundColor3 =
+            NewTheme.Element
+
+        UserCard.BackgroundTransparency =
+            Transparency.Element
+            or 0
+
+        UserAvatar.BackgroundColor3 =
+            NewTheme.Background
+
+        UserDisplay.TextColor3 =
+            NewTheme.Text
+
+        UserName.TextColor3 =
+            NewTheme.SubText
+
+        ApplyCorner(
+            UserCard,
+            Corners.Element
+            or 8
+        )
+
+        ApplyCorner(
+            UserAvatar,
+            999
+        )
+
+        MiniButton.Image =
+            LOGO_ASSET
+
+        for _, GradientObject in pairs(
+            Object.ThemeGradients
+        ) do
+
+            if GradientObject then
+                GradientObject:Destroy()
+            end
+        end
+
+        Object.ThemeGradients =
+            {}
+
+        if Gradients.Main then
+
+            Object.ThemeGradients.Main =
+                ApplyGradient(
+                    Main,
+                    Gradients.Main
+                )
+        end
+
+        if Gradients.TopBar then
+
+            Object.ThemeGradients.TopBar =
+                ApplyGradient(
+                    TopBar,
+                    Gradients.TopBar
+                )
+        end
+
+        if Gradients.Sidebar then
+
+            Object.ThemeGradients.Sidebar =
+                ApplyGradient(
+                    Sidebar,
+                    Gradients.Sidebar
+                )
+        end
+
+        if Gradients.Element then
+
+            Object.ThemeGradients.UserCard =
+                ApplyGradient(
+                    UserCard,
+                    Gradients.Element
+                )
+
+            Object.ThemeGradients.Search =
+                ApplyGradient(
+                    SearchButton,
+                    Gradients.Element
+                )
+
+            Object.ThemeGradients.Minimize =
+                ApplyGradient(
+                    MinimizeButton,
+                    Gradients.Element
+                )
+
+            Object.ThemeGradients.Close =
+                ApplyGradient(
+                    CloseButton,
+                    Gradients.Element
+                )
+        end
+
+        ApplyStroke(
+            MainStroke,
+            NewTheme
+        )
+
+        UpdateRomanArtwork(
+            NewTheme
+        )
+
+        if Effects.AnimatedGradient then
+
+            for _, GradientObject in pairs(
+                Object.ThemeGradients
+            ) do
+
+                if GradientObject then
+
+                    task.spawn(
+                        function()
+
+                            local StartRotation =
+                                GradientObject.Rotation
+
+                            Tween(
+                                GradientObject,
+                                TweenInfo.new(
+                                    6,
+                                    Enum.EasingStyle.Linear,
+                                    Enum.EasingDirection.In,
+                                    -1
+                                ),
+                                {
+                                    Rotation =
+                                        StartRotation +
+                                        360
+                                }
+                            )
+                        end
+                    )
+                end
+            end
+        end
+
+        if self.UnloadConfirmation then
+
+            local Popup =
+                self.UnloadConfirmation
+
+            Popup.Popup.BackgroundColor3 =
+                NewTheme.PopupBackground
+                or NewTheme.Background
+
+            Popup.Popup.BackgroundTransparency =
+                Transparency.Popup
+                or 0
+
+            Popup.PopupStroke.Color =
+                NewTheme.PopupBorder
+                or NewTheme.Border
+
+            Popup.PopupStroke.Thickness =
+                Stroke.Thickness
+                or 1
+
+            Popup.PopupStroke.Transparency =
+                Stroke.Transparency
+                or 0
+
+            Popup.Title.TextColor3 =
+                NewTheme.Text
+
+            Popup.Description.TextColor3 =
+                NewTheme.SubText
+
+            Popup.CancelButton.BackgroundColor3 =
+                NewTheme.Button
+                or NewTheme.Element
+
+            Popup.CancelButton.TextColor3 =
+                NewTheme.Text
+
+            Popup.UnloadButton.BackgroundColor3 =
+                NewTheme.Accent
+
+            Popup.UnloadButton.TextColor3 =
+                NewTheme.AccentText
+                or NewTheme.Background
+        end
+
+        for _, TabObject in ipairs(
+            self.Tabs
+        ) do
+
+            if TabObject.RefreshTheme then
+
+                pcall(function()
+
+                    TabObject:RefreshTheme()
+
+                end)
+            end
+        end
+    end
+
+    SearchButton.MouseButton1Click:Connect(
         function()
-            CreateUnloadConfirmation()
+
+            if Object.OpenSearch then
+
+                Object:OpenSearch()
+
+            elseif OTC._OpenSearch then
+
+                pcall(function()
+                    OTC._OpenSearch(Object)
+                end)
+
+            else
+
+                if Object.SearchOverlay then
+
+                    Object.SearchOverlay.Visible =
+                        not Object.SearchOverlay.Visible
+                end
+            end
+        end
+    )
+
+    SearchButton.MouseEnter:Connect(
+        function()
+
+            Tween(
+                SearchButton,
+                TweenInfo.new(
+                    0.12,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    Size =
+                        UDim2.new(
+                            0,
+                            38,
+                            0,
+                            38
+                        ),
+                    Position =
+                        UDim2.new(
+                            1,
+                            -152,
+                            0.5,
+                            -19
+                        )
+                }
+            )
+        end
+    )
+
+    SearchButton.MouseLeave:Connect(
+        function()
+
+            Tween(
+                SearchButton,
+                TweenInfo.new(
+                    0.12,
+                    Enum.EasingStyle.Quad,
+                    Enum.EasingDirection.Out
+                ),
+                {
+                    Size =
+                        UDim2.new(
+                            0,
+                            34,
+                            0,
+                            34
+                        ),
+                    Position =
+                        UDim2.new(
+                            1,
+                            -150,
+                            0.5,
+                            -17
+                        )
+                }
+            )
         end
     )
 
     MinimizeButton.MouseButton1Click:Connect(
         function()
             Object:Toggle()
+        end
+    )
+
+    CloseButton.MouseButton1Click:Connect(
+        function()
+            CreateUnloadConfirmation()
         end
     )
 
@@ -2633,17 +2555,15 @@ function Window.Create(
                             0,
                             38
                         ),
-
                     Position =
                         UDim2.new(
                             1,
-                            -80,
+                            -112,
                             0.5,
                             -19
                         )
                 }
             )
-
         end
     )
 
@@ -2665,17 +2585,15 @@ function Window.Create(
                             0,
                             34
                         ),
-
                     Position =
                         UDim2.new(
                             1,
-                            -78,
+                            -110,
                             0.5,
                             -17
                         )
                 }
             )
-
         end
     )
 
@@ -2697,17 +2615,15 @@ function Window.Create(
                             0,
                             38
                         ),
-
                     Position =
                         UDim2.new(
                             1,
-                            -42,
+                            -74,
                             0.5,
                             -19
                         )
                 }
             )
-
         end
     )
 
@@ -2729,17 +2645,15 @@ function Window.Create(
                             0,
                             34
                         ),
-
                     Position =
                         UDim2.new(
                             1,
-                            -40,
+                            -72,
                             0.5,
                             -17
                         )
                 }
             )
-
         end
     )
 
@@ -2749,59 +2663,31 @@ function Window.Create(
             return
         end
 
-        if self.OTC._Configuration
-            and self.OTC._Configuration.AutoSave
-            and self.OTC._ConfigDirty then
-
-            pcall(
-                function()
-                    self.OTC:SaveConfig()
-                end
-            )
-
-        end
-
         self.Closed =
             true
 
         if self.UnloadConfirmation then
 
             if self.UnloadConfirmation.Overlay then
+
                 self.UnloadConfirmation.Overlay:Destroy()
+
             end
 
             self.UnloadConfirmation =
                 nil
-
         end
 
         if self.VersionPopup then
 
             if self.VersionPopup.Overlay then
+
                 self.VersionPopup.Overlay:Destroy()
+
             end
 
             self.VersionPopup =
                 nil
-
-        end
-
-        if self.ResponsiveConnection then
-
-            self.ResponsiveConnection:Disconnect()
-
-            self.ResponsiveConnection =
-                nil
-
-        end
-
-        if self.RomanArtwork then
-
-            self.RomanArtwork:Destroy()
-
-            self.RomanArtwork =
-                nil
-
         end
 
         if self.ScreenGui then
@@ -2816,10 +2702,32 @@ function Window.Create(
                 OTC._Windows[Index] =
                     nil
             end
-
         end
-
     end
+
+    OTC._Windows[Object] =
+        Object
+
+    if OTC._InitializeInput then
+        OTC._InitializeInput()
+    end
+
+    if OTC._Animation
+        and OTC._Animation.Appear then
+
+        pcall(function()
+
+            OTC._Animation:Appear(
+                Main,
+                "Bottom",
+                20,
+                0.3
+            )
+
+        end)
+    end
+
+    Object:RefreshTheme()
 
     return Object
 end
