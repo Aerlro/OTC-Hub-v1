@@ -2,9 +2,9 @@ local Loader = {}
 
 local Root = script.Parent
 
-Loader.Version = "1.0.3"
+Loader.Version = "1.0.4"
 Loader.Latest = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/otc.lua"
-Loader.Versioned = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/versions/1.0.3/otc.lua"
+Loader.Versioned = "https://raw.githubusercontent.com/Aerlro/OTC-Hub-v1/main/versions/1.0.4/otc.lua"
 
 Loader.Core = {
     Window = require(Root.Core.window),
